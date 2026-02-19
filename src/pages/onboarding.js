@@ -11,9 +11,9 @@ import { changeLanguage, t } from '../utils/i18n.js';
 const ONBOARDING_KEY = 'bsm-onboarding-done';
 
 // Image assets (assumed to be in public or root served by Vite)
-const IMG_TASKY = './Tasky.png';
-const IMG_TASKY_EYES = './Tasky_yeux1.png';
-const IMG_TASKY_HAPPY = './Tasky_Happy.png';
+const IMG_TASKY = './Tasky.webp';
+const IMG_TASKY_EYES = './Tasky_yeux1.webp';
+const IMG_TASKY_HAPPY = './Tasky_Happy.webp';
 
 const STEPS = [
     {
@@ -160,9 +160,10 @@ function showStep(idx) {
 
             // USER REQUEST: Hide backdrop on Step 1 (Library) so they can interact
             // Step 0 = Lang, Step 1 = Library
+            // USER REQUEST: Hide backdrop on Step 1+ (Library, etc) so they can interact
             const backdropEl = document.getElementById('onboarding-backdrop');
             if (backdropEl) {
-                if (idx === 1) {
+                if (idx >= 1) {
                     backdropEl.style.display = 'none'; // Allow interaction
                     spotlightEl.style.display = 'none'; // Hide spotlight too as it might block or look weird
                 } else {
@@ -171,20 +172,13 @@ function showStep(idx) {
                 }
             }
 
-            if (navItem && spotlightEl && idx !== 1) {
-                // Scroll into view
-                navItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (navItem && spotlightEl && idx < 1) { // Only spotlight on step 0 if needed (or if we revert backdrop logic)
+                // ... unused logic for now if spotlight is hidden >= 1 ...
+            }
 
-                const rect = navItem.getBoundingClientRect();
-                spotlightEl.style.cssText = `
-                  left: ${rect.left - 6}px;
-                  top: ${rect.top - 4}px;
-                  width: ${rect.width + 12}px;
-                  height: ${rect.height + 8}px;
-                  opacity: 1;
-                `;
-            } else {
-                spotlightEl.style.opacity = '0';
+            // Still scroll to item
+            if (navItem) {
+                navItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
             renderBubble(step, idx);
@@ -209,8 +203,8 @@ function renderBubble(step, idx) {
     }
 
     // Position
-    const isMobile = window.innerWidth <= 500;
-    const bottom = isMobile ? 24 : 32;
+    const isMobile = window.innerWidth <= 768;
+    const bottom = isMobile ? 80 : 32;
     const left = isMobile ? 12 : 280;
 
     // For language select, center it
@@ -244,7 +238,6 @@ function renderBubble(step, idx) {
          `;
     } else {
         const title = step.titleKey ? t(step.titleKey) : step.title;
-        // Use t() for text if we have keys, otherwise raw text
         const text = step.textKey ? t(step.textKey) : step.text;
 
         const dotsHtml = STEPS.map((_, i) =>
@@ -256,6 +249,7 @@ function renderBubble(step, idx) {
             <div class="onboarding-bubble-title">${title}</div>
             <div class="onboarding-bubble-text">${text}</div>
             <div class="onboarding-bubble-actions">
+                ${idx > 1 ? `<button class="onboarding-btn-prev" id="onboarding-prev" style="background:transparent; border:1px solid var(--border-default); color:var(--text-secondary); padding:6px 12px; border-radius:6px; cursor:pointer;">←</button>` : ''}
                 <button class="onboarding-btn-next" id="onboarding-next">
                 ${isLast ? "🎉 " + t('common.finish') : t('common.next') + ' →'}
                 </button>
@@ -283,6 +277,10 @@ function renderBubble(step, idx) {
             } else {
                 showStep(idx + 1);
             }
+        });
+
+        document.getElementById('onboarding-prev')?.addEventListener('click', () => {
+            showStep(idx - 1);
         });
 
         document.getElementById('onboarding-skip')?.addEventListener('click', () => {

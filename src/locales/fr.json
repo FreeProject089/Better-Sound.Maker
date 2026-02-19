@@ -16,6 +16,11 @@
         "finish": "Terminer",
         "on": "ON",
         "off": "OFF",
+        "parameter": "Paramètre",
+        "type": "Type",
+        "default": "Défaut",
+        "description": "Description",
+        "notes": "Notes",
         "pageNotFound": "Page non trouvée"
     },
     "nav": {
@@ -37,6 +42,36 @@
             "help": "AIDE"
         },
         "tutorial": "Relancer Tuto"
+    },
+    "presetsPage": {
+        "title": "Préréglages & Modèles",
+        "desc": "Enregistrez vos sélections d'assets comme préréglages. Partagez-les ou basculez rapidement entre les configurations.",
+        "createTitle": "Créer un Nouveau Préréglage",
+        "presetName": "Nom du Préréglage",
+        "namePlaceholder": "ex: Hornet Complet, Armes uniquement...",
+        "saveBtn": "Enregistrer la Sélection ({count} assets)",
+        "noSelectionWarning": "Aucun asset sélectionné — choisissez-en d'abord dans la Bibliothèque",
+        "savedPresets": "Préréglages Enregistrés ({count})",
+        "importBtn": "Importer un Préréglage",
+        "emptyTitle": "Aucun Préréglage Enregistré",
+        "emptyDesc": "Créez votre premier préréglage en sélectionnant des assets dans la Bibliothèque, puis enregistrez-les ici.",
+        "assetsLabel": "{count} assets",
+        "applyBtn": "Appliquer",
+        "exportBtn": "Exporter",
+        "loadLibraryBtn": "Charger la Bibliothèque",
+        "libraryRequired": "Bibliothèque non chargée — les données sont requises pour appliquer les préréglages.",
+        "applyConfirm": {
+            "title": "Appliquer le Préréglage ?",
+            "content1": "Vous avez actuellement <strong>{count} assets</strong> sélectionnés.",
+            "content2": "L'application de ce préréglage va <strong>ajouter {count} assets</strong> à votre sélection.",
+            "tip": "💡 Vous pouvez d'abord enregistrer votre sélection actuelle comme préréglage pour ne pas la perdre.",
+            "saveAndApply": "💾 Sauvegarder & Appliquer",
+            "applyOnly": "Appliquer sans sauvegarder"
+        },
+        "deleteConfirm": {
+            "title": "Supprimer le Préréglage",
+            "content": "Êtes-vous sûr de vouloir supprimer ce préréglage ?"
+        }
     },
     "project": {
         "title": "Projets",
@@ -219,6 +254,11 @@
         }
     },
     "docs_content": {
+        "defaults": {
+            "title": "Valeurs par Défaut",
+            "desc": "Si un paramètre est absent du SDEF, DCS utilise ces valeurs par défaut internes.",
+            "note": "Note : Certains modules d'avion peuvent outrepasser ces valeurs par défaut globales."
+        },
         "audio": {
             "title": "🎵 Guide Audio pour le Modding DCS",
             "monoStereo": {
@@ -322,34 +362,29 @@
             }
         },
         "f18": {
-            "title": "Référence Sonore Complète F/A-18C",
-            "desc": "Basé sur le mod BetterHornet — tous les fichiers SDEF et WAV détaillés.",
-            "tipMono": "<strong>🚨 MONO vs STÉRÉO :</strong><br><strong>MONO (1 Canal) :</strong> OBLIGATOIRE pour tout ce qui est <strong>extérieur / 3D</strong>. DCS place le son dans l'espace.<br><strong>STÉRÉO (2 Canaux) :</strong> Pour les sons <strong>\"Ambiance\" / \"dans le casque\"</strong> (vent, ECS, respiration pilote).",
-            "warningLoop": "<strong>🔄 Durée des Loops :</strong><br><strong>Standard (4-8s) :</strong> Recommandé, évite les problèmes de pitch variable.<br><strong>Pro (30s+) :</strong> Plus réaliste mais le régime moteur doit être parfaitement stable sinon DCS créera des artefacts audibles (\"pleurage\").",
+            "title": "Référence Sonore F/A-18C",
+            "desc": "Guide détaillé pour le modding sonore du Hornet. Référencez ces chemins et paramètres pour vos sons personnalisés.",
+            "tipMono": "<strong>Moteurs & Cockpit :</strong> La plupart des sons extérieurs et des switchs intérieurs sont en Mono pour le positionnement 3D.",
+            "warningLoop": "<strong>Boucles Moteur :</strong> Assurez-vous que vos boucles de démarrage/arrêt/ralenti ont des crossfades précis pour éviter les clics.",
             "sections": {
-                "engines": "Moteurs & APU (Externe) — MONO",
-                "flyby": "Sons Distants (Flyby) — MONO",
-                "cockpit": "Cockpit (Interne) — STÉRÉO",
-                "switches": "Switchs (Sw01-15) — MONO",
-                "betty": "Betty (Alertes Vocales)",
-                "tones": "Tones (RWR & Alertes)",
-                "weapons": "Weapons (Armement) — MONO",
-                "explosions": "Explosions — MONO",
-                "damage": "Dégâts & Personnel",
-                "customTips": "Astuces de Customisation SDEF",
-                "randomLists": "Listes Aléatoires"
+                "engines": "Sons Moteur (Ext)",
+                "flyby": "Effets de Flyby",
+                "cockpit": "Ambiance Cockpit",
+                "switches": "Boutons & Interrupteurs",
+                "betty": "Alertes Vocales (Betty)",
+                "tones": "Tonalités d'Alerte",
+                "weapons": "Canon & Missiles",
+                "explosions": "Explosions",
+                "damage": "Effets de Dégâts",
+                "customTips": "Astuces Pro pour le Hornet",
+                "randomLists": "Sons Aléatoires"
             },
             "tips": {
-                "enginePitch": "<strong>🔊 Moteurs (plus \"Gras\" ou \"Aigu\") :</strong><br><code>pitch = 0.9</code> → Plus grave/lent (Rumble profond)<br><code>pitch = 1.1</code> → Plus aigu/rapide (Turbine stridente)<br><code>gain = 2.0</code> → Double le volume (⚠ saturation!)",
-                "cockpitQuiet": "<strong>🔇 Cockpit (Rendre plus silencieux) :</strong><br><code>gain = 0.3</code> → Si un son (ECS/Clim) casse les oreilles<br><code>inner_radius = 5</code> → Réduit la zone d'impact",
-                "explosionsDist": "<strong>💥 Explosions (Rendre plus \"Loin\") :</strong><br><code>pitch_random = 0.2</code> → Chaque explosion aura un pitch différent (±20%) — anti-robot<br><code>distance_filter_offset = 1000</code> → Son clair même de loin",
-                "randomListDesc": "Idéal pour les explosions, switchs, bruits mécaniques — chaque activation est unique."
+                "enginePitch": "Les moteurs utilisent la modulation de <code>pitch</code> basée sur la plage de RPM.",
+                "cockpitQuiet": "Gardez le gain des switchs du cockpit autour de 0.6-0.8 pour plus de réalisme.",
+                "explosionsDist": "Les explosions ont besoin d'un large <code>outer_radius</code> (15000+) pour être entendues de loin.",
+                "randomListDesc": "Utilisez une liste de fichiers pour <code>wave</code> afin d'éviter les schémas sonores répétitifs."
             }
-        },
-        "defaults": {
-            "title": "Valeurs par Défaut Recommandées",
-            "desc": "Le créateur de mod remplit automatiquement ces valeurs selon le type de son :",
-            "note": "Note : Un \"—\" signifie que la valeur par défaut du moteur DCS est utilisée."
         }
     },
     "creditsPage": {

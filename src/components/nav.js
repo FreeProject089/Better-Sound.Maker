@@ -39,7 +39,7 @@ export function renderNav(container) {
   container.innerHTML = `
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <img src="/BetterSoundMod.png" alt="Better Sound.Maker" class="sidebar-brand-img" />
+        <img src="/BetterSoundMod.webp" alt="Better Sound.Maker" class="sidebar-brand-img" />
       </div>
     </div>
     
@@ -59,7 +59,7 @@ export function renderNav(container) {
     </div>
 
     <div style="padding: 14px 18px; border-top: 1px solid var(--border-subtle);">
-      <div style="font-size: 11px; color: var(--text-muted);">DCS 2.9.8.1214</div>
+      <div style="font-size: 11px; color: var(--text-muted);">DCS 2.9 &More</div>
     </div>
   `;
 

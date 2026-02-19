@@ -3,60 +3,86 @@
  * Save, load, share, and apply asset selection presets
  */
 
-import { getState, savePreset, deletePreset, importPreset, selectAsset, isAssetSelected, subscribe, setLibraryData } from '../state/store.js';
+import { getState, savePreset, deletePreset, importPreset, selectAsset, isAssetSelected, subscribe, setLibraryData, loadLibraryFromStorage, saveLibraryToStorage } from '../state/store.js';
+import { getIcon, renderIcons } from '../utils/icons.js';
+import { t } from '../utils/i18n.js';
 import { showToast } from '../components/toast.js';
 import { showModal } from '../components/modal.js';
 import { pickJsonFile } from '../utils/file-picker.js';
+import { parseSdefList } from '../data/sdef-parser.js';
 
-export function renderPresets(container) {
+export async function renderPresets(container) {
   const state = getState();
   const presets = state.presets || [];
   const selectedCount = Object.keys(state.selectedAssets).length;
+  const isLibraryLoaded = !!state.libraryData;
+
+  // Auto-load library from storage if not loaded
+  if (!isLibraryLoaded) {
+    const cached = await loadLibraryFromStorage();
+    if (cached) {
+      // Re-render to update the isLibraryLoaded status
+      renderPresets(container);
+      return;
+    }
+  }
 
   container.innerHTML = `
     <div class="page-header">
-      <h1 class="page-title">Presets & Templates</h1>
-      <p class="page-description">Save your asset selections as presets. Share them or quickly switch between configurations.</p>
+      <h1 class="page-title">${t('presetsPage.title')}</h1>
+      <p class="page-description">${t('presetsPage.desc')}</p>
     </div>
 
     <div class="card" style="margin-bottom: 24px;">
       <div class="card-header">
-        <div class="card-title">Create New Preset</div>
+        <div class="card-title">${t('presetsPage.createTitle')}</div>
       </div>
       <div style="display: flex; gap: 12px; align-items: end;">
         <div class="input-group" style="flex: 1;">
-          <label class="input-label">Preset Name</label>
-          <input type="text" class="input-field" id="preset-name" placeholder="e.g., F/A-18C Complete, Weapons Only..." />
+          <label class="input-label">${t('presetsPage.presetName')}</label>
+          <input type="text" class="input-field" id="preset-name" placeholder="${t('presetsPage.namePlaceholder')}" />
         </div>
         <button class="btn btn-primary" id="save-preset-btn">
-          ${getIcon('save', 'w-4 h-4')} Save Current Selection (${selectedCount} assets)
+          ${getIcon('save', 'w-4 h-4')} ${t('presetsPage.saveBtn', { count: selectedCount })}
         </button>
       </div>
-      ${selectedCount === 0 ? `<div style="font-size: 12px; color: var(--accent-amber); margin-top: 8px;">${getIcon('alert-circle', 'w-3 h-3')} No assets selected — select some in the Library first</div>` : ''}
+      ${selectedCount === 0 ? `<div style="font-size: 12px; color: var(--accent-amber); margin-top: 8px;">${getIcon('alert-circle', 'w-3 h-3')} ${t('presetsPage.noSelectionWarning')}</div>` : ''}
     </div>
 
     <div class="flex-between" style="margin-bottom: 16px;">
-      <h2 style="font-size: 18px; font-weight: 600;">Saved Presets (${presets.length})</h2>
+      <h2 style="font-size: 18px; font-weight: 600;">${t('presetsPage.savedPresets', { count: presets.length })}</h2>
       <div class="flex-gap">
-        <button class="btn btn-secondary btn-sm" id="import-preset-btn">${getIcon('download', 'w-4 h-4')} Import Preset</button>
+        ${!isLibraryLoaded ? `<button class="btn btn-warning btn-sm" id="load-library-presets-btn">${getIcon('refresh-cw', 'w-4 h-4')} ${t('presetsPage.loadLibraryBtn')}</button>` : ''}
+        <button class="btn btn-secondary btn-sm" id="import-preset-btn">${getIcon('download', 'w-4 h-4')} ${t('presetsPage.importBtn')}</button>
       </div>
     </div>
+
+    ${!isLibraryLoaded ? `
+      <div class="tip-box" style="margin-bottom: 20px; border-left-color: var(--accent-amber);">
+        ${getIcon('alert-triangle', 'w-4 h-4')} ${t('presetsPage.libraryRequired')}
+      </div>
+    ` : ''}
 
     ${presets.length === 0 ? `
       <div class="empty-state" style="padding: 40px;">
         <div class="empty-state-icon">${getIcon('save', 'icon-xl')}</div>
-        <div class="empty-state-title">No Presets Saved</div>
-        <div class="empty-state-text">Create your first preset by selecting assets in the Library, then saving them here.</div>
+        <div class="empty-state-title">${t('presetsPage.emptyTitle')}</div>
+        <div class="empty-state-text">${t('presetsPage.emptyDesc')}</div>
       </div>
     ` : `
       <div class="grid-2">
         ${presets.map((preset, idx) => `
           <div class="card">
             <div class="flex-between" style="margin-bottom: 12px;">
-              <div>
-                <div class="card-title">${preset.name}</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                  ${new Date(preset.date).toLocaleDateString()} — ${preset.assetPaths.length} assets
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="font-size: 20px; color: var(--accent-blue); padding-top: 2px;">
+                  ${getIcon('layers', 'w-5 h-5')}
+                </div>
+                <div>
+                  <div class="card-title">${preset.name}</div>
+                  <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                    ${new Date(preset.date).toLocaleDateString()} — ${t('presetsPage.assetsLabel', { count: preset.assetPaths.length })}
+                  </div>
                 </div>
               </div>
               <span class="tag tag-blue">${preset.assetPaths.length}</span>
@@ -68,8 +94,8 @@ export function renderPresets(container) {
               ${preset.assetPaths.length > 8 ? `<div style="font-size: 11px; color: var(--text-muted);">... and ${preset.assetPaths.length - 8} more</div>` : ''}
             </div>
             <div class="flex-gap">
-              <button class="btn btn-primary btn-sm" data-apply-preset="${idx}">Apply</button>
-              <button class="btn btn-secondary btn-sm" data-export-preset="${idx}">${getIcon('upload', 'w-4 h-4')} Export</button>
+              <button class="btn btn-primary btn-sm" data-apply-preset="${idx}">${t('presetsPage.applyBtn')}</button>
+              <button class="btn btn-secondary btn-sm" data-export-preset="${idx}">${getIcon('upload', 'w-4 h-4')} ${t('presetsPage.exportBtn')}</button>
               <button class="btn btn-danger btn-sm" data-delete-preset="${idx}">${getIcon('trash-2', 'w-4 h-4')}</button>
             </div>
           </div>
@@ -87,12 +113,32 @@ export function renderPresets(container) {
       return;
     }
     if (selectedCount === 0) {
-      showToast('No assets selected', 'warning');
+      showToast(t('presetsPage.noSelectionWarning'), 'warning');
       return;
     }
     savePreset(name);
-    showToast(`Preset "${name}" saved with ${selectedCount} assets`, 'success');
+    showToast(`Preset "${name}" saved`, 'success');
     renderPresets(container);
+  });
+
+  document.getElementById('load-library-presets-btn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('load-library-presets-btn');
+    btn.disabled = true;
+    btn.innerHTML = `${getIcon('refresh-cw', 'w-4 h-4 spin')} Loading...`;
+
+    try {
+      const resp = await fetch('/sdef_and_wave_list.txt');
+      const text = await resp.text();
+      const data = parseSdefList(text);
+      setLibraryData(data);
+      await saveLibraryToStorage(data);
+      showToast('Library loaded successfully', 'success');
+      renderPresets(container);
+    } catch (e) {
+      showToast('Failed to load library: ' + e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = `${getIcon('refresh-cw', 'w-4 h-4')} ${t('presetsPage.loadLibraryBtn')}`;
+    }
   });
 
   document.getElementById('import-preset-btn')?.addEventListener('click', () => importPresetFromFile(container));
@@ -109,11 +155,11 @@ export function renderPresets(container) {
     btn.addEventListener('click', async () => {
       const idx = parseInt(btn.dataset.deletePreset);
       const result = await showModal({
-        title: 'Delete Preset',
-        content: `<p>Are you sure you want to delete this preset?</p>`,
+        title: t('presetsPage.deleteConfirm.title'),
+        content: `<p>${t('presetsPage.deleteConfirm.content')}</p>`,
         actions: [
-          { id: 'cancel', label: 'Cancel', class: 'btn-secondary' },
-          { id: 'delete', label: 'Delete', class: 'btn-danger' }
+          { id: 'cancel', label: t('common.cancel'), class: 'btn-secondary' },
+          { id: 'delete', label: t('common.delete'), class: 'btn-danger' }
         ]
       });
       if (result === 'delete') {
@@ -123,6 +169,9 @@ export function renderPresets(container) {
       }
     });
   });
+
+  // Render icons (Lucide)
+  renderIcons(container);
 }
 
 async function applyPreset(idx, container) {
@@ -140,18 +189,18 @@ async function applyPreset(idx, container) {
   const currentCount = Object.keys(state.selectedAssets).length;
   if (currentCount > 0) {
     const result = await showModal({
-      title: '⚠ Apply Preset?',
+      title: t('presetsPage.applyConfirm.title'),
       content: `
-        <p>You currently have <strong>${currentCount} assets</strong> selected.</p>
-        <p>Applying this preset will <strong>add ${preset.assetPaths.length} assets</strong> to your selection.</p>
+        <p>${t('presetsPage.applyConfirm.content1', { count: currentCount })}</p>
+        <p>${t('presetsPage.applyConfirm.content2', { count: preset.assetPaths.length })}</p>
         <p style="margin-top: 12px; color: var(--text-muted); font-size: 13px;">
-          💡 You can save your current selection as a preset first to avoid losing it.
+          ${t('presetsPage.applyConfirm.tip')}
         </p>
       `,
       actions: [
-        { id: 'cancel', label: 'Cancel', class: 'btn-secondary' },
-        { id: 'save-first', label: '💾 Save Current & Apply', class: 'btn-primary' },
-        { id: 'apply', label: 'Apply Without Saving', class: 'btn-warning' }
+        { id: 'cancel', label: t('common.cancel'), class: 'btn-secondary' },
+        { id: 'save-first', label: t('presetsPage.applyConfirm.saveAndApply'), class: 'btn-primary' },
+        { id: 'apply', label: t('presetsPage.applyConfirm.applyOnly'), class: 'btn-warning' }
       ]
     });
 

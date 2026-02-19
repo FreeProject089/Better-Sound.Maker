@@ -16,6 +16,11 @@
         "finish": "Finish",
         "on": "ON",
         "off": "OFF",
+        "parameter": "Parameter",
+        "type": "Type",
+        "default": "Default",
+        "description": "Description",
+        "notes": "Notes",
         "pageNotFound": "Page not found"
     },
     "nav": {
@@ -29,6 +34,7 @@
         "docs": "Documentation",
         "presets": "Presets",
         "credits": "Credits",
+        "tutorial": "Tutorial",
         "section": {
             "workspace": "WORKSPACE",
             "customization": "CUSTOMIZATION",
@@ -37,9 +43,40 @@
             "help": "HELP"
         }
     },
+    "presetsPage": {
+        "title": "Presets & Templates",
+        "desc": "Save your asset selections as presets. Share them or quickly switch between configurations.",
+        "createTitle": "Create New Preset",
+        "presetName": "Preset Name",
+        "namePlaceholder": "e.g., F/A-18C Complete, Weapons Only...",
+        "saveBtn": "Save Current Selection ({count} assets)",
+        "noSelectionWarning": "No assets selected — select some in the Library first",
+        "savedPresets": "Saved Presets ({count})",
+        "importBtn": "Import Preset",
+        "emptyTitle": "No Presets Saved",
+        "emptyDesc": "Create your first preset by selecting assets in the Library, then saving them here.",
+        "assetsLabel": "{count} assets",
+        "applyBtn": "Apply",
+        "exportBtn": "Export",
+        "loadLibraryBtn": "Load Library Data",
+        "libraryRequired": "Library not loaded — data is required to apply presets.",
+        "applyConfirm": {
+            "title": "Apply Preset?",
+            "content1": "You currently have <strong>{count} assets</strong> selected.",
+            "content2": "Applying this preset will <strong>add {count} assets</strong> to your selection.",
+            "tip": "💡 You can save your current selection as a preset first to avoid losing it.",
+            "saveAndApply": "💾 Save Current & Apply",
+            "applyOnly": "Apply Without Saving"
+        },
+        "deleteConfirm": {
+            "title": "Delete Preset",
+            "content": "Are you sure you want to delete this preset?"
+        }
+    },
     "project": {
         "title": "Projects",
         "description": "Manage your selected sound assets and upload custom audio files.",
+        "manageSubtitle": "Manage {count} selected assets. Upload your audio and configure each asset.",
         "createTitle": "Create New Project",
         "name": "Project Name",
         "desc": "Description",
@@ -114,6 +151,31 @@
             "envelope": "Envelope (Attack/Release)",
             "stereo": "Stereo Settings",
             "doppler": "Doppler Effect"
+        },
+        "params": {
+            "inherit": "Inherit from (.sdef)",
+            "wave": "Wave file path",
+            "gain": "Sound Gain (Volume)",
+            "pitch": "Sound Pitch (Frequency)",
+            "lowpass": "Lowpass Filter",
+            "position": "Relative Position",
+            "silent_radius": "Silent Radius",
+            "peak_radius": "Peak Volume Radius",
+            "inner_radius": "Reference Radius (Inner)",
+            "outer_radius": "Maximum Radius (Outer)",
+            "direction": "Direction Vector",
+            "cone_inner_angle": "Cone Inner Angle",
+            "cone_outer_angle": "Cone Outer Angle",
+            "cone_outer_gain": "Cone Outer Gain",
+            "cone_outer_lowpass": "Cone Outer Lowpass",
+            "detached": "Detached (One-Shot)",
+            "streaming": "Streaming Mode",
+            "listmode": "List Mode (Random/Seq)",
+            "attack": "Attack Time",
+            "release": "Release Time",
+            "auto_width": "Auto Width",
+            "nodoppler": "Disable Doppler",
+            "distance_filter_offset": "Distance Filter Offset"
         }
     },
     "themePage": {
@@ -165,6 +227,11 @@
         "finished": "You're all set! Enjoy modding."
     },
     "docs_content": {
+        "defaults": {
+            "title": "Recommended Defaults per Sound Type",
+            "desc": "The mod creator auto-fills these values based on sound type:",
+            "note": "Note: A \"—\" means the default of the engine is used."
+        },
         "audio": {
             "title": "🎵 Audio Guide for DCS Sound Modding",
             "monoStereo": {
@@ -246,6 +313,51 @@
             "trouble": "Troubleshooting",
             "folderStructure": "Final Folder Structure",
             "links": "Useful Links"
+        },
+        "gain": {
+            "title": "Gain-Distance Model",
+            "desc": "DCS uses a multi-stage gain curve based on distance. This visual model shows how volume (gain) changes as you move away.",
+            "rampUp": {
+                "title": "1. Ramp Up",
+                "desc": "From <code>silent_radius</code> to <code>peak_radius</code>. Sound fades in linearly from 0 to 100%."
+            },
+            "peak": {
+                "title": "2. Peak Zone",
+                "desc": "At <code>peak_radius</code>, the volume is at its maximum (Gain = 1.0)."
+            },
+            "reference": {
+                "title": "3. Reference",
+                "desc": "At <code>inner_radius</code>, volume is defined as 0.85 of max. This is the standard DCS reference point."
+            },
+            "falloff": {
+                "title": "4. Falloff",
+                "desc": "From <code>inner_radius</code> to <code>outer_radius</code>, volume drops following an inverse curve to 0."
+            }
+        },
+        "f18": {
+            "title": "F/A-18C Sound Reference",
+            "desc": "Detailed guide for Hornet sound modding. Reference these paths and settings for your custom sounds.",
+            "tipMono": "<strong>Engines & Cockpit:</strong> Most exterior sounds and interior switches are Mono for 3D positioning.",
+            "warningLoop": "<strong>Engine Loops:</strong> Ensure your startup/shutdown/idle loops have precise crossfades to avoid popping.",
+            "sections": {
+                "engines": "Engine Sounds (Ext)",
+                "flyby": "Flyby Effects",
+                "cockpit": "Cockpit Ambience",
+                "switches": "Buttons & Switches",
+                "betty": "Voice Alerts (Betty)",
+                "tones": "Warning Tones",
+                "weapons": "Cannon & Missiles",
+                "explosions": "Explosions",
+                "damage": "Damage Effects",
+                "customTips": "Pro Tips for Hornet",
+                "randomLists": "Randomized Sounds"
+            },
+            "tips": {
+                "enginePitch": "Engines use <code>pitch</code> modulation based on RPM range.",
+                "cockpitQuiet": "Keep cockpit switches gain around 0.6-0.8 for realism.",
+                "explosionsDist": "Explosions need large <code>outer_radius</code> (15000+) to be heard from distance.",
+                "randomListDesc": "Use a list of files for <code>wave</code> to avoid repetitive sound patterns."
+            }
         }
     },
     "docs": {
@@ -257,6 +369,21 @@
             "f18": "F/A-18C Reference",
             "theme": "Theme Guide",
             "install": "Installation"
+        },
+        "loadSoundsTitle": "How DCS Loads Sounds",
+        "loadSoundsDesc": "When DCS needs a sound, it looks for the SDEF file at the specified path. The SDEF tells DCS:",
+        "loadSoundsSteps": {
+            "1": "Which audio file(s) to use (<code>wave</code>)",
+            "2": "At what volume to play it (<code>gain</code>)",
+            "3": "Where it comes from in 3D space (<code>position</code>, <code>inner_radius</code>, <code>outer_radius</code>)",
+            "4": "How to play it (loop, oneshot, random selection)"
+        },
+        "overridePriority": "<strong>Override Priority:</strong> When you mount your <code>Sounds/</code> folder using <code>mount_vfs_sound_path</code>, your SDEF files take priority over DCS defaults. You only need to include files you want to change.",
+        "fullRefTitle": "Full Parameter Reference",
+        "examples": {
+            "switch": "Example: Simple Switch (One-Shot)",
+            "random": "Example: Randomized Selection",
+            "engine": "Example: Engine Loop with Directional Cone"
         },
         "audio": {
             "title": "Audio Guide for DCS Sound Modding",

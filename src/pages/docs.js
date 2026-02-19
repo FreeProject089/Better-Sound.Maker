@@ -5,7 +5,7 @@
  */
 
 import { t } from '../utils/i18n.js';
-import { getIcon } from '../utils/icons.js';
+import { getIcon, renderIcons } from '../utils/icons.js';
 
 export function renderDocs(container) {
   container.innerHTML = `
@@ -31,6 +31,8 @@ export function renderDocs(container) {
       showTab(tab.dataset.tab);
     });
   });
+
+  renderIcons(container);
 }
 
 function showTab(tab) {
@@ -43,6 +45,37 @@ function showTab(tab) {
     case 'theme': el.innerHTML = themeGuide(); break;
     case 'install': el.innerHTML = installGuide(); break;
   }
+
+  renderIcons(el);
+}
+
+function audioGuide() {
+  return `
+    <h2>${t('docs_content.audio.title')}</h2>
+
+    <h3>${t('docs_content.audio.monoStereo.title')}</h3>
+    <table>
+      <tr><th>${t('docs_content.audio.monoStereo.table.use')}</th><th>${t('docs_content.audio.monoStereo.table.mono')}</th><th>${t('docs_content.audio.monoStereo.table.stereo')}</th></tr>
+      <tr><td>${t('docs_content.audio.monoStereo.table.channels')}</td><td>${t('docs_content.audio.monoStereo.table.monoDesc')}</td><td>${t('docs_content.audio.monoStereo.table.stereoDesc')}</td></tr>
+      <tr><td>${t('docs_content.audio.monoStereo.table.size')}</td><td>${t('docs_content.audio.monoStereo.table.smaller')}</td><td>${t('docs_content.audio.monoStereo.table.larger')}</td></tr>
+      <tr><td>${t('docs_content.audio.monoStereo.table.spatial')}</td><td>${t('docs_content.audio.monoStereo.table.full3d')}</td><td>${t('docs_content.audio.monoStereo.table.limited3d')}</td></tr>
+      <tr><td>${t('docs_content.audio.monoStereo.table.use')}</td><td>${t('docs_content.audio.monoStereo.table.engineSwitch')}</td><td>${t('docs_content.audio.monoStereo.table.ambient')}</td></tr>
+    </table>
+    <div class="tip-box">
+      ${t('docs_content.audio.monoStereo.tip')}
+    </div>
+
+    <h3>${t('docs_content.audio.loopOneshot.title')}</h3>
+    <p>${t('docs_content.audio.loopOneshot.desc')}</p>
+    <ul>
+      <li>${t('docs_content.audio.loopOneshot.loop')}</li>
+      <li>${t('docs_content.audio.loopOneshot.oneshot')}</li>
+    </ul>
+
+    <div class="warning-box">
+      ${t('docs_content.audio.loopOneshot.warning')}
+    </div>
+  `;
 }
 
 // ... audioGuide ...
@@ -69,7 +102,7 @@ function sdefGuide() {
 
     <h3>${t('docs.fullRefTitle')}</h3>
     <table>
-      <tr><th>Parameter</th><th>Type</th><th>Default</th><th>Description</th></tr>
+      <tr><th>${t('common.parameter')}</th><th>${t('common.type')}</th><th>${t('common.default')}</th><th>${t('common.description')}</th></tr>
       <tr><td><code>inherit</code></td><td>string</td><td>""</td><td>${t('sdef.params.inherit')}</td></tr>
       <tr><td><code>wave</code></td><td>string/list</td><td>"default"</td><td>${t('sdef.params.wave')}</td></tr>
       <tr><td><code>gain</code></td><td>number</td><td>1.0</td><td>${t('sdef.params.gain')}</td></tr>
@@ -128,7 +161,7 @@ release = 0.2</pre>
     <h3>${t('docs_content.defaults.title') || 'Recommended Defaults per Sound Type'}</h3>
     <p>${t('docs_content.defaults.desc') || 'The mod creator auto-fills these values based on sound type:'}</p>
     <table>
-      <tr><th>Type</th><th>inner_radius</th><th>outer_radius</th><th>gain</th><th>detached</th><th>Notes</th></tr>
+      <tr><th>${t('common.type')}</th><th>inner_radius</th><th>outer_radius</th><th>gain</th><th>detached</th><th>${t('common.notes')}</th></tr>
       <tr><td>${getIcon('mic', 'w-3 h-3')} Cockpit</td><td>50</td><td>—</td><td>1</td><td>—</td><td>Switches, buttons, knobs, MFD sounds</td></tr>
       <tr><td>${getIcon('plane', 'w-3 h-3')} Engine</td><td>30</td><td>10000</td><td>0.9</td><td>—</td><td>Engine loops, startup, spooldown</td></tr>
       <tr><td>${getIcon('crosshair', 'w-3 h-3')} Weapon</td><td>80</td><td>12000</td><td>1</td><td>true</td><td>Gunfire, missile launch, explosions</td></tr>

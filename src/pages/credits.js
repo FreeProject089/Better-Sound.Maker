@@ -14,7 +14,7 @@ export function renderCredits(container) {
     <div class="credits-hero card" style="max-width:720px;margin-bottom:28px;text-align:center;padding:36px 28px;background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(6,182,212,0.06));border-color:rgba(59,130,246,0.25);">
       <div style="display:flex;justify-content:center;margin-bottom:18px;">
         <div class="credits-logo-wrap">
-          <img src="icon.png" alt="Better Sound.Maker" class="credits-logo-img" />
+          <img src="icon.webp" alt="Better Sound.Maker" class="credits-logo-img" />
         </div>
       </div>
       <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;">Better Sound.Maker</h2>
@@ -28,7 +28,7 @@ export function renderCredits(container) {
     <div class="grid-2" style="max-width:720px;margin-bottom:24px;gap:16px;">
       <div class="card credits-info-card">
         <div class="credits-card-icon" style="background:transparent; padding:0; overflow:hidden;">
-          <img src="pfp.png" style="width:100%; height:100%; object-fit:cover; border-radius:10px;" alt="Author" />
+          <img src="pfp.webp" style="width:100%; height:100%; object-fit:cover; border-radius:10px;" alt="Author" />
         </div>
         <div class="credits-card-label">${t('creditsPage.author')}</div>
         <div class="credits-card-value">FreeProject089</div>
@@ -36,7 +36,7 @@ export function renderCredits(container) {
       </div>
       <div class="card credits-info-card">
         <div class="credits-card-icon" style="background:transparent; padding:0;">
-          <img src="dcs.png" style="width:100%; height:100%; object-fit:contain;" alt="DCS World" />
+          <img src="dcs.webp" style="width:100%; height:100%; object-fit:contain;" alt="DCS World" />
         </div>
         <div class="credits-card-label">${t('creditsPage.builtFor')}</div>
         <div class="credits-card-value">DCS World 2.9+</div>
@@ -50,7 +50,9 @@ export function renderCredits(container) {
 
         <a href="https://github.com/FreeProject089/Better-ModMaker" target="_blank" class="credits-link-card credits-link-github">
           <div class="credits-link-icon">
-            ${getIcon('github', 'w-6 h-6')}
+            <svg viewBox="0 0 16 16" fill="currentColor" style="width:24px; height:24px;" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
           </div>
           <div class="credits-link-text">
             <div class="credits-link-title">${t('creditsPage.github.title')}</div>
@@ -61,7 +63,9 @@ export function renderCredits(container) {
 
         <a href="https://discord.gg/CTaaEF9R75" target="_blank" class="credits-link-card credits-link-discord">
           <div class="credits-link-icon">
-             ${getIcon('message-circle', 'w-6 h-6')}
+             <svg viewBox="0 0 24 24" fill="currentColor" style="width:28px; height:28px;" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01 10.198 10.198 0 0 0 .372.292.077.077 0 0 1-.008.128 12.723 12.723 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.078.078 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.419-2.157 2.419z"/>
+            </svg>
           </div>
           <div class="credits-link-text">
             <div class="credits-link-title">${t('creditsPage.discord.title')}</div>
@@ -72,7 +76,7 @@ export function renderCredits(container) {
 
         <a href="https://forums.eagle.ru/" target="_blank" class="credits-link-card credits-link-ed">
           <div class="credits-link-icon" style="background:transparent; padding:0; overflow:hidden;">
-            <img src="ED.png" style="width:100%; height:100%; object-fit:cover;" alt="Eagle Dynamics" />
+            <img src="ED.webp" style="width:100%; height:100%; object-fit:cover;" alt="Eagle Dynamics" />
           </div>
           <div class="credits-link-text">
             <div class="credits-link-title">${t('creditsPage.ed.title')}</div>
