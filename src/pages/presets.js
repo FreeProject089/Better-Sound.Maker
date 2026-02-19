@@ -127,7 +127,7 @@ export async function renderPresets(container) {
     btn.innerHTML = `${getIcon('refresh-cw', 'w-4 h-4 spin')} Loading...`;
 
     try {
-      const resp = await fetch('/sdef_and_wave_list.txt');
+      const resp = await fetch('./sdef_and_wave_list.txt');
       const text = await resp.text();
       const data = parseSdefList(text);
       setLibraryData(data);

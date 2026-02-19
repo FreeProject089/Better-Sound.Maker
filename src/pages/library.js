@@ -121,7 +121,7 @@ async function loadLibraryData() {
     }
 
     // Fallback to fetch
-    const resp = await fetch('/sdef_and_wave_list.txt');
+    const resp = await fetch('./sdef_and_wave_list.txt');
     const text = await resp.text();
     const data = parseSdefList(text);
 

@@ -6,7 +6,7 @@
  * through each page of the app. Supports skip and "don't show again".
  */
 
-import { changeLanguage, t } from '../utils/i18n.js';
+import { changeLanguage, getAvailableLanguages, t } from '../utils/i18n.js';
 
 const ONBOARDING_KEY = 'bsm-onboarding-done';
 
@@ -228,12 +228,20 @@ function renderBubble(step, idx) {
     let contentHtml = '';
 
     if (step.page === 'language-select') {
+        const languages = getAvailableLanguages();
+        const enObj = languages.find(l => l.code === 'en') || { flag: '🇺🇸', name: 'English' };
+        const frObj = languages.find(l => l.code === 'fr') || { flag: '🇫🇷', name: 'Français' };
+
         contentHtml = `
             <div class="onboarding-bubble-title">${step.title}</div>
             <div class="onboarding-bubble-text">${step.text}</div>
-            <div class="onboarding-lang-buttons" style="display:flex; gap:10px; justify-content:center; margin-top:15px;">
-                <button class="btn btn-primary" id="lang-en">🇺🇸 English</button>
-                <button class="btn btn-primary" id="lang-fr">🇫🇷 Français</button>
+            <div class="onboarding-lang-buttons" style="display:flex; gap:12px; justify-content:center; margin-top:20px;">
+                <button class="btn btn-primary" id="lang-en" style="display:flex; align-items:center; gap:8px; padding:10px 20px;">
+                    ${enObj.flag} <span>${enObj.name}</span>
+                </button>
+                <button class="btn btn-primary" id="lang-fr" style="display:flex; align-items:center; gap:8px; padding:10px 20px;">
+                    ${frObj.flag} <span>${frObj.name}</span>
+                </button>
             </div>
          `;
     } else {

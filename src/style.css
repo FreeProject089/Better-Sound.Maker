@@ -2947,7 +2947,7 @@ body.onboarding-active #sidebar {
   bottom: 100%;
   left: 0;
   width: 100%;
-  background: var(--bg-surface);
+  background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);

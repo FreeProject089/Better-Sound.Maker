@@ -39,7 +39,7 @@ export function renderNav(container) {
   container.innerHTML = `
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <img src="/BetterSoundMod.webp" alt="Better Sound.Maker" class="sidebar-brand-img" />
+        <img src="./BetterSoundMod.webp" alt="Better Sound.Maker" class="sidebar-brand-img" />
       </div>
     </div>
     
@@ -49,7 +49,7 @@ export function renderNav(container) {
         <div class="lang-dropdown">
             <button class="lang-dropdown-btn" id="lang-dropdown-btn">
                 <span class="option-flag">${currentLangObj.flag}</span>
-                <span>${currentLangObj.name}</span>
+                <span>${currentLangObj.name}</span> 
                 <span class="lang-chevron">${getIcon('chevron-down', 'w-4 h-4')}</span>
             </button>
             <div class="lang-dropdown-menu" id="lang-dropdown-menu">

@@ -27,14 +27,14 @@
   "build": {
     "appId": "com.bettersoundmaker.app",
     "productName": "Better Sound.Maker",
-    "icon": "app-icon-256.png",
+    "icon": "Bm.png",
     "directories": {
       "output": "release"
     },
     "files": [
       "dist/**",
       "electron/**",
-      "app-icon-256.png",
+      "Bm.png",
       "public/**"
     ],
     "win": {

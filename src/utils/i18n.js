@@ -43,13 +43,19 @@ export async function initI18n() {
 
         await Promise.all(loadPromises);
 
+        // Flag SVGs for platforms that don't support unicode flags (Windows Chrome/Electron)
+        const FLAG_SVGS = {
+            'en': `<svg viewBox="0 0 640 480" width="18" height="14" style="border-radius:2px"><path fill="#012169" d="M0 0h640v480H0z"/><path fill="#FFF" d="m75 0 245 180L565 0h75v55L400 240l240 175v65h-75L320 300 75 480H0v-55l240-175L0 75V0h75z"/><path fill="#C8102E" d="m424 286 216 154v40L394 316l30-30zM501 0 320 131 139 0h78l103 75L423 0h78zM0 440l216-154 30 30L30 480H0v-40zM0 0l239 174-30 30L0 55V0z"/><path fill="#FFF" d="M240 0v480h160V0H240zM0 160v160h640V160H0z"/><path fill="#C8102E" d="M0 192v96h640v-96H0zM272 0v480h96V0h-96z"/></svg>`,
+            'fr': `<svg viewBox="0 0 640 480" width="18" height="14" style="border-radius:2px"><path fill="#fff" d="M0 0h640v480H0z"/><path fill="#002395" d="M0 0h213.3v480H0z"/><path fill="#ed2939" d="M426.7 0H640v480H426.7z"/></svg>`
+        };
+
         // Determine info for available languages (like native name)
         availableLanguages = availableLanguages.map(lang => {
             const data = translations[lang.code];
             return {
                 code: lang.code,
                 name: data?._info?.name || lang.code.toUpperCase(),
-                flag: data?._info?.flag || '🏳️'
+                flag: FLAG_SVGS[lang.code] || data?._info?.flag || '🏳️'
             };
         });
 
