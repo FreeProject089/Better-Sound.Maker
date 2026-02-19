@@ -1,0 +1,19 @@
+{
+  "name": "dcs-sound-mod-creator",
+  "version": "1.0.0",
+  "description": "Create DCS World sound mods easily",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "electron": "^40.5.0",
+    "electron-builder": "^26.8.1",
+    "vite": "^6.1.0"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  }
+}
