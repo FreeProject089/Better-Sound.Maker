@@ -2,11 +2,18 @@
  * store.js — Central application state with pub/sub reactivity
  */
 
+import { get, set, del, keys as idbKeys } from 'idb-keyval';
+
 const STORAGE_KEY = 'dcs-sound-mod-creator';
+const ASSET_FILES_PREFIX = 'audio::';
+const THEME_FILES_PREFIX = 'theme::';
 
 const defaultState = {
-    // Selected assets: key = sdefPath, value = { sdefContent, audioFile (name only), audioMeta, customWaves }
+    // Selected assets: key = sdefPath, value = { sdefContent, audioFileName, audioMeta, customWaves, note }
     selectedAssets: {},
+
+    // Notes: key = sdefPath or `wave::wavePath`, value = string
+    assetNotes: {},
 
     // Project configuration for entry.lua
     projectConfig: {
@@ -110,6 +117,7 @@ export function selectAsset(sdefPath, assetData) {
         audioMeta: null,
         customWaves: assetData.waves || [],
         originalAsset: assetData,
+        note: '',
         ...state.selectedAssets[sdefPath]
     };
     notify('selectedAssets');
@@ -140,11 +148,24 @@ export function toggleAsset(sdefPath, assetData) {
 }
 
 // --- Audio Files ---
-export function setAudioFile(sdefPath, file, meta) {
+export async function setAudioFile(sdefPath, file, meta) {
     audioFiles.set(sdefPath, file);
     if (state.selectedAssets[sdefPath]) {
         state.selectedAssets[sdefPath].audioFileName = file.name;
         state.selectedAssets[sdefPath].audioMeta = meta;
+        // Persist path if available (Electron)
+        if (file.path) {
+            state.selectedAssets[sdefPath].audioPath = file.path;
+        } else {
+            // Browser: Save blob to IndexedDB
+            try {
+                // We serialize the file as a Blob or ArrayBuffer
+                // idb-keyval handles Blobs/Files directly in modern browsers
+                await set(ASSET_FILES_PREFIX + sdefPath, file);
+            } catch (e) {
+                console.warn('Failed to save audio to IDB', e);
+            }
+        }
         notify('selectedAssets');
         saveState();
     }
@@ -154,14 +175,37 @@ export function getAudioFile(sdefPath) {
     return audioFiles.get(sdefPath);
 }
 
-export function removeAudioFile(sdefPath) {
+export async function removeAudioFile(sdefPath) {
     audioFiles.delete(sdefPath);
     if (state.selectedAssets[sdefPath]) {
         state.selectedAssets[sdefPath].audioFileName = null;
         state.selectedAssets[sdefPath].audioMeta = null;
+        state.selectedAssets[sdefPath].audioPath = null;
+
+        // Remove from IDB
+        try {
+            await del(ASSET_FILES_PREFIX + sdefPath);
+        } catch (e) { /* ignore */ }
+
         notify('selectedAssets');
         saveState();
     }
+}
+
+// --- Notes ---
+export function setAssetNote(key, text) {
+    if (!state.assetNotes) state.assetNotes = {};
+    if (text.trim() === '') {
+        delete state.assetNotes[key];
+    } else {
+        state.assetNotes[key] = text;
+    }
+    notify('assetNotes');
+    saveState();
+}
+
+export function getAssetNote(key) {
+    return state.assetNotes?.[key] || '';
 }
 
 // --- SDEF Content ---
@@ -260,4 +304,70 @@ export function resetProject() {
 }
 
 // Initialize
+// Initialize
 loadState();
+
+// Restore persisted audio files (if in Electron)
+// Restore persisted audio files
+(async function restoreAudioFiles() {
+    // 1. Electron Strategy: Read from disk paths
+    if (window.electronAPI) {
+        // Wait a tick for listeners to maybe be ready, though not strictly necessary
+        await new Promise(r => setTimeout(r, 100));
+
+        const keys = Object.keys(state.selectedAssets);
+        let restoredCount = 0;
+
+        for (const key of keys) {
+            const asset = state.selectedAssets[key];
+            if (asset.audioPath && !audioFiles.has(key)) {
+                try {
+                    const buffer = await window.electronAPI.readFile(asset.audioPath);
+                    if (buffer) {
+                        const type = asset.audioFileName?.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav';
+                        const blob = new Blob([buffer], { type });
+                        blob.name = asset.audioFileName || 'restored_audio';
+                        // Re-attach path
+                        blob.path = asset.audioPath;
+
+                        audioFiles.set(key, blob);
+                        restoredCount++;
+                    }
+                } catch (e) {
+                    console.warn(`Failed to restore audio for ${key} from ${asset.audioPath}`, e);
+                }
+            }
+        }
+
+        if (restoredCount > 0) {
+            notify('selectedAssets');
+            console.log(`Restored ${restoredCount} audio files from disk (Electron).`);
+        }
+    }
+
+    // 2. Browser Strategy: Read from IndexedDB
+    // We try this regardless of Electron, in case some files were "downloaded"/synced and stored in IDB
+    try {
+        const keys = await idbKeys();
+        let idbCount = 0;
+        for (const k of keys) {
+            if (typeof k === 'string' && k.startsWith(ASSET_FILES_PREFIX)) {
+                const sdefPath = k.replace(ASSET_FILES_PREFIX, '');
+                // Only restore if we don't have it yet (e.g. from Electron path)
+                if (!audioFiles.has(sdefPath)) {
+                    const file = await get(k);
+                    if (file) {
+                        audioFiles.set(sdefPath, file);
+                        idbCount++;
+                    }
+                }
+            }
+        }
+        if (idbCount > 0) {
+            notify('selectedAssets');
+            console.log(`Restored ${idbCount} audio files from storage (IDB).`);
+        }
+    } catch (e) {
+        console.warn('IDB Restore error:', e);
+    }
+})();

@@ -8,6 +8,10 @@
  *   SdefPath.sdef       (no leading whitespace, ends with .sdef)
  *     wave:             (tab + "wave:")
  *       Effects/path    (tab tab + wave path)
+ *
+ * A section can be a module path like "CoreMods/aircraft/C130J:"
+ * In those cases, we keep the sdef path as-is (contextual to the mod).
+ * Wave paths with a leading "/" are normalized (slash stripped).
  */
 
 export function parseSdefList(text) {
@@ -21,7 +25,7 @@ export function parseSdefList(text) {
         const line = lines[i];
         const trimmed = line.trim();
 
-        // Skip empty lines
+        // Skip empty lines — push pending asset
         if (!trimmed) {
             if (currentAsset && currentSection) {
                 currentSection.assets.push(currentAsset);
@@ -36,15 +40,18 @@ export function parseSdefList(text) {
             continue;
         }
 
-        // Section header (e.g., "DCS World:" or "Mods/terrains/Normandy:")
+        // Section header (e.g., "DCS World:" or "CoreMods/aircraft/C130J:")
         if (trimmed.endsWith(':') && !line.startsWith('\t') && !trimmed.startsWith('wave')) {
             // Save previous asset if pending
             if (currentAsset && currentSection) {
                 currentSection.assets.push(currentAsset);
                 currentAsset = null;
             }
+            const sectionName = trimmed.slice(0, -1);
             currentSection = {
-                name: trimmed.slice(0, -1),
+                name: sectionName,
+                // Extract module prefix for disambiguation (e.g. "CoreMods/aircraft/C130J" → "C130J")
+                modPrefix: sectionName.includes('/') ? sectionName : '',
                 assets: []
             };
             sections.push(currentSection);
@@ -58,46 +65,72 @@ export function parseSdefList(text) {
             continue;
         }
 
-        // Wave path (double tab indented)
+        // Wave path (double-tab indented) — normalize leading slash
         if (line.startsWith('\t\t') && inWaveBlock && currentAsset) {
-            currentAsset.waves.push(trimmed);
+            // Remove leading "/" if present (some mod entries use "/Effects/...")
+            const wavePath = trimmed.startsWith('/') ? trimmed.slice(1) : trimmed;
+            currentAsset.waves.push(wavePath);
             continue;
         }
 
-        // SDEF entry (no leading whitespace, typically ends with .sdef)
+        // SDEF entry (no leading whitespace)
         if (!line.startsWith('\t') && currentSection) {
             // Save previous asset
             if (currentAsset) {
                 currentSection.assets.push(currentAsset);
             }
 
-            const sdefPath = trimmed;
-            const parts = sdefPath.replace(/\.sdef$/, '').split('/');
-            const name = parts[parts.length - 1];
+            // sdefPath as written in the file
+            let sdefPath = trimmed;
 
-            // Extract category hierarchy
+            // For mod sections, qualify the sdef path with the section name so it's unique searchable
+            // e.g. "CoreMods/aircraft/C130J" + "Aircrafts/apu_run.sdef"
+            let displaySection = '';
+            if (currentSection.modPrefix) {
+                // Last part of section path is the mod name (C130J, FA-18C, etc.)
+                const parts = currentSection.modPrefix.split('/');
+                displaySection = parts[parts.length - 1];
+            }
+
+            const pathParts = sdefPath.replace(/\.sdef$/, '').split('/');
+            const name = pathParts[pathParts.length - 1];
+
+            // Category hierarchy
             let category = '';
             let subcategory = '';
             let group = '';
 
-            if (parts.length >= 2) {
-                category = parts[0];
-            }
-            if (parts.length >= 3) {
-                subcategory = parts[1];
-            }
-            if (parts.length >= 4) {
-                group = parts.slice(2, -1).join('/');
+            if (displaySection) {
+                // For mods: category = module name, subcategory = first path segment
+                category = displaySection;
+                if (pathParts.length >= 2) {
+                    subcategory = pathParts[0];
+                }
+                if (pathParts.length >= 3) {
+                    group = pathParts.slice(1, -1).join('/');
+                }
+            } else {
+                if (pathParts.length >= 2) {
+                    category = pathParts[0];
+                }
+                if (pathParts.length >= 3) {
+                    subcategory = pathParts[1];
+                }
+                if (pathParts.length >= 4) {
+                    group = pathParts.slice(2, -1).join('/');
+                }
             }
 
             currentAsset = {
                 sdefPath,
+                sectionName: currentSection.name,
+                displaySection,
                 category,
                 subcategory,
                 group,
                 name,
                 waves: [],
-                fullPath: parts.join('/')
+                fullPath: pathParts.join('/')
             };
             inWaveBlock = false;
         }
@@ -155,6 +188,8 @@ export function filterAssets(assets, { query = '', category = '', subcategory = 
         filtered = filtered.filter(a =>
             a.sdefPath.toLowerCase().includes(q) ||
             a.name.toLowerCase().includes(q) ||
+            a.sectionName?.toLowerCase().includes(q) ||
+            a.displaySection?.toLowerCase().includes(q) ||
             a.waves.some(w => w.toLowerCase().includes(q))
         );
     }

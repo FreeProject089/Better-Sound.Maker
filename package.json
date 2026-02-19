@@ -1,19 +1,47 @@
 {
-  "name": "dcs-sound-mod-creator",
+  "name": "better-sound-maker",
   "version": "1.0.0",
-  "description": "Create DCS World sound mods easily",
+  "description": "Better Sound.Maker — Create DCS World sound mods easily",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "electron:build": "vite build && electron-builder"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "electron": "^40.5.0",
     "electron-builder": "^26.8.1",
     "vite": "^6.1.0"
   },
   "dependencies": {
+    "idb-keyval": "^6.2.2",
     "jszip": "^3.10.1"
+  },
+  "build": {
+    "appId": "com.bettersoundmaker.app",
+    "productName": "Better Sound.Maker",
+    "icon": "app-icon-256.png",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**",
+      "electron/**",
+      "app-icon-256.png",
+      "public/**"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

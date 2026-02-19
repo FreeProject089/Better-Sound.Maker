@@ -1,36 +1,35 @@
-# Generated .gitignore file for: Node, npm
-# Created with FOSSA's DevOps Tools
-
-# Node
+# Node / npm
 node_modules/
 npm-debug.log
 yarn-error.log
-.env
-.DS_Store
-dist/
 .cache/
 coverage/
 
-# npm
-# Add npm-specific ignores here
+# Build outputs
+dist/
+dist-electron/
+release/
 
-# Common
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Temp / backup
 *.log
 *.bak
 *.tmp
 *.swp
 *~
 
-# IDE and editor generated files
+# IDE
 .idea/
 *.sublime-*
+.vscode/
 
-# Local environment files
-.env
-.env.local
-.env.*.local
-
-
+# Project assets (sound files, mods — tracked separately via GitHub collab)
 Assets/

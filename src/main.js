@@ -1,6 +1,6 @@
 /**
  * main.js — App bootstrap and router
- * DCS Sound Mod Creator
+ * Better Sound.Maker
  */
 
 import './style.css';
@@ -13,6 +13,7 @@ import { renderPresets } from './pages/presets.js';
 import { renderBuild } from './pages/build.js';
 import { renderDocs } from './pages/docs.js';
 import { renderCredits } from './pages/credits.js';
+import { renderCollaboration } from './pages/collaboration.js';
 import { getState, subscribe, navigate } from './state/store.js';
 
 // Page renderers map
@@ -22,6 +23,7 @@ const pages = {
     'sdef-editor': renderSdefEditor,
     'theme': renderTheme,
     'presets': renderPresets,
+    'collaboration': renderCollaboration,
     'build': renderBuild,
     'docs': renderDocs,
     'credits': renderCredits
