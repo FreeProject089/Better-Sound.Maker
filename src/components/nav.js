@@ -6,6 +6,7 @@
 import { getState, subscribe, navigate, getSelectedCount } from '../state/store.js';
 import { getAvailableLanguages, getCurrentLanguage, changeLanguage, t } from '../utils/i18n.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
+import { APP_VERSION } from '../utils/version.js';
 
 const NAV_ITEMS = [
   { id: 'library', icon: 'library', label: 'nav.library', section: 'nav.section.workspace' },
@@ -61,7 +62,7 @@ export function renderNav(container) {
     <div style="padding: 14px 18px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 8px;">
       <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted);">
         <span>DCS 2.9 & More</span>
-        <div id="sidebar-version-tag" style="padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 10px; opacity: 0.8;">v0.9.1</div>
+        <div id="sidebar-version-tag" style="padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 10px; opacity: 0.8;">v${APP_VERSION}</div>
       </div>
       <button id="sidebar-update-btn" class="btn btn-secondary btn-sm" style="width: 100%; border-radius: 8px; font-size: 10px; padding: 6px; background: rgba(100,255,218,0.05); color: var(--accent-green); border: 1px solid rgba(100,255,218,0.2);">
         ${getIcon('refresh-cw', 'w-3 h-3 mr-2')}

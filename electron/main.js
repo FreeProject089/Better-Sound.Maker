@@ -14,12 +14,21 @@ function checkUpdate(quiet = true) {
     return new Promise((resolve) => {
         if (isDev) {
             console.log('Skipping auto-updater in development mode.');
+            if (!quiet) {
+                dialog.showMessageBox({ type: 'info', message: 'Auto-updater is disabled in development mode.' });
+            }
             return resolve();
         }
 
         try {
             autoUpdater.autoDownload = true;
             autoUpdater.autoInstallOnAppQuit = true;
+
+            // Remove previous listeners to prevent duplicates if called multiple times manually
+            autoUpdater.removeAllListeners('update-downloaded');
+            autoUpdater.removeAllListeners('error');
+            autoUpdater.removeAllListeners('update-not-available');
+            autoUpdater.removeAllListeners('update-available');
 
             autoUpdater.once('update-downloaded', (info) => {
                 const choice = dialog.showMessageBoxSync({
@@ -40,15 +49,31 @@ function checkUpdate(quiet = true) {
 
             autoUpdater.once('error', (err) => {
                 console.error('AutoUpdater Error:', err);
+                if (!quiet) {
+                    dialog.showErrorBox('Update Error', err == null ? 'unknown' : (err.stack || err).toString());
+                }
                 resolve();
             });
 
             autoUpdater.once('update-not-available', () => {
+                if (!quiet) {
+                    dialog.showMessageBoxSync({ type: 'info', title: 'Up to Date', message: 'You are already running the latest version.' });
+                }
                 resolve();
+            });
+
+            autoUpdater.once('update-available', () => {
+                if (!quiet) {
+                    dialog.showMessageBoxSync({ type: 'info', title: 'Update Available', message: 'A new version is available. Downloading in the background...' });
+                }
+                // No resolve here, wait for download or error
             });
 
             autoUpdater.checkForUpdates().catch((err) => {
                 console.error('Check for updates failed:', err);
+                if (!quiet) {
+                    dialog.showErrorBox('Update Error', err == null ? 'unknown' : (err.stack || err).toString());
+                }
                 resolve();
             });
 
@@ -161,3 +186,8 @@ ipcMain.handle('fs:readTextFile', async (_event, filePath) => {
 
 // Get app root path
 ipcMain.handle('app:getPath', () => app.getAppPath());
+
+// Check for updates manually
+ipcMain.handle('app:checkForUpdates', async () => {
+    return checkUpdate(false);
+});

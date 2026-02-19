@@ -7,6 +7,15 @@ import { showToast } from '../components/toast.js';
 import { APP_VERSION, GITHUB_REPO } from './version.js';
 
 export async function checkUpdate(quiet = true) {
+    if (window.electronAPI && window.electronAPI.checkForUpdates) {
+        // In the Electron app, `electron-updater` handles the process natively in the background.
+        if (!quiet) {
+            showToast('Checking for updates...', 'info');
+            await window.electronAPI.checkForUpdates();
+        }
+        return;
+    }
+
     try {
         if (!quiet) showToast('Checking for updates...', 'info');
 

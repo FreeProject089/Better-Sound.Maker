@@ -51,4 +51,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
      * Get app root path
      */
     getAppPath: () => ipcRenderer.invoke('app:getPath'),
+
+    /**
+     * Trigger the native autoUpdater to check for updates.
+     */
+    checkForUpdates: () => ipcRenderer.invoke('app:checkForUpdates'),
 });

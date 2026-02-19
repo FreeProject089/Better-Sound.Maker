@@ -10,7 +10,7 @@ This guide covers the process of releasing a new version of the application.
 ## 🛠️ Release Steps
 1. **Update Version**: Edit `package.json`, `README.md`, and `RELEASE_GUIDE.md`.
 2. **Commit Changes**: Push to main branch.
-3. **Draft Release**: Create a new release on GitHub with tag `v1.0.1`.
+3. **Draft Release**: Create a new release on GitHub with tag `v1.0.2`.
 4. **Build Binaries**: Run `npm run electron:build`.
 5. **Upload Assets**: Attach the `.exe` (and others) to the GitHub release.
 6. **Publish**: Release it to the world!
