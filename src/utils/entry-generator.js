@@ -23,9 +23,12 @@ export function generateEntryLua(config) {
     const safeDisplay = (displayName || modName).replace(/"/g, '\\"');
     const safeShort = (shortName || modName.substring(0, 4).toUpperCase()).replace(/"/g, '\\"');
 
-    let lua = `-- Generated with DCS Better Sound.Maker
--- Credits: ${safeCredits || safeAuthor}
--- Version: ${version}
+    let lua = `--------------------------------------------------------------------------------
+--  Generated with Better ModMaker
+--  Mod: ${safeDisplay}
+--  Version: ${version}
+--  Author: ${safeCredits || safeAuthor}
+--------------------------------------------------------------------------------
 
 declare_plugin("${safeModName}",
     {
@@ -42,7 +45,7 @@ declare_plugin("${safeModName}",
     }
 
     lua += `
-
+        
         -- Module Info
         displayName = "${safeDisplay}",
         shortName   = "${safeShort}",
@@ -59,6 +62,16 @@ declare_plugin("${safeModName}",
                 dir  = "Theme"
             },
         },`;
+    } else {
+        lua += `
+
+        -- Skins       =
+        -- {
+        --     {
+        --         name = "${safeModName}",
+        --         dir  = "Theme"
+        --     },
+        -- },`;
     }
 
     lua += `
@@ -75,6 +88,11 @@ mount_vfs_sound_path(current_mod_path .. "/Sounds")
         lua += `
 -- Mount theme textures
 mount_vfs_texture_path(current_mod_path .. "/Theme/ME")
+`;
+    } else {
+        lua += `
+-- Mount theme textures (Disabled)
+-- mount_vfs_texture_path(current_mod_path .. "/Theme/ME")
 `;
     }
 

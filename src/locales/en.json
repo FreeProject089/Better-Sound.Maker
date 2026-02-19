@@ -1,0 +1,407 @@
+{
+    "_info": {
+        "name": "English",
+        "flag": "🇺🇸"
+    },
+    "common": {
+        "actions": "Actions",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "remove": "Remove",
+        "edit": "Edit",
+        "upload": "Upload",
+        "back": "Back",
+        "next": "Next",
+        "finish": "Finish",
+        "on": "ON",
+        "off": "OFF",
+        "pageNotFound": "Page not found"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "library": "Assets Library",
+        "projects": "Projects",
+        "sdef": "SDEF Editor",
+        "theme": "Theme & Settings",
+        "collab": "Collaboration",
+        "builder": "Mod Generator",
+        "docs": "Documentation",
+        "presets": "Presets",
+        "credits": "Credits",
+        "section": {
+            "workspace": "WORKSPACE",
+            "customization": "CUSTOMIZATION",
+            "team": "TEAM",
+            "export": "EXPORT",
+            "help": "HELP"
+        }
+    },
+    "project": {
+        "title": "Projects",
+        "description": "Manage your selected sound assets and upload custom audio files.",
+        "createTitle": "Create New Project",
+        "name": "Project Name",
+        "desc": "Description",
+        "version": "Version",
+        "author": "Author",
+        "loop": "Loop",
+        "oneShot": "One-Shot",
+        "noAssetsTitle": "No Assets Selected",
+        "noAssetsText": "Go to the Assets Library to select the sounds you want to modify.",
+        "goToLibrary": "Go to Library",
+        "audioAssigned": "Audio Assigned",
+        "missingAudio": "Missing Audio",
+        "clickDragUpload": "Click or Drag Audio",
+        "editSdef": "Edit SDEF",
+        "remove": "Remove from project",
+        "play": "Play",
+        "audioFile": "Audio File",
+        "replace": "Replace",
+        "reupload": "Re-upload",
+        "removeAudio": "Remove Audio"
+    },
+    "library": {
+        "title": "Assets Library",
+        "description": "Browse DCS sound assets. Navigate folders, upload audio replacements, and annotate SDEF/WAV files.",
+        "searchPlaceholder": "Search SDEF path, wave path...",
+        "selectAll": "Select All Visible",
+        "clearSelection": "Clear Selection",
+        "reload": "Reload Library",
+        "allAssets": "All Assets",
+        "sdefFile": "SDEF / File",
+        "waves": "Wave(s)",
+        "type": "Type",
+        "loop": "Loop",
+        "note": "Note",
+        "emptyDetail": "Click on an asset row to see details, add notes, and upload audio.",
+        "totalAssets": "Total Assets",
+        "modules": "Modules",
+        "showing": "Showing",
+        "selected": "Selected",
+        "waveNotePlaceholder": "Note about this wave file...",
+        "uploadWaveReplacement": "Upload replacement for this specific wave file",
+        "uploadWav": "Upload WAV/OGG",
+        "sdefNote": "SDEF Note",
+        "sdefNotePlaceholder": "Add a note about this SDEF...",
+        "waveFiles": "Wave Files",
+        "noWavePaths": "No wave paths defined in SDEF",
+        "replaceAudio": "Replace Audio",
+        "uploadAudio": "Upload Audio",
+        "deselect": "Deselect",
+        "select": "Select",
+        "remove": "Remove Audio"
+    },
+    "sdef": {
+        "title": "SDEF Editor",
+        "description": "Edit .sdef parameters — switch between visual UI and raw text modes.",
+        "visual": "Visual",
+        "raw": "Raw",
+        "save": "Save",
+        "saved": "SDEF Saved",
+        "noSelectionTitle": "Select a SDEF file",
+        "noSelectionText": "Choose a file from the sidebar to start editing.",
+        "groups": {
+            "include": "Inheritance",
+            "sample": "Sound Sample",
+            "volume": "Volume Control",
+            "frequency": "Frequency / Pitch",
+            "filtering": "filtering",
+            "position": "3D Position",
+            "radius": "Distance / Radius",
+            "cone": "Directional Cone",
+            "playmode": "Play Mode",
+            "envelope": "Envelope (Attack/Release)",
+            "stereo": "Stereo Settings",
+            "doppler": "Doppler Effect"
+        }
+    },
+    "themePage": {
+        "title": "Theme & Settings",
+        "description": "Customize the DCS UI and application settings.",
+        "enable": "Enable Theme",
+        "enableDesc": "When enabled, the mod will include a Theme/ directory with your custom images and the entry.lua will mount theme textures.",
+        "disabledTitle": "Theme Disabled",
+        "disabledText": "Enable the theme toggle above to configure custom DCS UI images.",
+        "clickToUpload": "Click to upload",
+        "remove": "Remove",
+        "slots": {
+            "icon": {
+                "name": "Mod Icon",
+                "desc": "The mod icon shown in DCS mod manager"
+            },
+            "mainMenu": {
+                "name": "Main Menu Logo",
+                "desc": "Logo displayed on the DCS main menu"
+            },
+            "loading": {
+                "name": "Loading Screen",
+                "desc": "Background image during DCS loading"
+            },
+            "briefing": {
+                "name": "Briefing Map Background",
+                "desc": "Background for the mission briefing map"
+            },
+            "baseMenu": {
+                "name": "Base Menu Window",
+                "desc": "Background for the base menu window"
+            }
+        }
+    },
+    "tutorial": {
+        "welcome": "Welcome to Better ModMaker!",
+        "intro": "Let's take a quick tour to get you started.",
+        "language": "Please select your language to get started.",
+        "library": "This is where you browse and select DCS sound assets. Navigate the folder tree and check the files you want to replace with your custom audio.",
+        "project": "Here you configure your mod details — name, aircraft, version. All selected assets appear here so you can review them.",
+        "sdef": "Each sound asset needs an .sdef file. The visual editor lets you tweak volume, looping, distance, pitch and more — no code needed!",
+        "theme": "Customise the look of the app. Change the background image and accent colors to make it feel like yours.",
+        "presets": "Save and load your SDEF parameter presets. Great for reusing settings across different mods.",
+        "collab": "Connect to a GitHub repo to sync your project with teammates. Push your mod build, leave notes, and restore earlier versions.",
+        "build": "When you're ready, hit Build to generate the complete mod folder — entry.lua, .sdef files, and your audio — ready to drop into DCS Mods.",
+        "docs": "Everything you need to know about DCS sound modding: file formats, parameters, tips and examples.",
+        "credits": "Info about the app, the developer, and useful community links. You're all set — happy modding! 🎧",
+        "skip": "Skip",
+        "finished": "You're all set! Enjoy modding."
+    },
+    "docs_content": {
+        "audio": {
+            "title": "🎵 Audio Guide for DCS Sound Modding",
+            "monoStereo": {
+                "title": "Mono vs Stereo",
+                "table": {
+                    "channels": "Channels",
+                    "size": "File size",
+                    "spatial": "3D spatialization",
+                    "use": "Use for",
+                    "mono": "Mono",
+                    "stereo": "Stereo",
+                    "monoDesc": "1 channel",
+                    "stereoDesc": "2 channels (L+R)",
+                    "smaller": "Smaller",
+                    "larger": "~2x larger",
+                    "full3d": "✅ Full 3D positioning",
+                    "limited3d": "❌ Limited — sounds come from center",
+                    "engineSwitch": "Engine sounds, cockpit switches, weapons",
+                    "ambient": "Ambient sounds, radio chatter, music"
+                },
+                "tip": "<strong>Rule of thumb:</strong> If DCS needs to position the sound in 3D space (engines, switches, weapons), use <strong>Mono</strong>. Stereo is primarily for ambient/atmospheric sounds and UI effects."
+            },
+            "loopOneshot": {
+                "title": "Loop vs One-Shot",
+                "desc": "DCS distinguishes between two playback modes:",
+                "loop": "<strong>Loop:</strong> Sound plays continuously until stopped (engines, APU, wind, avionics hum). These need seamless loop points.",
+                "oneshot": "<strong>One-shot:</strong> Sound plays once and stops (button clicks, switch toggles, explosions, weapon launches). Set <code>detached = true</code> in the SDEF.",
+                "warning": "<strong>Important:</strong> Looping sounds should have clean loop points — avoid clicks or pops at the start/end boundaries. Use a DAW to crossfade the loop points."
+            }
+        },
+        "sdef": {
+            "title": "📄 SDEF File Guide",
+            "whatIs": {
+                "title": "What is a .sdef file?",
+                "p1": "A <code>.sdef</code> (Source DEFinition) file tells DCS how to play a sound. It defines which audio file to use, its volume, spatial properties, playback mode, and more.",
+                "p2": "SDEF files live in <code>Sounds/sdef/</code> and reference audio files in <code>Sounds/Effects/</code>."
+            }
+        },
+        "theme": {
+            "title": "🎨 Theme Customization Guide",
+            "whatIs": {
+                "title": "What is a DCS Theme?",
+                "desc": "A theme allows you to customize the look of DCS World's user interface — including the main menu background, loading screen, briefing map, and mod icon."
+            },
+            "fileRequirements": {
+                "title": "File Requirements",
+                "file": "File",
+                "location": "Location",
+                "size": "Size",
+                "usage": "Usage in DCS",
+                "iconUsage": "Mod icon in the DCS module manager",
+                "logoSize": "Variable",
+                "logoUsage": "Logo displayed on the main menu screen",
+                "loadingUsage": "Background image shown during mission loading",
+                "briefingSize": "Variable",
+                "briefingUsage": "Background of the mission briefing map screen",
+                "menuUsage": "Main menu background image"
+            },
+            "formatRecommendations": {
+                "title": "Format Recommendations",
+                "png": "All files must be <strong>PNG format</strong>",
+                "resolution": "Use the exact recommended resolutions for best results",
+                "transparency": "The icon supports <strong>transparency</strong>",
+                "hd": "Loading and menu backgrounds should be <strong>1920×1080</strong> for full HD displays",
+                "vram": "Larger images may work but will use more VRAM"
+            },
+            "folderStructure": {
+                "title": "Theme Folder Structure"
+            },
+            "tip": "Theme support must be enabled in the entry.lua with a <code>Skins</code> section and <code>mount_vfs_texture_path</code>. The Build page handles this automatically when you enable Theme."
+        },
+        "install": {
+            "title": "📦 How to Install a DCS Sound Mod",
+            "steps": "Installation Steps",
+            "step1": "Navigate to your DCS saved games folder:",
+            "step2": "Copy your entire mod folder (e.g., <code>SoundModBetterHornet/</code>) into the <code>resource</code> folder.",
+            "step3": "Start DCS World.",
+            "step4": "Your mod should be automatically detected!",
+            "trouble": "Troubleshooting",
+            "folderStructure": "Final Folder Structure",
+            "links": "Useful Links"
+        }
+    },
+    "docs": {
+        "title": "Documentation",
+        "desc": "Learn how to use Better ModMaker and create DCS sound mods.",
+        "tabs": {
+            "audio": "Audio Guide",
+            "sdef": "SDEF Guide",
+            "f18": "F/A-18C Reference",
+            "theme": "Theme Guide",
+            "install": "Installation"
+        },
+        "audio": {
+            "title": "Audio Guide for DCS Sound Modding",
+            "monoVsStereo": "Mono vs Stereo",
+            "mono": "Mono",
+            "stereo": "Stereo",
+            "loop": "Loop",
+            "oneshot": "One-Shot"
+        },
+        "sdef": {
+            "title": "SDEF File Guide",
+            "whatIs": "What is a .sdef file?",
+            "params": "Full Parameter Reference"
+        },
+        "f18": {
+            "title": "F/A-18C Complete Sound Reference",
+            "desc": "Based on the BetterHornet mod — every SDEF file and WAV detailed."
+        },
+        "theme": {
+            "title": "Theme Customization Guide",
+            "whatIs": "What is a DCS Theme?"
+        },
+        "install": {
+            "title": "How to Install a DCS Sound Mod",
+            "steps": "Installation Steps"
+        }
+    },
+    "creditsPage": {
+        "subtitle": "About Better Sound.Maker",
+        "appDescription": "A complete tool for creating DCS World sound mods. Select assets, upload audio, edit SDEF files, and build ready-to-install mod packages.",
+        "author": "Author",
+        "creator": "Creator & Developer",
+        "builtFor": "Built For",
+        "linksTitle": "🔗 Links & Community",
+        "github": {
+            "title": "GitHub Repository",
+            "sub": "FreeProject089/Better-ModMaker"
+        },
+        "discord": {
+            "title": "Discord Community",
+            "sub": "Get help & updates"
+        },
+        "ed": {
+            "title": "Eagle Dynamics Forums",
+            "sub": "DCS World community & modding resources"
+        }
+    },
+    "collabPage": {
+        "title": "Collaboration",
+        "description": "Sync your mod project with a GitHub repository. Multiple users can work on the same mod, share notes, and restore any previous version.",
+        "settings": {
+            "title": "GitHub Settings",
+            "sub": "Connect to your repository",
+            "pat": "Personal Access Token",
+            "patNote": "(stored locally only)",
+            "repoScope": "Needs repo scope.",
+            "createToken": "Create token",
+            "repo": "Repository",
+            "username": "Your Name / Username"
+        },
+        "sync": {
+            "title": "Sync Project",
+            "sub": "Push or pull the full mod build"
+        },
+        "notes": {
+            "title": "Team Notes",
+            "sub": "Share messages with teammates",
+            "placeholder": "Write a note for the team...",
+            "empty": "No notes yet.",
+            "loading": "⏳ Loading notes..."
+        },
+        "history": {
+            "title": "Commit History",
+            "sub": "Restore any previous snapshot",
+            "empty": "No commits yet — push your project first!",
+            "loading": "⏳ Loading..."
+        },
+        "buttons": {
+            "save": "Save",
+            "test": "Test",
+            "push": "Push",
+            "pull": "Pull",
+            "post": "Post Note",
+            "refresh": "Refresh",
+            "restore": "Restore this version"
+        },
+        "status": {
+            "testing": "⏳ Testing connection...",
+            "connected": "✅ Connected as",
+            "pushing": "📦 Preparing full mod build for push...",
+            "pushSuccess": "✅ Build Pushed!",
+            "pulling": "⬇️ Pulling from repo...",
+            "pullSuccess": "✅ Project pulled",
+            "restoring": "⏳ Restoring...",
+            "restored": "✅ Restored!",
+            "failed": "❌ Failed"
+        },
+        "toast": {
+            "settingsSaved": "Settings saved",
+            "enterPat": "Enter PAT and repo first",
+            "configureFirst": "Configure GitHub settings first",
+            "notePosted": "Note posted!",
+            "restoreSuccess": "Restored to",
+            "noteEmpty": "Note is empty"
+        }
+    },
+    "build": {
+        "title": "Build Mod",
+        "description": "Configure your mod details and export a complete DCS-ready mod folder.",
+        "stats": {
+            "assets": "Assets",
+            "audio": "Audio Files",
+            "sdef": "SDEF Edited",
+            "theme": "Theme"
+        },
+        "config": {
+            "title": "Mod Configuration",
+            "modName": "Mod Name",
+            "displayName": "Display Name",
+            "author": "Author / Team",
+            "shortName": "Short Name",
+            "version": "Version",
+            "description": "Description",
+            "url": "URL (optional)",
+            "credits": "Credits",
+            "enableTheme": "Enable Theme",
+            "enableThemeDesc": "Include Theme/ folder in the mod",
+            "save": "Save Configuration"
+        },
+        "audio": {
+            "title": "Audio Format",
+            "format": "Output Format",
+            "common": "Original (keep as-is)",
+            "wav": "Convert all to WAV (PCM 16-bit)",
+            "ogg": "Convert all to OGG (smaller files)",
+            "tip": "DCS supports both .wav and .ogg formats. WAV is higher quality, OGG is smaller.",
+            "warning": "Browser OGG encoding is limited — WAV conversion is recommended."
+        },
+        "preview": {
+            "entry": "entry.lua Preview",
+            "structure": "Output Structure Preview"
+        },
+        "action": {
+            "build": "Build & Export Mod",
+            "noAssets": "No assets selected — go to the Library to select sounds"
+        }
+    }
+}

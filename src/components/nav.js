@@ -4,34 +4,96 @@
  */
 
 import { getState, subscribe, navigate, getSelectedCount } from '../state/store.js';
+import { getAvailableLanguages, getCurrentLanguage, changeLanguage, t } from '../utils/i18n.js';
+import { getIcon, renderIcons } from '../utils/icons.js';
 
 const NAV_ITEMS = [
-  { id: 'library', icon: '📚', label: 'Assets Library', section: 'WORKSPACE' },
-  { id: 'project', icon: '📁', label: 'Project', section: 'WORKSPACE', badge: true },
-  { id: 'sdef-editor', icon: '🎛️', label: 'SDEF Editor', section: 'WORKSPACE' },
-  { id: 'theme', icon: '🎨', label: 'Theme', section: 'CUSTOMIZATION' },
-  { id: 'presets', icon: '💾', label: 'Presets', section: 'CUSTOMIZATION' },
-  { id: 'collaboration', icon: '🤝', label: 'Collaboration', section: 'TEAM' },
-  { id: 'build', icon: '🚀', label: 'Build Mod', section: 'EXPORT' },
-  { id: 'docs', icon: '📖', label: 'Documentation', section: 'HELP' },
-  { id: 'credits', icon: '⭐', label: 'Credits', section: 'HELP' }
+  { id: 'library', icon: 'library', label: 'nav.library', section: 'nav.section.workspace' },
+  { id: 'project', icon: 'folder', label: 'nav.projects', section: 'nav.section.workspace', badge: true },
+  { id: 'sdef-editor', icon: 'sliders', label: 'nav.sdef', section: 'nav.section.workspace' },
+  { id: 'theme', icon: 'palette', label: 'nav.theme', section: 'nav.section.customization' },
+  { id: 'presets', icon: 'save', label: 'nav.presets', section: 'nav.section.customization' },
+  { id: 'collaboration', icon: 'users', label: 'nav.collab', section: 'nav.section.team' },
+  { id: 'build', icon: 'rocket', label: 'nav.builder', section: 'nav.section.export' },
+  { id: 'docs', icon: 'book-open', label: 'nav.docs', section: 'nav.section.help' },
+  { id: 'credits', icon: 'star', label: 'nav.credits', section: 'nav.section.help' },
+  { id: 'tutorial', icon: 'play-circle', label: 'nav.tutorial', section: 'nav.section.help' }
 ];
-
 export function renderNav(container) {
+  const languages = getAvailableLanguages();
+  // ... (omitted unchanging lines)
+  // ...
+  // ...
+
+  const currentLang = getCurrentLanguage();
+  const currentLangObj = languages.find(l => l.code === currentLang) || languages[0];
+
+  const langOptions = languages.map(lang => `
+    <div class="lang-option ${lang.code === currentLang ? 'selected' : ''}" data-lang="${lang.code}">
+      <span class="option-flag">${lang.flag}</span>
+      <span>${lang.name}</span>
+      ${lang.code === currentLang ? getIcon('check', 'w-3 h-3 ml-auto') : ''}
+    </div>
+  `).join('');
+
   container.innerHTML = `
     <div class="sidebar-header">
       <div class="sidebar-brand">
         <img src="/BetterSoundMod.png" alt="Better Sound.Maker" class="sidebar-brand-img" />
       </div>
-      <!-- sidebar-logo removed as requested -->
     </div>
+    
     <div class="sidebar-nav" id="nav-items"></div>
+    
+    <div class="sidebar-lang">
+        <div class="lang-dropdown">
+            <button class="lang-dropdown-btn" id="lang-dropdown-btn">
+                <span class="option-flag">${currentLangObj.flag}</span>
+                <span>${currentLangObj.name}</span>
+                <span class="lang-chevron">${getIcon('chevron-down', 'w-4 h-4')}</span>
+            </button>
+            <div class="lang-dropdown-menu" id="lang-dropdown-menu">
+                ${langOptions}
+            </div>
+        </div>
+    </div>
+
     <div style="padding: 14px 18px; border-top: 1px solid var(--border-subtle);">
       <div style="font-size: 11px; color: var(--text-muted);">DCS 2.9.8.1214</div>
     </div>
   `;
 
   renderNavItems();
+
+  // Language Dropdown Handlers
+  const btn = container.querySelector('#lang-dropdown-btn');
+  const menu = container.querySelector('#lang-dropdown-menu');
+
+  if (btn && menu) {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('show');
+      btn.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.classList.remove('show');
+        btn.classList.remove('active');
+      }
+    });
+
+    menu.querySelectorAll('.lang-option').forEach(el => {
+      el.addEventListener('click', () => {
+        const code = el.dataset.lang;
+        changeLanguage(code);
+        renderNav(container);
+      });
+    });
+  }
+
+  // Render initial icons in static parts (lang selector)
+  renderIcons(container);
 
   subscribe('currentPage', renderNavItems);
   subscribe('selectedAssets', renderNavItems);
@@ -51,7 +113,7 @@ function renderNavItems() {
   for (const item of NAV_ITEMS) {
     if (item.section !== lastSection) {
       lastSection = item.section;
-      html += `<div class="nav-section-label">${item.section}</div>`;
+      html += `<div class="nav-section-label">${t(item.section)}</div>`;
     }
 
     const active = currentPage === item.id ? 'active' : '';
@@ -59,10 +121,13 @@ function renderNavItems() {
       ? `<span class="nav-badge">${selectedCount}</span>`
       : '';
 
+    // Translate label
+    const label = t(item.label);
+
     html += `
       <div class="nav-item ${active}" data-page="${item.id}">
-        <span class="nav-icon">${item.icon}</span>
-        <span>${item.label}</span>
+        <span class="nav-icon">${getIcon(item.icon)}</span>
+        <span>${label}</span>
         ${badge}
       </div>
     `;
@@ -73,7 +138,14 @@ function renderNavItems() {
   // Add click handlers
   navContainer.querySelectorAll('.nav-item').forEach(el => {
     el.addEventListener('click', () => {
-      navigate(el.dataset.page);
+      if (el.dataset.page === 'tutorial') {
+        import('../pages/onboarding.js').then(m => m.restartTutorial());
+      } else {
+        navigate(el.dataset.page);
+      }
     });
   });
+
+  // Render icons (Lucide)
+  renderIcons(navContainer);
 }

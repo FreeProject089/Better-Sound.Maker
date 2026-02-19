@@ -1,0 +1,475 @@
+{
+    "_info": {
+        "name": "Français",
+        "flag": "🇫🇷"
+    },
+    "common": {
+        "actions": "Actions",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "remove": "Retirer",
+        "edit": "Éditer",
+        "upload": "Télécharger",
+        "back": "Retour",
+        "next": "Suivant",
+        "finish": "Terminer",
+        "on": "ON",
+        "off": "OFF",
+        "pageNotFound": "Page non trouvée"
+    },
+    "nav": {
+        "dashboard": "Tableau de Bord",
+        "projects": "Projets",
+        "library": "Bibliothèque Assets",
+        "sdef": "Éditeur SDEF",
+        "builder": "Générateur de Mod",
+        "docs": "Documentation",
+        "theme": "Thème & Paramètres",
+        "collab": "Collaboration",
+        "presets": "Préréglages",
+        "credits": "Crédits",
+        "section": {
+            "workspace": "ESPACE DE TRAVAIL",
+            "customization": "PERSONNALISATION",
+            "team": "ÉQUIPE",
+            "export": "EXPORT",
+            "help": "AIDE"
+        },
+        "tutorial": "Relancer Tuto"
+    },
+    "project": {
+        "title": "Projets",
+        "description": "Gérez vos assets sonores sélectionnés et uploadez des fichiers audio personnalisés.",
+        "manageSubtitle": "Gérez {count} assets sélectionnés. Uploadez vos audio et configurez chaque asset.",
+        "createTitle": "Créer un Nouveau Projet",
+        "name": "Nom du Projet",
+        "desc": "Description",
+        "version": "Version",
+        "author": "Auteur",
+        "loop": "En Boucle (Loop)",
+        "oneShot": "Coup Unique (One-Shot)",
+        "noAssetsTitle": "Aucun Asset Sélectionné",
+        "noAssetsText": "Allez dans la Bibliothèque d'Assets pour choisir les sons à modifier.",
+        "goToLibrary": "Aller à la Bibliothèque",
+        "audioAssigned": "Audio Assigné",
+        "missingAudio": "Audio Manquant",
+        "audioFile": "Fichier Audio",
+        "clickDragUpload": "Cliquez ou Glissez un Audio",
+        "editSdef": "Éditer SDEF",
+        "remove": "Retirer du projet",
+        "play": "Lire",
+        "replace": "Remplacer",
+        "reupload": "Ré-uploader",
+        "removeAudio": "Retirer Audio"
+    },
+    "library": {
+        "title": "Bibliothèque d'Assets",
+        "description": "Parcourez les assets sonores DCS. Naviguez, remplacez l'audio et annotez.",
+        "searchPlaceholder": "Chercher chemin SDEF, wave...",
+        "selectAll": "Tout Sélectionner",
+        "clearSelection": "Effacer Sélection",
+        "reload": "Recharger la Bibliothèque",
+        "allAssets": "Tous les Assets",
+        "sdefFile": "SDEF / Fichier",
+        "waves": "Fichier(s) Wave",
+        "type": "Type",
+        "loop": "Boucle",
+        "note": "Note",
+        "emptyDetail": "Cliquez sur une ligne pour voir les détails, ajouter des notes et upload l'audio.",
+        "totalAssets": "Total Assets",
+        "modules": "Modules",
+        "showing": "Affichage",
+        "selected": "Sélectionné",
+        "waveNotePlaceholder": "Note sur ce fichier wave...",
+        "uploadWaveReplacement": "Remplacer ce fichier wave spécifique",
+        "uploadWav": "Upload WAV/OGG",
+        "sdefNote": "Note SDEF",
+        "sdefNotePlaceholder": "Ajouter une note...",
+        "waveFiles": "Fichiers Wave",
+        "noWavePaths": "Aucun chemin wave défini",
+        "replaceAudio": "Remplacer Audio",
+        "uploadAudio": "Ajouter Audio",
+        "deselect": "Désélectionner",
+        "select": "Sélectionner",
+        "remove": "Retirer Audio"
+    },
+    "sdef": {
+        "title": "Éditeur SDEF",
+        "description": "Éditez les paramètres .sdef — basculez entre l'interface visuelle et le mode texte brut.",
+        "visual": "Visuel",
+        "raw": "Brut",
+        "save": "Enregistrer",
+        "saved": "SDEF Enregistré",
+        "noSelectionTitle": "Sélectionnez un fichier SDEF",
+        "noSelectionText": "Choisissez un fichier dans la barre latérale pour commencer l'édition.",
+        "nofiles": "Aucun fichier .sdef trouvé dans Sounds/sdef/",
+        "groups": {
+            "include": "Héritage",
+            "sample": "Échantillon Sonore",
+            "volume": "Contrôle du Volume",
+            "frequency": "Fréquence / Pitch",
+            "filtering": "Filtrage",
+            "position": "Position 3D",
+            "radius": "Distance & Rayon",
+            "cone": "Directionnalité (Cône)",
+            "playmode": "Mode de Lecture",
+            "envelope": "Enveloppe (Attack/Release)",
+            "stereo": "Stéréo & Largeur",
+            "doppler": "Effet Doppler"
+        },
+        "params": {
+            "inherit": "Héritage (.sdef)",
+            "wave": "Fichier Wave",
+            "gain": "Gain (Volume)",
+            "pitch": "Pitch (Fréquence)",
+            "lowpass": "Filtre Passe-bas",
+            "position": "Position Relative",
+            "silent_radius": "Rayon Silencieux",
+            "peak_radius": "Rayon Volume Max",
+            "inner_radius": "Rayon Réf (Inner)",
+            "outer_radius": "Rayon Max (Outer)",
+            "direction": "Direction",
+            "cone_inner_angle": "Angle Interne",
+            "cone_outer_angle": "Angle Externe",
+            "cone_outer_gain": "Gain Externe",
+            "cone_outer_lowpass": "Passe-bas Externe",
+            "detached": "Détaché (One-Shot)",
+            "streaming": "Streaming",
+            "listmode": "Mode de Liste",
+            "attack": "Attaque",
+            "release": "Relâchement",
+            "auto_width": "Largeur Auto",
+            "nodoppler": "Désactiver Doppler",
+            "distance_filter_offset": "Offset Filtre Distance"
+        }
+    },
+    "themePage": {
+        "title": "Thème & Paramètres",
+        "description": "Personnalisez l'UI de DCS et les paramètres de l'application.",
+        "enable": "Activer le Thème",
+        "enableDesc": "Si activé, le mod inclura un dossier Theme/ avec vos images personnalisées et le entry.lua montera les textures.",
+        "disabledTitle": "Thème Désactivé",
+        "disabledText": "Activez l'option ci-dessus pour configurer les images personnalisées.",
+        "clickToUpload": "Cliquez pour upload",
+        "remove": "Retirer",
+        "slots": {
+            "icon": {
+                "name": "Icône du Mod",
+                "desc": "Icône visible dans le gestionnaire de mods DCS"
+            },
+            "mainMenu": {
+                "name": "Logo Menu Principal",
+                "desc": "Logo affiché sur le menu principal"
+            },
+            "loading": {
+                "name": "Écran de Chargement",
+                "desc": "Image de fond pendant le chargement"
+            },
+            "briefing": {
+                "name": "Fond Carte Briefing",
+                "desc": "Fond pour la carte de briefing de mission"
+            },
+            "baseMenu": {
+                "name": "Fenêtre Menu Base",
+                "desc": "Fond pour la fenêtre de menu de base"
+            }
+        }
+    },
+    "tutorial": {
+        "welcome": "Bienvenue sur Better ModMaker !",
+        "intro": "Faisons un tour rapide pour bien démarrer.",
+        "language": "Veuillez choisir votre langue pour commencer.",
+        "library": "C'est ici que vous parcourez et sélectionnez les assets sonores DCS. Naviguez dans l'arborescence et cochez les fichiers à remplacer.",
+        "project": "Configurez ici les détails de votre mod : nom, avion, version. Tous les assets sélectionnés apparaissent ici pour révision.",
+        "sdef": "Chaque asset a besoin d'un fichier .sdef. L'éditeur visuel vous permet d'ajuster le volume, la boucle, la distance, etc. — sans code !",
+        "theme": "Personnalisez l'apparence de l'application. Changez l'image de fond et les couleurs d'accentuation.",
+        "presets": "Enregistrez et chargez vos préréglages de paramètres SDEF. Idéal pour réutiliser des réglages sur différents mods.",
+        "collab": "Connectez-vous à un dépôt GitHub pour synchroniser avec vos coéquipiers. Pushez votre build, laissez des notes, et restaurez des versions.",
+        "build": "Quand vous êtes prêt, cliquez sur Build pour générer le dossier de mod complet — entry.lua, fichiers sdef et audio — prêt pour DCS Mods.",
+        "docs": "Tout ce que vous devez savoir sur le modding sonore DCS : formats de fichiers, paramètres, astuces et exemples.",
+        "credits": "Infos sur l'app, le développeur et liens utiles. C'est parti — bon modding ! 🎧",
+        "skip": "Passer",
+        "finished": "Vous êtes prêt ! Profitez du modding."
+    },
+    "docs": {
+        "title": "Documentation",
+        "desc": "Apprenez à utiliser Better ModMaker et à créer des mods sonores DCS.",
+        "tabs": {
+            "audio": "Guide Audio",
+            "sdef": "Guide SDEF",
+            "f18": "Référence F/A-18C",
+            "theme": "Guide Thème",
+            "install": "Installation"
+        },
+        "loadSoundsTitle": "Comment DCS Charge les Sons",
+        "loadSoundsDesc": "Quand DCS a besoin d'un son, il cherche le fichier SDEF au chemin spécifié. Le SDEF dit à DCS :",
+        "loadSoundsSteps": {
+            "1": "Quel(s) fichier(s) audio utiliser (<code>wave</code>)",
+            "2": "À quel volume le jouer (<code>gain</code>)",
+            "3": "D'où il vient dans l'espace 3D (<code>position</code>, <code>inner_radius</code>, <code>outer_radius</code>)",
+            "4": "Comment le jouer (boucle, coup unique, sélection aléatoire)"
+        },
+        "overridePriority": "<strong>Priorité de Surcharge :</strong> Quand vous montez votre dossier <code>Sounds/</code> avec <code>mount_vfs_sound_path</code>, vos fichiers SDEF prennent la priorité sur ceux par défaut de DCS. Vous n'avez besoin d'inclure que les fichiers que vous souhaitez modifier.",
+        "fullRefTitle": "Référence Complète des Paramètres",
+        "examples": {
+            "switch": "Exemple : Switch Simple (One-Shot)",
+            "random": "Exemple : Sélection Aléatoire",
+            "engine": "Exemple : Boucle Moteur avec Cône"
+        }
+    },
+    "docs_content": {
+        "audio": {
+            "title": "🎵 Guide Audio pour le Modding DCS",
+            "monoStereo": {
+                "title": "Mono vs Stéréo",
+                "table": {
+                    "channels": "Canaux",
+                    "size": "Taille",
+                    "spatial": "Spatialisation 3D",
+                    "use": "Usage",
+                    "mono": "Mono",
+                    "stereo": "Stéréo",
+                    "monoDesc": "1 canal",
+                    "stereoDesc": "2 canaux (G+D)",
+                    "smaller": "Plus petit",
+                    "larger": "~2x plus gros",
+                    "full3d": "✅ Positionnement 3D complet",
+                    "limited3d": "❌ Limité — sons centrés",
+                    "engineSwitch": "Moteurs, switchs, armes",
+                    "ambient": "Ambiance, radio, musique"
+                },
+                "tip": "<strong>Règle d'or :</strong> Si DCS doit positionner le son en 3D (moteurs, armes), utilisez <strong>Mono</strong>. La stéréo est pour l'ambiance et l'UI."
+            },
+            "loopOneshot": {
+                "title": "Boucle vs One-Shot",
+                "desc": "DCS distingue deux modes de lecture :",
+                "loop": "<strong>Boucle (Loop) :</strong> Son continu (moteurs, vent). Nécessite des points de boucle parfaits.",
+                "oneshot": "<strong>One-shot :</strong> Son joué une fois (clic, explosion). Mettez <code>detached = true</code> dans le SDEF.",
+                "warning": "<strong>Important :</strong> Les boucles doivent être propres — sans clic au début/fin. Utilisez un DAW pour les crossfades."
+            }
+        },
+        "sdef": {
+            "title": "📄 Guide Fichier SDEF",
+            "whatIs": {
+                "title": "Qu'est-ce qu'un fichier .sdef ?",
+                "p1": "Un fichier <code>.sdef</code> indique à DCS comment jouer un son. Il définit le fichier audio, le volume, la spatialisation, etc.",
+                "p2": "Les SDEF sont dans <code>Sounds/sdef/</code> et référencent les audios dans <code>Sounds/Effects/</code>."
+            }
+        },
+        "theme": {
+            "title": "🎨 Guide Thème",
+            "whatIs": {
+                "title": "Qu'est-ce qu'un thème DCS ?",
+                "desc": "Un thème permet de personnaliser l'interface de DCS World — image de fond, chargement, briefing, et icône de mod."
+            },
+            "fileRequirements": {
+                "title": "Prérequis des Fichiers",
+                "file": "Fichier",
+                "location": "Emplacement",
+                "size": "Taille",
+                "usage": "Usage dans DCS",
+                "iconUsage": "Icône du mod dans le gestionnaire de modules",
+                "logoSize": "Variable",
+                "logoUsage": "Logo affiché sur le menu principal",
+                "loadingUsage": "Image de fond pendant le chargement de mission",
+                "briefingSize": "Variable",
+                "briefingUsage": "Fond de la carte de briefing",
+                "menuUsage": "Image de fond du menu principal"
+            },
+            "formatRecommendations": {
+                "title": "Recommandations de Format",
+                "png": "Tous les fichiers doivent être au format <strong>PNG</strong>",
+                "resolution": "Utilisez les résolutions recommandées pour de meilleurs résultats",
+                "transparency": "L'icône supporte la <strong>transparence</strong>",
+                "hd": "Les fonds d'écran doivent être en <strong>1920×1080</strong> pour le Full HD",
+                "vram": "Des images plus grandes peuvent fonctionner mais utiliseront plus de VRAM"
+            },
+            "folderStructure": {
+                "title": "Structure du Dossier Thème"
+            },
+            "tip": "Le support de thème doit être activé dans le entry.lua avec une section <code>Skins</code>. La page Build le gère automatiquement si vous activez le Thème."
+        },
+        "install": {
+            "title": "📦 Installer un Mod Son DCS",
+            "steps": "Étapes d'installation",
+            "step1": "Allez dans votre dossier Parties Enregistrées DCS :",
+            "step2": "Copiez votre dossier de mod (ex: <code>SoundModBetterHornet/</code>) dans le dossier <code>resource</code>.",
+            "step3": "Lancez DCS World.",
+            "step4": "Votre mod devrait être automatiquement détecté !",
+            "trouble": "Dépannage",
+            "folderStructure": "Structure Finale des Dossiers",
+            "links": "Liens Utiles"
+        },
+        "gain": {
+            "title": "Modèle Gain-Distance",
+            "desc": "DCS utilise une courbe de gain multi-étapes basée sur la distance. Ce modèle visuel montre comment le volume (gain) change lorsque vous vous éloignez.",
+            "rampUp": {
+                "title": "1. Montée",
+                "desc": "De <code>silent_radius</code> à <code>peak_radius</code>. Le son monte linéairement de 0 à 100%."
+            },
+            "peak": {
+                "title": "2. Zone Pic",
+                "desc": "À <code>peak_radius</code>, le volume est maximum (Gain = 1.0)."
+            },
+            "reference": {
+                "title": "3. Référence",
+                "desc": "À <code>inner_radius</code>, le volume est défini à 0.85 du max. C'est le point de référence standard DCS."
+            },
+            "falloff": {
+                "title": "4. Atténuation",
+                "desc": "De <code>inner_radius</code> à <code>outer_radius</code>, le volume baisse selon une courbe inverse jusqu'à 0."
+            }
+        },
+        "f18": {
+            "title": "Référence Sonore Complète F/A-18C",
+            "desc": "Basé sur le mod BetterHornet — tous les fichiers SDEF et WAV détaillés.",
+            "tipMono": "<strong>🚨 MONO vs STÉRÉO :</strong><br><strong>MONO (1 Canal) :</strong> OBLIGATOIRE pour tout ce qui est <strong>extérieur / 3D</strong>. DCS place le son dans l'espace.<br><strong>STÉRÉO (2 Canaux) :</strong> Pour les sons <strong>\"Ambiance\" / \"dans le casque\"</strong> (vent, ECS, respiration pilote).",
+            "warningLoop": "<strong>🔄 Durée des Loops :</strong><br><strong>Standard (4-8s) :</strong> Recommandé, évite les problèmes de pitch variable.<br><strong>Pro (30s+) :</strong> Plus réaliste mais le régime moteur doit être parfaitement stable sinon DCS créera des artefacts audibles (\"pleurage\").",
+            "sections": {
+                "engines": "Moteurs & APU (Externe) — MONO",
+                "flyby": "Sons Distants (Flyby) — MONO",
+                "cockpit": "Cockpit (Interne) — STÉRÉO",
+                "switches": "Switchs (Sw01-15) — MONO",
+                "betty": "Betty (Alertes Vocales)",
+                "tones": "Tones (RWR & Alertes)",
+                "weapons": "Weapons (Armement) — MONO",
+                "explosions": "Explosions — MONO",
+                "damage": "Dégâts & Personnel",
+                "customTips": "Astuces de Customisation SDEF",
+                "randomLists": "Listes Aléatoires"
+            },
+            "tips": {
+                "enginePitch": "<strong>🔊 Moteurs (plus \"Gras\" ou \"Aigu\") :</strong><br><code>pitch = 0.9</code> → Plus grave/lent (Rumble profond)<br><code>pitch = 1.1</code> → Plus aigu/rapide (Turbine stridente)<br><code>gain = 2.0</code> → Double le volume (⚠ saturation!)",
+                "cockpitQuiet": "<strong>🔇 Cockpit (Rendre plus silencieux) :</strong><br><code>gain = 0.3</code> → Si un son (ECS/Clim) casse les oreilles<br><code>inner_radius = 5</code> → Réduit la zone d'impact",
+                "explosionsDist": "<strong>💥 Explosions (Rendre plus \"Loin\") :</strong><br><code>pitch_random = 0.2</code> → Chaque explosion aura un pitch différent (±20%) — anti-robot<br><code>distance_filter_offset = 1000</code> → Son clair même de loin",
+                "randomListDesc": "Idéal pour les explosions, switchs, bruits mécaniques — chaque activation est unique."
+            }
+        },
+        "defaults": {
+            "title": "Valeurs par Défaut Recommandées",
+            "desc": "Le créateur de mod remplit automatiquement ces valeurs selon le type de son :",
+            "note": "Note : Un \"—\" signifie que la valeur par défaut du moteur DCS est utilisée."
+        }
+    },
+    "creditsPage": {
+        "subtitle": "À propos de Better Sound.Maker",
+        "appDescription": "Un outil complet pour créer des mods sonores DCS World. Sélectionnez des assets, uploadez l'audio, éditez les SDEF et créez des packages prêts à installer.",
+        "author": "Auteur",
+        "creator": "Créateur & Développeur",
+        "builtFor": "Conçu pour",
+        "linksTitle": "Liens & Communauté",
+        "github": {
+            "title": "Dépôt GitHub",
+            "sub": "FreeProject089/Better-ModMaker"
+        },
+        "discord": {
+            "title": "Communauté Discord",
+            "sub": "Aide & Mises à jour"
+        },
+        "ed": {
+            "title": "Forums Eagle Dynamics",
+            "sub": "Ressources de modding DCS World"
+        }
+    },
+    "collabPage": {
+        "title": "Collaboration",
+        "description": "Synchronisez votre mod avec un dépôt GitHub. Travaillez à plusieurs, partagez des notes et restaurez des versions précédentes.",
+        "settings": {
+            "title": "Paramètres GitHub",
+            "sub": "Connectez-vous à votre dépôt",
+            "pat": "Jeton d'Accès Personnel (PAT)",
+            "patNote": "(stocké localement uniquem.)",
+            "repoScope": "Nécessite scope repo.",
+            "createToken": "Créer jeton",
+            "repo": "Dépôt (Repository)",
+            "username": "Votre Nom / Pseudo"
+        },
+        "sync": {
+            "title": "Synchronisation",
+            "sub": "Push ou Pull le mod complet"
+        },
+        "notes": {
+            "title": "Notes d'Équipe",
+            "sub": "Partagez des messages",
+            "placeholder": "Écrire une note pour l'équipe...",
+            "empty": "Aucune note.",
+            "loading": "⏳ Chargement..."
+        },
+        "history": {
+            "title": "Historique des Commits",
+            "sub": "Restaurer une version précédente",
+            "empty": "Aucun commit — pushez votre projet d'abord !",
+            "loading": "⏳ Chargement..."
+        },
+        "buttons": {
+            "save": "Enregistrer",
+            "test": "Tester",
+            "push": "Push",
+            "pull": "Pull",
+            "post": "Envoyer Note",
+            "refresh": "Actualiser",
+            "restore": "Restaurer cette version"
+        },
+        "status": {
+            "testing": "⏳ Test de connexion...",
+            "connected": "✅ Connecté en tant que",
+            "pushing": "📦 Préparation du build pour push...",
+            "pushSuccess": "✅ Build Pushé !",
+            "pulling": "⬇️ Récupération du dépôt...",
+            "pullSuccess": "✅ Projet récupéré",
+            "restoring": "⏳ Restauration...",
+            "restored": "✅ Restauré !",
+            "failed": "❌ Échec"
+        },
+        "toast": {
+            "settingsSaved": "Paramètres enregistrés",
+            "enterPat": "Entrez PAT et dépôt d'abord",
+            "configureFirst": "Configurez GitHub d'abord",
+            "notePosted": "Note envoyée !",
+            "restoreSuccess": "Restauré vers",
+            "noteEmpty": "La note est vide"
+        }
+    },
+    "build": {
+        "title": "Construire le Mod",
+        "description": "Configurez les détails de votre mod et exportez un dossier prêt pour DCS.",
+        "stats": {
+            "assets": "Assets",
+            "audio": "Fichiers Audio",
+            "sdef": "SDEF édités",
+            "theme": "Thème"
+        },
+        "config": {
+            "title": "Configuration du Mod",
+            "modName": "Nom du Mod",
+            "displayName": "Nom d'affichage",
+            "author": "Auteur / Équipe",
+            "shortName": "Nom Court",
+            "version": "Version",
+            "description": "Description",
+            "url": "URL (optionnel)",
+            "credits": "Crédits",
+            "enableTheme": "Activer le Thème",
+            "enableThemeDesc": "Inclure le dossier Theme/ dans le mod",
+            "save": "Sauvegarder Configuration"
+        },
+        "audio": {
+            "title": "Format Audio",
+            "format": "Format de Sortie",
+            "common": "Original (tel quel)",
+            "wav": "Tout convertir en WAV (PCM 16-bit)",
+            "ogg": "Tout convertir en OGG (fichiers plus légers)",
+            "tip": "DCS supporte .wav et .ogg. WAV est meilleure qualité en PCM, OGG est plus léger.",
+            "warning": "L'encodage OGG par navigateur est limité — Conversion WAV recommandée."
+        },
+        "preview": {
+            "entry": "Aperçu entry.lua",
+            "structure": "Aperçu Structure"
+        },
+        "action": {
+            "build": "Construire & Exporter",
+            "noAssets": "Aucun asset sélectionné — allez dans la Bibliothèque"
+        }
+    }
+}

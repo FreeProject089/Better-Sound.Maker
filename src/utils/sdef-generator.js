@@ -34,7 +34,10 @@ export { SDEF_PARAMS };
  * Generate SDEF text from a params object
  */
 export function generateSdef(params) {
-    const lines = [];
+    const lines = [
+        '-- Generated with Better ModMaker',
+        ''
+    ];
 
     // Wave
     if (params.wave) {

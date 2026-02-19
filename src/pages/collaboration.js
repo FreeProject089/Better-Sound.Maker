@@ -19,6 +19,8 @@ import { showToast } from '../components/toast.js';
 import { generateEntryLua } from '../utils/entry-generator.js';
 import { generateSdef } from '../utils/sdef-generator.js';
 import { detectSoundType, getTypeDefaults } from '../utils/audio-analyzer.js';
+import { t, updateTranslations } from '../utils/i18n.js';
+import { getIcon, renderIcons } from '../utils/icons.js';
 
 const COLLAB_KEY = 'bsm-collab';
 
@@ -37,97 +39,137 @@ export function renderCollaboration(container) {
 
   container.innerHTML = `
     <div class="page-header">
-      <h1 class="page-title">🤝 Collaboration</h1>
-      <p class="page-description">
-        Sync your mod project with a GitHub repository. Multiple users can work on the same mod,
-        share notes, and restore any previous version.
+      <h1 class="page-title" data-i18n="collabPage.title">Collaboration</h1>
+      <p class="page-description" data-i18n="collabPage.description">
+        ${t('collabPage.description')}
       </p>
     </div>
 
-    <!-- ── Settings ─────────────────────────────────────── -->
     <div class="collab-grid">
       <div class="collab-left">
 
-        <div class="card" style="margin-bottom:20px;">
-          <div class="card-title" style="margin-bottom:16px;">⚙️ GitHub Settings</div>
+        <!-- GitHub Settings -->
+        <div class="card collab-card" style="margin-bottom:20px;">
+          <div class="collab-card-header">
+            <div class="collab-card-icon" style="background:rgba(255,255,255,0.08);">
+              ${getIcon('github')}
+            </div>
+            <div>
+              <div class="collab-card-title">${t('collabPage.settings.title')}</div>
+              <div class="collab-card-sub">${t('collabPage.settings.sub')}</div>
+            </div>
+          </div>
           <div class="flex-col" style="gap:14px;">
-
             <div class="input-group">
-              <label class="input-label">GitHub PAT
-                <span style="font-size:10px;color:var(--text-muted);margin-left:6px;">(stored locally only)</span>
+              <label class="input-label">${t('collabPage.settings.pat')}
+                <span style="font-size:10px;color:var(--text-muted);margin-left:6px;">${t('collabPage.settings.patNote')}</span>
               </label>
               <input type="password" class="input-field" id="collab-pat"
                      placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
                      value="${escHtml(cfg.pat || '')}" />
               <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
-                Needs <strong>repo</strong> scope.
+                ${t('collabPage.settings.repoScope')}
                 <a href="https://github.com/settings/tokens/new" target="_blank"
-                   style="color:var(--accent-blue);">Create token ↗</a>
+                   style="color:var(--accent-blue);">${t('collabPage.settings.createToken')} ↗</a>
               </div>
             </div>
-
             <div class="input-group">
-              <label class="input-label">Repository</label>
+              <label class="input-label">${t('collabPage.settings.repo')}</label>
               <input type="text" class="input-field" id="collab-repo"
                      placeholder="owner/my-sound-mod"
                      value="${escHtml(cfg.repo || '')}" />
             </div>
-
             <div class="input-group">
-              <label class="input-label">Your Name / Username</label>
+              <label class="input-label">${t('collabPage.settings.username')}</label>
               <input type="text" class="input-field" id="collab-username"
                      placeholder="YourName"
                      value="${escHtml(cfg.username || '')}" />
             </div>
-
             <div class="flex-gap" style="gap:10px;margin-top:4px;">
-              <button class="btn btn-secondary" id="collab-save-btn" style="flex:1;">💾 Save Settings</button>
-              <button class="btn btn-secondary" id="collab-test-btn" style="flex:1;">🔌 Test Connection</button>
+              <button class="btn btn-secondary" id="collab-save-btn" style="flex:1;">
+                ${getIcon('save', 'w-3 h-3')}
+                ${t('collabPage.buttons.save')}
+              </button>
+              <button class="btn btn-secondary" id="collab-test-btn" style="flex:1;">
+                ${getIcon('zap', 'w-3 h-3')}
+                ${t('collabPage.buttons.test')}
+              </button>
             </div>
-            <div id="collab-status" style="font-size:12px;display:none;"></div>
+            <div id="collab-status" class="collab-status-bar" style="display:none;"></div>
           </div>
         </div>
 
-        <!-- ── Sync ─────────────────────────────────────── -->
-        <div class="card" style="margin-bottom:20px;">
-          <div class="card-title" style="margin-bottom:16px;">☁️ Sync Project</div>
-          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">
-            Push your current project state to the repo, or pull the latest from teammates.
-          </p>
-          <div class="flex-gap" style="gap:10px;">
-            <button class="btn btn-success" id="collab-push-btn" style="flex:1;">⬆️ Push</button>
-            <button class="btn btn-secondary" id="collab-pull-btn" style="flex:1;">⬇️ Pull</button>
+        <!-- Sync -->
+        <div class="card collab-card" style="margin-bottom:20px;">
+          <div class="collab-card-header">
+            <div class="collab-card-icon" style="background:rgba(16,185,129,0.12);color:var(--accent-green);">
+              ${getIcon('refresh-cw')}
+            </div>
+            <div>
+              <div class="collab-card-title">${t('collabPage.sync.title')}</div>
+              <div class="collab-card-sub">${t('collabPage.sync.sub')}</div>
+            </div>
           </div>
-          <div id="collab-sync-status" style="font-size:12px;margin-top:10px;display:none;"></div>
+          <div class="collab-sync-btns">
+            <button class="btn btn-success collab-sync-btn" id="collab-push-btn">
+              ${getIcon('upload', 'w-4 h-4')}
+              ${t('collabPage.buttons.push')}
+            </button>
+            <button class="btn btn-secondary collab-sync-btn" id="collab-pull-btn">
+              ${getIcon('download', 'w-4 h-4')}
+              ${t('collabPage.buttons.pull')}
+            </button>
+          </div>
+          <div id="collab-sync-status" class="collab-status-bar" style="display:none;margin-top:10px;"></div>
         </div>
 
-        <!-- ── Notes ────────────────────────────────────── -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:16px;">📝 Team Notes</div>
-          <textarea class="input-field" id="collab-note-text"
-                    rows="4"
-                    placeholder="Write a note for the team..."></textarea>
-          <button class="btn btn-secondary" id="collab-note-send" style="width:100%;margin-top:10px;">
-            📨 Post Note
-          </button>
-          <button class="btn btn-secondary" id="collab-notes-load" style="width:100%;margin-top:8px;font-size:12px;">
-            🔄 Load Team Notes
-          </button>
-          <div id="collab-notes-list" style="margin-top:14px;"></div>
+        <!-- Notes -->
+        <div class="card collab-card">
+          <div class="collab-card-header">
+            <div class="collab-card-icon" style="background:rgba(139,92,246,0.12);color:var(--accent-purple);">
+              ${getIcon('message-square')}
+            </div>
+            <div>
+              <div class="collab-card-title">${t('collabPage.notes.title')}</div>
+              <div class="collab-card-sub">${t('collabPage.notes.sub')}</div>
+            </div>
+          </div>
+          <textarea class="input-field" id="collab-note-text" rows="3" placeholder="${t('collabPage.notes.placeholder')}"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button class="btn btn-primary" id="collab-note-send" style="flex:1;">
+              ${getIcon('send', 'w-3 h-3')}
+              ${t('collabPage.buttons.post')}
+            </button>
+            <button class="btn btn-secondary" id="collab-notes-load">
+              ${getIcon('refresh-cw', 'w-3 h-3')}
+              ${t('collabPage.buttons.refresh')}
+            </button>
+          </div>
+          <div id="collab-notes-list" style="margin-top:16px;"></div>
         </div>
 
       </div>
 
-      <!-- ── History ──────────────────────────────────────── -->
+      <!-- History -->
       <div class="collab-right">
-        <div class="card" style="height:100%;">
-          <div class="flex-between" style="margin-bottom:16px;">
-            <div class="card-title">📜 Commit History</div>
-            <button class="btn btn-secondary btn-sm" id="collab-history-load">🔄 Refresh</button>
+        <div class="card collab-card" style="height:100%;">
+          <div class="collab-card-header" style="margin-bottom:16px;">
+            <div class="collab-card-icon" style="background:rgba(59,130,246,0.12);color:var(--accent-blue);">
+              ${getIcon('git-commit')}
+            </div>
+            <div style="flex:1;">
+              <div class="collab-card-title">${t('collabPage.history.title')}</div>
+              <div class="collab-card-sub">${t('collabPage.history.sub')}</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="collab-history-load">
+              ${getIcon('refresh-cw', 'w-3 h-3')}
+              ${t('collabPage.buttons.refresh')}
+            </button>
           </div>
           <div id="collab-history-list">
-            <div style="color:var(--text-muted);font-size:12px;text-align:center;padding:30px 0;">
-              Click Refresh to load commit history
+            <div class="collab-history-empty">
+              <div style="color:var(--text-muted);margin-bottom:10px;">${getIcon('git-commit', 'w-8 h-8')}</div>
+              <div>${t('collabPage.history.empty')}</div>
             </div>
           </div>
         </div>
@@ -137,6 +179,8 @@ export function renderCollaboration(container) {
 
   addCollabStyles();
   bindCollabEvents();
+  updateTranslations();
+  renderIcons(container);
 }
 
 /* ── Event binding ────────────────────────────────────────────────── */
@@ -150,21 +194,21 @@ function bindCollabEvents() {
       username: document.getElementById('collab-username')?.value.trim() || '',
     };
     saveCollabConfig(cfg);
-    showToast('Settings saved', 'success');
+    showToast(t('collabPage.toast.settingsSaved'), 'success');
   });
 
   // Test connection
   document.getElementById('collab-test-btn')?.addEventListener('click', async () => {
     const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast('Enter PAT and repo first', 'warning'); return; }
+    if (!pat || !repo) { showToast(t('collabPage.toast.enterPat'), 'warning'); return; }
 
     const statusEl = document.getElementById('collab-status');
     statusEl.style.display = 'block';
-    statusEl.textContent = '⏳ Testing connection…';
+    statusEl.textContent = t('collabPage.status.testing');
 
     const result = await testConnection(pat, repo);
     if (result.ok) {
-      statusEl.innerHTML = `✅ Connected as <strong>${result.user}</strong> → <strong>${result.repoName}</strong>`;
+      statusEl.innerHTML = `${t('collabPage.status.connected')} <strong>${result.user}</strong> → <strong>${result.repoName}</strong>`;
       statusEl.style.color = 'var(--accent-green)';
     } else {
       statusEl.textContent = `❌ ${result.error}`;
@@ -175,11 +219,11 @@ function bindCollabEvents() {
   // Push (Re-implemented as "Push Build")
   document.getElementById('collab-push-btn')?.addEventListener('click', async () => {
     const { pat, repo, username } = getCollabInputs();
-    if (!pat || !repo) { showToast('Configure GitHub settings first', 'warning'); return; }
+    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
 
     const syncEl = document.getElementById('collab-sync-status');
     syncEl.style.display = 'block';
-    syncEl.textContent = '📦 Preparing full mod build for push...';
+    syncEl.textContent = t('collabPage.status.pushing');
 
     const state = getState();
     const config = state.projectConfig;
@@ -291,13 +335,13 @@ function bindCollabEvents() {
         }
       }
 
-      syncEl.innerHTML = `✅ Build Pushed! ${count} assets synced.`;
+      syncEl.innerHTML = `${t('collabPage.status.pushSuccess')} ${count} assets synced.`;
       syncEl.style.color = 'var(--accent-green)';
-      showToast('Full project build pushed to GitHub!', 'success');
+      showToast(t('collabPage.status.pushSuccess'), 'success');
 
     } catch (err) {
       console.error(err);
-      syncEl.textContent = `❌ Push failed: ${err.message}`;
+      syncEl.textContent = `${t('collabPage.status.failed')}: ${err.message}`;
       syncEl.style.color = 'var(--accent-red, #f85149)';
     }
   });
@@ -305,11 +349,11 @@ function bindCollabEvents() {
   // Pull
   document.getElementById('collab-pull-btn')?.addEventListener('click', async () => {
     const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast('Configure GitHub settings first', 'warning'); return; }
+    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
 
     const syncEl = document.getElementById('collab-sync-status');
     syncEl.style.display = 'block';
-    syncEl.textContent = '⬇️ Pulling from repo…';
+    syncEl.textContent = t('collabPage.status.pulling');
 
     const result = await pullProjectState(pat, repo);
     if (result.ok) {
@@ -351,7 +395,7 @@ function bindCollabEvents() {
             }
           }
         }
-        syncEl.innerHTML = `✅ Project pulled + ${downloaded} audio files loaded!`;
+        syncEl.innerHTML = `${t('collabPage.status.pullSuccess')} + ${downloaded} audio files loaded!`;
       } catch (err) {
         console.error('Audio pull error', err);
         syncEl.innerHTML += `<br>⚠ Audio dl warning: ${err.message}`;
@@ -359,24 +403,24 @@ function bindCollabEvents() {
       // --- AUDIO PULL END ---
 
       syncEl.style.color = 'var(--accent-green)';
-      showToast('Project pulled from GitHub', 'success');
+      showToast(t('collabPage.status.pullSuccess'), 'success');
     } else {
-      syncEl.textContent = `❌ Pull failed: ${result.error}`;
+      syncEl.textContent = `${t('collabPage.status.failed')}: ${result.error}`;
       syncEl.style.color = 'var(--accent-red, #f85149)';
-      showToast('Pull failed: ' + result.error, 'error');
+      showToast(t('collabPage.status.failed') + ': ' + result.error, 'error');
     }
   });
 
   // Post note
   document.getElementById('collab-note-send')?.addEventListener('click', async () => {
     const { pat, repo, username } = getCollabInputs();
-    if (!pat || !repo) { showToast('Configure GitHub settings first', 'warning'); return; }
+    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
     const text = document.getElementById('collab-note-text')?.value.trim();
-    if (!text) { showToast('Note is empty', 'warning'); return; }
+    if (!text) { showToast(t('collabPage.toast.noteEmpty'), 'warning'); return; }
 
     const result = await pushNote(pat, repo, username || 'user', text);
     if (result.ok) {
-      showToast('Note posted!', 'success');
+      showToast(t('collabPage.toast.notePosted'), 'success');
       if (document.getElementById('collab-note-text')) {
         document.getElementById('collab-note-text').value = '';
       }
@@ -388,14 +432,14 @@ function bindCollabEvents() {
   // Load notes
   document.getElementById('collab-notes-load')?.addEventListener('click', async () => {
     const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast('Configure GitHub settings first', 'warning'); return; }
+    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
 
     const listEl = document.getElementById('collab-notes-list');
-    listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;">⏳ Loading notes…</div>';
+    listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">${t('collabPage.notes.loading')}</div>`;
 
     const notes = await listNotes(pat, repo);
     if (notes.length === 0) {
-      listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0;">No notes yet.</div>';
+      listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0;">${t('collabPage.notes.empty')}</div>`;
       return;
     }
 
@@ -413,18 +457,19 @@ function bindCollabEvents() {
   // Load history
   document.getElementById('collab-history-load')?.addEventListener('click', async () => {
     const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast('Configure GitHub settings first', 'warning'); return; }
+    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
     await loadHistory(pat, repo);
   });
 }
 
+
 async function loadHistory(pat, repo) {
   const listEl = document.getElementById('collab-history-list');
-  listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0;">⏳ Loading…</div>';
+  listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0;">${t('collabPage.history.loading')}</div>`;
 
   const commits = await getCommitLog(pat, repo);
   if (commits.length === 0) {
-    listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:30px 0;">No commits yet — push your project first!</div>';
+    listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:30px 0;">${t('collabPage.history.empty')}</div>`;
     return;
   }
 
@@ -439,7 +484,7 @@ async function loadHistory(pat, repo) {
         <button class="btn btn-secondary btn-sm" style="margin-top:8px;width:100%;"
                 data-sha="${c.sha}" data-pat="${pat}" data-repo="${encodeURIComponent(repo)}"
                 id="restore-btn-${i}">
-          ↩️ Restore this version
+          ↩️ ${t('collabPage.buttons.restore')}
         </button>
       </div>
     `).join('');
@@ -449,20 +494,21 @@ async function loadHistory(pat, repo) {
     document.getElementById(`restore-btn-${i}`)?.addEventListener('click', async () => {
       const btn = document.getElementById(`restore-btn-${i}`);
       btn.disabled = true;
-      btn.textContent = '⏳ Restoring…';
+      btn.textContent = t('collabPage.status.restoring');
       const state = await getStateAtCommit(pat, repo, c.sha);
       if (state) {
         applyPulledState(state);
-        showToast(`Restored to ${c.sha.slice(0, 7)}`, 'success');
-        btn.textContent = '✅ Restored!';
+        showToast(`${t('collabPage.toast.restoreSuccess')} ${c.sha.slice(0, 7)}`, 'success');
+        btn.textContent = t('collabPage.status.restored');
       } else {
         showToast('Failed to restore snapshot', 'error');
-        btn.textContent = '❌ Failed';
+        btn.textContent = t('collabPage.status.failed');
         btn.disabled = false;
       }
     });
   });
 }
+
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
 
@@ -503,13 +549,71 @@ function addCollabStyles() {
       @media (max-width: 900px) {
         .collab-grid { grid-template-columns: 1fr; }
       }
+      @media (max-width: 480px) {
+        .collab-grid { gap: 12px; }
+      }
       .collab-right { min-height: 400px; }
-      .collab-note-card {
-        background: var(--bg-secondary);
+
+      .collab-card {
+        border-top: 2px solid var(--border-subtle);
+        transition: border-color 0.2s;
+      }
+      .collab-card:hover { border-top-color: rgba(59,130,246,0.4); }
+
+      .collab-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .collab-card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: var(--text-primary);
+      }
+      .collab-card-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .collab-card-sub {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .collab-sync-btns {
+        display: flex;
+        gap: 10px;
+      }
+      .collab-sync-btn { flex: 1; justify-content: center; }
+      .collab-status-bar {
+        font-size: 12px;
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        background: rgba(255,255,255,0.03);
         border: 1px solid var(--border-subtle);
-        border-radius: 8px;
-        padding: 12px;
+      }
+      .collab-history-empty {
+        color: var(--text-muted);
+        font-size: 12px;
+        text-align: center;
+        padding: 40px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .collab-note-card {
+        background: rgba(139,92,246,0.06);
+        border: 1px solid rgba(139,92,246,0.2);
+        border-radius: 10px;
+        padding: 12px 14px;
         margin-bottom: 10px;
+        position: relative;
       }
       .collab-note-header {
         display: flex;
@@ -526,10 +630,13 @@ function addCollabStyles() {
       .collab-commit-card {
         background: var(--bg-secondary);
         border: 1px solid var(--border-subtle);
+        border-left: 3px solid var(--accent-blue);
         border-radius: 8px;
         padding: 12px;
         margin-bottom: 10px;
+        transition: border-left-color 0.2s;
       }
+      .collab-commit-card:hover { border-left-color: var(--accent-cyan); }
       .collab-commit-header {
         display: flex;
         justify-content: space-between;
@@ -547,3 +654,4 @@ function addCollabStyles() {
     `;
   document.head.appendChild(style);
 }
+

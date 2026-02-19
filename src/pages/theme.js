@@ -6,40 +6,42 @@
 import { getState, subscribe, updateProjectConfig, setThemeImage, removeThemeImage } from '../state/store.js';
 import { showToast } from '../components/toast.js';
 import { pickImageFile } from '../utils/file-picker.js';
+import { t, updateTranslations } from '../utils/i18n.js';
+import { getIcon } from '../utils/icons.js';
 
 const THEME_SLOTS = [
   {
     id: 'icon.png',
-    name: 'Mod Icon',
-    desc: 'The mod icon shown in DCS mod manager',
+    nameKey: 'themePage.slots.icon.name',
+    descKey: 'themePage.slots.icon.desc',
     recommended: '128 × 128 px',
     aspect: '1/1'
   },
   {
     id: 'MainMenulogo.png',
-    name: 'Main Menu Logo',
-    desc: 'Logo displayed on the DCS main menu',
+    nameKey: 'themePage.slots.mainMenu.name',
+    descKey: 'themePage.slots.mainMenu.desc',
     recommended: 'PNG, transparent background',
     aspect: '16/9'
   },
   {
     id: 'loading-window.png',
-    name: 'Loading Screen',
-    desc: 'Background image during DCS loading',
+    nameKey: 'themePage.slots.loading.name',
+    descKey: 'themePage.slots.loading.desc',
     recommended: '1920 × 1080 px',
     aspect: '16/9'
   },
   {
     id: 'briefing-map-default.png',
-    name: 'Briefing Map Background',
-    desc: 'Background for the mission briefing map',
+    nameKey: 'themePage.slots.briefing.name',
+    descKey: 'themePage.slots.briefing.desc',
     recommended: 'PNG format',
     aspect: '16/9'
   },
   {
     id: 'base-menu-window.png',
-    name: 'Base Menu Window',
-    desc: 'Background for the base menu window',
+    nameKey: 'themePage.slots.baseMenu.name',
+    descKey: 'themePage.slots.baseMenu.desc',
     recommended: '1920 × 1080 px',
     aspect: '16/9'
   }
@@ -52,16 +54,16 @@ export function renderTheme(container) {
 
   container.innerHTML = `
     <div class="page-header">
-      <h1 class="page-title">Theme Support</h1>
-      <p class="page-description">Optionally customize the DCS UI with your own images. These will be included in the Theme/ folder of your mod.</p>
+      <h1 class="page-title">${t('themePage.title')}</h1>
+      <p class="page-description">${t('themePage.description')}</p>
     </div>
 
     <div class="card" style="margin-bottom: 24px;">
       <div class="flex-between">
         <div>
-          <div class="card-title">Enable Theme</div>
+          <div class="card-title">${t('themePage.enable')}</div>
           <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
-            When enabled, the mod will include a Theme/ directory with your custom images and the entry.lua will mount theme textures.
+            ${t('themePage.enableDesc')}
           </div>
         </div>
         <label class="toggle">
@@ -78,20 +80,20 @@ export function renderTheme(container) {
     return `
             <div class="theme-slot">
               <div class="theme-slot-preview" data-slot="${slot.id}" style="aspect-ratio: ${slot.aspect};">
-                ${img ? `<img src="${img.dataUrl}" alt="${slot.name}" />` : `
+                ${img ? `<img src="${img.dataUrl}" alt="${t(slot.nameKey)}" />` : `
                   <div style="text-align: center; padding: 20px;">
-                    <div style="font-size: 32px; margin-bottom: 8px; opacity: 0.4;">🖼️</div>
-                    <div style="font-size: 12px; color: var(--text-muted);">Click to upload</div>
+                    <div style="margin-bottom: 8px; opacity: 0.4;">${getIcon('image', 'w-8 h-8')}</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">${t('themePage.clickToUpload')}</div>
                   </div>
                 `}
               </div>
-              <div class="theme-slot-name">${slot.name}</div>
-              <div class="theme-slot-info">${slot.desc}</div>
+              <div class="theme-slot-name">${t(slot.nameKey)}</div>
+              <div class="theme-slot-info">${t(slot.descKey)}</div>
               <div class="theme-slot-info" style="margin-top: 4px;">${slot.recommended}</div>
               ${img ? `
                 <div style="margin-top: 8px; display: flex; gap: 8px; justify-content: center;">
                   <span class="tag tag-green">${img.fileName}</span>
-                  <button class="btn btn-danger btn-sm" data-remove-theme="${slot.id}">Remove</button>
+                  <button class="btn btn-danger btn-sm" data-remove-theme="${slot.id}">${t('themePage.remove')}</button>
                 </div>
               ` : ''}
             </div>
@@ -102,9 +104,9 @@ export function renderTheme(container) {
 
     <div id="theme-disabled-msg" class="${config.themeEnabled ? 'hidden' : ''}">
       <div class="empty-state" style="padding: 40px;">
-        <div class="empty-state-icon">🎨</div>
-        <div class="empty-state-title">Theme Disabled</div>
-        <div class="empty-state-text">Enable the theme toggle above to configure custom DCS UI images.</div>
+        <div class="empty-state-icon">${getIcon('image', 'icon-xl')}</div>
+        <div class="empty-state-title">${t('themePage.disabledTitle')}</div>
+        <div class="empty-state-text">${t('themePage.disabledText')}</div>
       </div>
     </div>
   `;
@@ -116,20 +118,6 @@ export function renderTheme(container) {
     document.getElementById('theme-disabled-msg')?.classList.toggle('hidden', e.target.checked);
   });
 
-  // Upload slots
-  container.querySelectorAll('[data-slot]').forEach(el => {
-    el.addEventListener('click', () => pickThemeImage(el.dataset.slot, container));
-    // Drag & drop
-    el.addEventListener('dragover', (e) => { e.preventDefault(); el.style.borderColor = 'var(--accent-blue)'; });
-    el.addEventListener('dragleave', () => { el.style.borderColor = ''; });
-    el.addEventListener('drop', (e) => {
-      e.preventDefault();
-      el.style.borderColor = '';
-      const file = e.dataTransfer.files[0];
-      if (file) handleThemeUpload(el.dataset.slot, file, container);
-    });
-  });
-
   // Remove buttons
   container.querySelectorAll('[data-remove-theme]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -138,6 +126,16 @@ export function renderTheme(container) {
       showToast('Image removed', 'info');
     });
   });
+
+  // Upload zones
+  container.querySelectorAll('.theme-slot-preview').forEach(el => {
+    el.addEventListener('click', () => {
+      if (document.getElementById('theme-slots-container').classList.contains('hidden')) return;
+      pickThemeImage(el.dataset.slot, container);
+    });
+  });
+
+  updateTranslations();
 }
 
 async function pickThemeImage(slot, container) {

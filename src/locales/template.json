@@ -1,0 +1,70 @@
+{
+    "_info": {
+        "name": "Template",
+        "flag": "INT"
+    },
+    "common": {
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "remove": "Remove",
+        "edit": "Edit",
+        "upload": "Upload",
+        "back": "Back",
+        "next": "Next",
+        "finish": "Finish"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "projects": "Projects",
+        "library": "Assets Library",
+        "sdef": "SDEF Editor",
+        "builder": "Mod Builder",
+        "docs": "Documentation",
+        "theme": "Theme & Settings",
+        "collab": "Collaboration"
+    },
+    "project": {
+        "title": "Projects",
+        "createTitle": "Create New Project",
+        "name": "Project Name",
+        "desc": "Description",
+        "version": "Version",
+        "author": "Author",
+        "loop": "Loop",
+        "oneShot": "One-Shot",
+        "noAssetsTitle": "No Assets",
+        "noAssetsText": "This project is empty."
+    },
+    "sdef": {
+        "title": "SDEF Editor",
+        "description": "Edit .sdef parameters — switch between visual UI and raw text modes.",
+        "visual": "Visual",
+        "raw": "Raw",
+        "save": "Save",
+        "saved": "SDEF Saved",
+        "noSelectionTitle": "Select a SDEF file",
+        "noSelectionText": "Choose a file from the sidebar to start editing.",
+        "groups": {
+            "include": "Inheritance",
+            "sample": "Sound Sample",
+            "volume": "Volume Control",
+            "frequency": "Frequency / Pitch",
+            "filtering": "filtering",
+            "position": "3D Position",
+            "radius": "Distance / Radius",
+            "cone": "Directional Cone",
+            "playmode": "Play Mode",
+            "envelope": "Envelope (Attack/Release)",
+            "stereo": "Stereo Settings",
+            "doppler": "Doppler Effect"
+        }
+    },
+    "tutorial": {
+        "welcome": "Welcome to Better ModMaker!",
+        "intro": "Let's take a quick tour to get you started.",
+        "step1": "This is your dashboard. You can see recent activity here.",
+        "step2": "Use the sidebar to navigate between different tools.",
+        "finish": "You're all set! Enjoy modding."
+    }
+}

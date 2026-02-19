@@ -29,22 +29,22 @@ export function renderPresets(container) {
           <input type="text" class="input-field" id="preset-name" placeholder="e.g., F/A-18C Complete, Weapons Only..." />
         </div>
         <button class="btn btn-primary" id="save-preset-btn">
-          💾 Save Current Selection (${selectedCount} assets)
+          ${getIcon('save', 'w-4 h-4')} Save Current Selection (${selectedCount} assets)
         </button>
       </div>
-      ${selectedCount === 0 ? '<div style="font-size: 12px; color: var(--accent-amber); margin-top: 8px;">⚠ No assets selected — select some in the Library first</div>' : ''}
+      ${selectedCount === 0 ? `<div style="font-size: 12px; color: var(--accent-amber); margin-top: 8px;">${getIcon('alert-circle', 'w-3 h-3')} No assets selected — select some in the Library first</div>` : ''}
     </div>
 
     <div class="flex-between" style="margin-bottom: 16px;">
       <h2 style="font-size: 18px; font-weight: 600;">Saved Presets (${presets.length})</h2>
       <div class="flex-gap">
-        <button class="btn btn-secondary btn-sm" id="import-preset-btn">📥 Import Preset</button>
+        <button class="btn btn-secondary btn-sm" id="import-preset-btn">${getIcon('download', 'w-4 h-4')} Import Preset</button>
       </div>
     </div>
 
     ${presets.length === 0 ? `
       <div class="empty-state" style="padding: 40px;">
-        <div class="empty-state-icon">💾</div>
+        <div class="empty-state-icon">${getIcon('save', 'icon-xl')}</div>
         <div class="empty-state-title">No Presets Saved</div>
         <div class="empty-state-text">Create your first preset by selecting assets in the Library, then saving them here.</div>
       </div>
@@ -69,8 +69,8 @@ export function renderPresets(container) {
             </div>
             <div class="flex-gap">
               <button class="btn btn-primary btn-sm" data-apply-preset="${idx}">Apply</button>
-              <button class="btn btn-secondary btn-sm" data-export-preset="${idx}">📤 Export</button>
-              <button class="btn btn-danger btn-sm" data-delete-preset="${idx}">🗑️</button>
+              <button class="btn btn-secondary btn-sm" data-export-preset="${idx}">${getIcon('upload', 'w-4 h-4')} Export</button>
+              <button class="btn btn-danger btn-sm" data-delete-preset="${idx}">${getIcon('trash-2', 'w-4 h-4')}</button>
             </div>
           </div>
         `).join('')}

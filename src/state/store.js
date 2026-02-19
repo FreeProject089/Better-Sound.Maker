@@ -287,6 +287,30 @@ export function setCurrentSdef(sdefPath) {
 export function setLibraryData(data) {
     state.libraryData = data;
     notify('libraryData');
+    // Helper to persist if needed, but we might want to do this explicitly
+}
+
+export async function saveLibraryToStorage(data) {
+    try {
+        await set(STORAGE_KEY + '::library', data);
+        console.log('Library data saved to IDB');
+    } catch (e) {
+        console.warn('Failed to save library data to IDB:', e);
+    }
+}
+
+export async function loadLibraryFromStorage() {
+    try {
+        const data = await get(STORAGE_KEY + '::library');
+        if (data) {
+            state.libraryData = data;
+            notify('libraryData');
+            return data;
+        }
+    } catch (e) {
+        console.warn('Failed to load library data from IDB:', e);
+    }
+    return null;
 }
 
 // --- Reset ---

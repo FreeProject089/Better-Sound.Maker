@@ -7,6 +7,8 @@ import { getState, updateProjectConfig, subscribe } from '../state/store.js';
 import { generateEntryLua } from '../utils/entry-generator.js';
 import { buildMod } from '../utils/mod-builder.js';
 import { showToast } from '../components/toast.js';
+import { t, updateTranslations } from '../utils/i18n.js';
+import { getIcon } from '../utils/icons.js';
 
 export function renderBuild(container) {
   const state = getState();
@@ -20,74 +22,76 @@ export function renderBuild(container) {
 
   container.innerHTML = `
     <div class="page-header">
-      <h1 class="page-title">Build Mod</h1>
-      <p class="page-description">Configure your mod details and export a complete DCS-ready mod folder.</p>
+      <h1 class="page-title">${t('build.title')}</h1>
+      <p class="page-description">${t('build.description')}</p>
     </div>
 
     <div class="stats-bar">
       <div class="stat-card">
         <div class="stat-value">${selectedCount}</div>
-        <div class="stat-label">Assets</div>
+        <div class="stat-label">${t('build.stats.assets')}</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-green);">${audioCount}</div>
-        <div class="stat-label">Audio Files</div>
+        <div class="stat-label">${t('build.stats.audio')}</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" style="color: var(--accent-cyan);">${sdefCount}</div>
-        <div class="stat-label">SDEF Edited</div>
+        <div class="stat-label">${t('build.stats.sdef')}</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" style="color: ${config.themeEnabled ? 'var(--accent-green)' : 'var(--text-muted)'};">
-          ${config.themeEnabled ? 'ON' : 'OFF'}
+          ${config.themeEnabled ? t('common.on') : t('common.off')}
         </div>
-        <div class="stat-label">Theme</div>
+        <div class="stat-label">${t('build.stats.theme')}</div>
       </div>
     </div>
 
     <div class="build-form">
       <div>
         <div class="card" style="margin-bottom: 20px;">
-          <div class="card-title" style="margin-bottom: 16px;">📋 Mod Configuration</div>
+          <div class="card-title" style="margin-bottom: 16px;">
+            ${getIcon('clipboard', 'w-4 h-4')} ${t('build.config.title')}
+          </div>
           <div class="flex-col" style="gap: 14px;">
             <div class="input-group">
-              <label class="input-label">Mod Name *</label>
+              <label class="input-label">${t('build.config.modName')} *</label>
               <input type="text" class="input-field" id="cfg-modName" value="${config.modName}" placeholder="e.g., BetterHornet" />
             </div>
             <div class="input-group">
-              <label class="input-label">Display Name</label>
+              <label class="input-label">${t('build.config.displayName')}</label>
               <input type="text" class="input-field" id="cfg-displayName" value="${config.displayName}" placeholder="e.g., Better Hornet Sound" />
             </div>
             <div class="grid-2">
               <div class="input-group">
-                <label class="input-label">Author / Team *</label>
+                <label class="input-label">${t('build.config.author')} *</label>
                 <input type="text" class="input-field" id="cfg-author" value="${config.author}" placeholder="Your name" />
               </div>
               <div class="input-group">
-                <label class="input-label">Short Name</label>
+                <label class="input-label">${t('build.config.shortName')}</label>
                 <input type="text" class="input-field" id="cfg-shortName" value="${config.shortName}" placeholder="BH" maxlength="6" />
               </div>
             </div>
             <div class="input-group">
-              <label class="input-label">Version</label>
+              <label class="input-label">${t('build.config.version')}</label>
               <input type="text" class="input-field" id="cfg-version" value="${config.version}" placeholder="1.0.0" />
             </div>
             <div class="input-group">
-              <label class="input-label">Description</label>
+              <label class="input-label">${t('build.config.description')}</label>
               <textarea class="input-field" id="cfg-description" rows="3" placeholder="Description of your sound mod...">${config.description}</textarea>
             </div>
             <div class="input-group">
-              <label class="input-label">URL (optional)</label>
+              <label class="input-label">${t('build.config.url')}</label>
               <input type="text" class="input-field" id="cfg-url" value="${config.url}" placeholder="https://..." />
             </div>
             <div class="input-group">
-              <label class="input-label">Credits</label>
+              <label class="input-label">${t('build.config.credits')}</label>
               <input type="text" class="input-field" id="cfg-credits" value="${config.credits}" placeholder="Acknowledgments..." />
             </div>
             <div class="flex-between" style="padding: 10px 0;">
               <div>
-                <div style="font-weight: 600; font-size: 13px;">Enable Theme</div>
-                <div style="font-size: 12px; color: var(--text-muted);">Include Theme/ folder in the mod</div>
+                <div style="font-weight: 600; font-size: 13px;">${t('build.config.enableTheme')}</div>
+                <div style="font-size: 12px; color: var(--text-muted);">${t('build.config.enableThemeDesc')}</div>
               </div>
               <label class="toggle">
                 <input type="checkbox" id="cfg-themeEnabled" ${config.themeEnabled ? 'checked' : ''} />
@@ -96,21 +100,25 @@ export function renderBuild(container) {
             </div>
           </div>
 
-          <button class="btn btn-secondary" id="save-config-btn" style="margin-top: 16px; width: 100%;">💾 Save Configuration</button>
+          <button class="btn btn-secondary" id="save-config-btn" style="margin-top: 16px; width: 100%;">
+            ${getIcon('save', 'w-4 h-4')} ${t('build.config.save')}
+          </button>
         </div>
 
         <div class="card" style="margin-bottom: 20px;">
-          <div class="card-title" style="margin-bottom: 16px;">🎵 Audio Format</div>
+          <div class="card-title" style="margin-bottom: 16px;">
+            ${getIcon('music', 'w-4 h-4')} ${t('build.audio.title')}
+          </div>
           <div class="input-group">
-            <label class="input-label">Output Format</label>
+            <label class="input-label">${t('build.audio.format')}</label>
             <select class="input-field" id="cfg-audioFormat">
-              <option value="original" selected>Original (keep as-is)</option>
-              <option value="wav">Convert all to WAV (PCM 16-bit)</option>
-              <option value="ogg">Convert all to OGG (smaller files)</option>
+              <option value="original" selected>${t('build.audio.common')}</option>
+              <option value="wav">${t('build.audio.wav')}</option>
+              <option value="ogg">${t('build.audio.ogg')}</option>
             </select>
             <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-              💡 DCS supports both .wav and .ogg formats. WAV is higher quality, OGG is smaller.
-              <br>⚠ Browser OGG encoding is limited — WAV conversion is recommended.
+              ${getIcon('lightbulb', 'w-3 h-3 inline')} ${t('build.audio.tip')}
+              <br>${getIcon('alert-triangle', 'w-3 h-3 inline')} ${t('build.audio.warning')}
             </div>
           </div>
         </div>
@@ -118,12 +126,16 @@ export function renderBuild(container) {
 
       <div>
         <div class="card" style="margin-bottom: 20px;">
-          <div class="card-title" style="margin-bottom: 12px;">📄 entry.lua Preview</div>
+          <div class="card-title" style="margin-bottom: 12px;">
+            ${getIcon('file-text', 'w-4 h-4')} ${t('build.preview.entry')}
+          </div>
           <div class="build-preview" id="entry-preview">${escapeHtml(entryPreview)}</div>
         </div>
 
         <div class="card" style="margin-bottom: 20px;">
-          <div class="card-title" style="margin-bottom: 12px;">📂 Output Structure Preview</div>
+          <div class="card-title" style="margin-bottom: 12px;">
+            ${getIcon('folder', 'w-4 h-4')} ${t('build.preview.structure')}
+          </div>
           <div class="build-preview" style="color: var(--text-secondary); font-size: 12px;">
 SoundMod${config.modName || '{Name}'}/
 ├── entry.lua
@@ -143,7 +155,7 @@ ${config.themeEnabled ? `├── Theme/
         </div>
 
         <button class="btn btn-success btn-lg" id="build-mod-btn" style="width: 100%; font-size: 16px; padding: 16px;">
-          🚀 Build & Export Mod
+          ${getIcon('package', 'w-5 h-5')} ${t('build.action.build')}
         </button>
 
         <div id="build-progress" class="hidden" style="margin-top: 16px;">
@@ -155,7 +167,7 @@ ${config.themeEnabled ? `├── Theme/
 
         ${selectedCount === 0 ? `
           <div style="margin-top: 12px; text-align: center;">
-            <div class="tag tag-amber">⚠ No assets selected — go to the Library to select sounds</div>
+            <div class="tag tag-amber">${getIcon('alert-triangle', 'w-3 h-3')} ${t('build.action.noAssets')}</div>
           </div>
         ` : ''}
       </div>
@@ -228,6 +240,8 @@ ${config.themeEnabled ? `├── Theme/
       if (textEl) textEl.textContent = `❌ ${result.error}`;
     }
   });
+
+  updateTranslations();
 }
 
 function escapeHtml(str) {
