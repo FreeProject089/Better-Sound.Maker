@@ -58,8 +58,15 @@ export function renderNav(container) {
         </div>
     </div>
 
-    <div style="padding: 14px 18px; border-top: 1px solid var(--border-subtle);">
-      <div style="font-size: 11px; color: var(--text-muted);">DCS 2.9 &More</div>
+    <div style="padding: 14px 18px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted);">
+        <span>DCS 2.9 & More</span>
+        <div id="sidebar-version-tag" style="padding: 2px 6px; background: rgba(255,255,255,0.05); border-radius: 10px; opacity: 0.8;">v0.9.1</div>
+      </div>
+      <button id="sidebar-update-btn" class="btn btn-secondary btn-sm" style="width: 100%; border-radius: 8px; font-size: 10px; padding: 6px; background: rgba(100,255,218,0.05); color: var(--accent-green); border: 1px solid rgba(100,255,218,0.2);">
+        ${getIcon('refresh-cw', 'w-3 h-3 mr-2')}
+        Check for Updates
+      </button>
     </div>
   `;
 
@@ -91,6 +98,15 @@ export function renderNav(container) {
       });
     });
   }
+
+  const updateBtn = container.querySelector('#sidebar-update-btn');
+  if (updateBtn) {
+    updateBtn.addEventListener('click', async () => {
+      const { checkUpdate } = await import('../utils/update-check.js');
+      checkUpdate(false); // quiet = false to show feedback if up to date
+    });
+  }
+
 
   // Render initial icons in static parts (lang selector)
   renderIcons(container);

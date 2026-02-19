@@ -1,8 +1,8 @@
-# 📄 Release Guide — Better Sound.Maker v1.0.1
+# 📄 Release Guide — Better Sound.Maker v1.0.2
 
 This guide covers the process of releasing a new version of the application.
 
-## 🚀 Version 1.0.1 Highlights
+## 🚀 Version 1.0.2 Highlights
 - **Auto-Updater**: The app now checks for updates on GitHub at launch and on closure.
 - **Onboarding Polish**: Mascot "Tasky" introduced with a smooth typing animation for better user engagement.
 - **Release Notes**: New modal system to showcase latest changes after an update.

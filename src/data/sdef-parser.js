@@ -92,7 +92,7 @@ export function parseSdefList(text) {
                 displaySection = parts[parts.length - 1];
             }
 
-            const pathParts = sdefPath.replace(/\.sdef$/, '').split('/');
+            const pathParts = sdefPath.replace(/\.sdef$/, '').split(/[\\\/]/);
             const name = pathParts[pathParts.length - 1];
 
             // Category hierarchy

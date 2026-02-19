@@ -2,7 +2,7 @@
 
 **Better Sound.Maker** is a powerful, modern desktop application designed to streamline the creation and management of sound mods for **DCS World**. It provides a comprehensive suite of tools to browse assets, edit SDEF parameters visually, manage custom audio, and package complete mods ready for installation.
 
-![App Version](https://img.shields.io/badge/version-1.0.1-blue)
+![App Version](https://img.shields.io/badge/version-1.0.2-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Electron-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 

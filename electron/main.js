@@ -8,46 +8,55 @@ const fs = require('fs');
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
-async function checkUpdate(quiet = true) {
-    const GITHUB_REPO = 'FreeProject089/Better-ModMaker';
-    const GITHUB_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/package.json`;
+const { autoUpdater } = require('electron-updater');
 
-    try {
-        const request = net.request(GITHUB_URL);
-        request.on('response', (response) => {
-            let body = '';
-            response.on('data', (chunk) => body += chunk);
-            response.on('end', () => {
-                try {
-                    if (response.statusCode !== 200) return;
-                    const data = JSON.parse(body);
-                    const currentVersion = app.getVersion();
+function checkUpdate(quiet = true) {
+    return new Promise((resolve) => {
+        if (isDev) {
+            console.log('Skipping auto-updater in development mode.');
+            return resolve();
+        }
 
-                    // Simple version comparison
-                    if (data.version !== currentVersion) {
-                        const choice = dialog.showMessageBoxSync({
-                            type: 'info',
-                            buttons: ['Update Now', 'Later'],
-                            title: 'Update Available',
-                            message: `A new version (${data.version}) of Better Sound.Maker is available!`,
-                            detail: `Current: ${currentVersion} → New: ${data.version}\n\nWould you like to visit the release page to download it?`,
-                            defaultId: 0,
-                            cancelId: 1
-                        });
-                        if (choice === 0) {
-                            shell.openExternal(`https://github.com/${GITHUB_REPO}/releases`);
-                        }
-                    }
-                } catch (e) {
-                    console.error('Update check parse error:', e);
+        try {
+            autoUpdater.autoDownload = true;
+            autoUpdater.autoInstallOnAppQuit = true;
+
+            autoUpdater.once('update-downloaded', (info) => {
+                const choice = dialog.showMessageBoxSync({
+                    type: 'info',
+                    buttons: ['Restart to Update', 'Later'],
+                    title: 'Update Downloaded',
+                    message: `A new version (${info.version}) has been downloaded!`,
+                    detail: `The update will be applied automatically when you quit the application, or you can restart now.`,
+                    defaultId: 0,
+                    cancelId: 1
+                });
+
+                if (choice === 0) {
+                    autoUpdater.quitAndInstall();
                 }
+                resolve();
             });
-        });
-        request.on('error', (err) => console.error('Update check request error:', err));
-        request.end();
-    } catch (err) {
-        console.error('Update check failed:', err);
-    }
+
+            autoUpdater.once('error', (err) => {
+                console.error('AutoUpdater Error:', err);
+                resolve();
+            });
+
+            autoUpdater.once('update-not-available', () => {
+                resolve();
+            });
+
+            autoUpdater.checkForUpdates().catch((err) => {
+                console.error('Check for updates failed:', err);
+                resolve();
+            });
+
+        } catch (err) {
+            console.error('Update check setup failed:', err);
+            resolve();
+        }
+    });
 }
 
 function createWindow() {
@@ -95,25 +104,7 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
 
-let isQuitting = false;
-app.on('before-quit', (event) => {
-    if (!isQuitting) {
-        // Only check if not already quitting
-        event.preventDefault();
-        isQuitting = true;
-
-        // Perform a quick check on closure
-        // We use a timeout to ensure app quits even if network is slow
-        const quitTimeout = setTimeout(() => {
-            app.quit();
-        }, 3000);
-
-        checkUpdate(true).finally(() => {
-            clearTimeout(quitTimeout);
-            app.quit();
-        });
-    }
-});
+// Removed custom before-quit handler as electron-updater handles autoInstallOnAppQuit internally.
 
 /* ── IPC handlers ─────────────────────────────────────────────────── */
 

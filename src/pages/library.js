@@ -120,8 +120,8 @@ async function loadLibraryData() {
       return;
     }
 
-    // Fallback to fetch
-    const resp = await fetch('./sdef_and_wave_list.txt');
+    // Fallback to fetch default (now from public folder) with cache busting
+    const resp = await fetch(`./sdef_and_wave_list.txt?v=${Date.now()}`);
     const text = await resp.text();
     const data = parseSdefList(text);
 
@@ -175,13 +175,15 @@ async function reloadLibrary() {
 function buildFolderTree(assets) {
   const root = {};
   for (const asset of assets) {
-    // Use displaySection as a top-level if it's a mod asset, else parse the path
     let pathStr = asset.sdefPath;
-    if (asset.displaySection) {
-      // Prefix with the mod/section name so they appear under a module folder
-      pathStr = asset.displaySection + '/' + pathStr;
+    // CRITICAL: DCS uses both / and \. Splitting by regex handles both.
+    const parts = pathStr.replace(/\.sdef$/i, '').split(/[\\\/]/);
+
+    // Add displaySection (mod name) as root if not already there
+    if (asset.displaySection && parts[0] !== asset.displaySection) {
+      parts.unshift(asset.displaySection);
     }
-    const parts = pathStr.replace(/\.sdef$/i, '').split('/');
+
     let node = root;
     for (let i = 0; i < parts.length - 1; i++) {
       const seg = parts[i];
@@ -215,16 +217,28 @@ function collectAssets(node) {
   return result;
 }
 
-/** Count all assets under a node */
+/** Count all assets under a node (memoized) */
 function countAssets(node) {
-  return collectAssets(node).length;
+  if (!node) return 0;
+  if (node._count !== undefined) return node._count;
+
+  let count = (node._files || []).length;
+  for (const key of Object.keys(node)) {
+    if (key === '_files' || key === '_count') continue;
+    count += countAssets(node[key]);
+  }
+
+  node._count = count;
+  return count;
 }
 
 function renderFolderTree() {
   const treeEl = document.getElementById('folder-tree');
   if (!treeEl) return;
 
-  // Always show the full tree (collapsed) with the current path open
+  // Clear memoized counts to be safe on re-render (e.g. after selection changes if we used it, but here it's static)
+  // For now, let's just render.
+
   let html = '';
 
   // "All Assets" root entry
@@ -266,7 +280,8 @@ function renderFolderTree() {
 
 function renderTreeNode(node, parentPath, depth) {
   let html = '';
-  const keys = Object.keys(node).filter(k => k !== '_files').sort();
+  // Keys that are subfolders (exclude internal props)
+  const keys = Object.keys(node).filter(k => k !== '_files' && k !== '_count').sort();
 
   for (const key of keys) {
     const child = node[key];
@@ -276,13 +291,15 @@ function renderTreeNode(node, parentPath, depth) {
     const isOpen = currentPath.slice(0, childPath.length).join('/') === pathStr ||
       currentPath.join('/').startsWith(pathStr + '/');
     const count = countAssets(child);
-    const hasSubfolders = Object.keys(child).some(k => k !== '_files');
+    const hasSubfolders = Object.keys(child).some(k => k !== '_files' && k !== '_count');
     const indent = depth * 14;
 
     html += `
       <div class="folder-item ${isActive ? 'active' : ''}" data-path="${pathStr}" style="padding-left:${12 + indent}px;">
-        <span class="folder-toggle ${isOpen && hasSubfolders ? 'open' : ''}">${hasSubfolders ? getIcon('chevron-right', 'w-4 h-4') : '<span style="width:10px;display:inline-block"></span>'}</span>
-        <span class="folder-icon">${hasSubfolders ? (isOpen ? getIcon('folder-open') : getIcon('folder')) : getIcon('music')}</span>
+        <span class="folder-toggle ${isOpen && hasSubfolders ? 'open' : ''}">
+          ${hasSubfolders ? getIcon('chevron-right', 'w-4 h-4') : '<span style="width:14px;display:inline-block"></span>'}
+        </span>
+        <span class="folder-icon">${isOpen ? getIcon('folder-open') : getIcon('folder')}</span>
         <span class="folder-label">${key}</span>
         <span class="folder-count">${count}</span>
       </div>

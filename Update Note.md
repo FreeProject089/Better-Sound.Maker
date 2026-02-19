@@ -1,14 +1,11 @@
-# 📝 Update Note — v1.0.1
+# 📝 Update Note — v1.0.2
 
 ### NEW FEATURES
-- **Auto-Updater**: Never miss an update! Better Sound.Maker now automatically checks the GitHub repository for new versions when you start or close the app.
-- **Tasky Mascot**: Say hello to Tasky! Our brand new mascot will guide you through the app with interactive tutorials.
-- **Fast Writing Animation**: Tutorials now feel more alive with a smooth typing effect.
-- **Post-Update Modal**: Automatically see what's new after installing an update.
+- **True Auto-Updater**: Instead of opening your browser to download manually, `electron-updater` now silently downloads the latest version in the background. Once the download is ready, you will be prompted to apply the update immediately or let it install seamlessly the next time you quit the app.
+- **Automated Publishing**: Deployed new configuration so releases go straight to our GitHub page.
 
 ### IMPROVEMENTS
-- UI refinements for the onboarding process.
-- Updated documentation for version 1.0.1.
+- Cleaned up the exit process: removed forced delays when quitting the app so that nothing hangs in the background.
 
 ---
 *Thank you for using Better Sound.Maker!*

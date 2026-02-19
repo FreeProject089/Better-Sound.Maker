@@ -1,6 +1,6 @@
 {
   "name": "better-sound-maker",
-  "version": "0.9.1",
+  "version": "1.0.2",
   "description": "Better Sound.Maker — Create DCS World sound mods easily",
   "type": "module",
   "main": "electron/main.js",
@@ -22,6 +22,7 @@
     "glob": "^11.0.0"
   },
   "dependencies": {
+    "electron-updater": "^6.8.3",
     "i18next": "^25.8.11",
     "i18next-http-backend": "^3.0.2",
     "idb-keyval": "^6.2.2",
@@ -32,6 +33,13 @@
     "appId": "com.bettersoundmaker.app",
     "productName": "Better Sound.Maker",
     "icon": "public/Bm.png",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "FreeProject089",
+        "repo": "Better-ModMaker"
+      }
+    ],
     "directories": {
       "output": "release"
     },

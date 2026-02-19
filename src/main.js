@@ -29,7 +29,7 @@ const pages = {
     'credits': renderCredits
 };
 
-const CURRENT_VERSION = '1.0.1';
+const CURRENT_VERSION = '0.9.1';
 const LAST_VERSION_KEY = 'bsm-last-run-version';
 
 // Simple Markdown parser
@@ -51,15 +51,12 @@ function parseMarkdown(md) {
 async function checkReleaseNotes() {
     const lastVersion = localStorage.getItem(LAST_VERSION_KEY);
 
-    // Only show if version changed OR it's the very first time we track it and we are on 1.0.1
     if (lastVersion !== CURRENT_VERSION) {
         if (window.electronAPI) {
             try {
                 const appPath = await window.electronAPI.getAppPath();
-                // Depending on structure (dev vs prod), path might vary.
-                // In dev, it's root. In prod, it might be resources/app.
-                // We'll try to find the Update folder.
-                const notePath = `${appPath}/Update/.md/v${CURRENT_VERSION}.md`;
+                // Release notes are kept for v1.0.1+
+                const notePath = `${appPath}/Update/.md/v1.0.1.md`;
                 const content = await window.electronAPI.readTextFile(notePath);
 
                 if (content) {
@@ -72,8 +69,6 @@ async function checkReleaseNotes() {
                             {
                                 text: 'View All Notes',
                                 onClick: () => {
-                                    // Could navigate to a special 'Updates' page if we had one
-                                    // For now just console log or toast
                                     import('./components/toast.js').then(({ showToast }) => {
                                         showToast('All release notes are in the /Update folder', 'info');
                                     });
@@ -104,6 +99,10 @@ async function init() {
     // Render sidebar
     const sidebar = document.getElementById('sidebar');
     renderNav(sidebar);
+
+    // Check for updates
+    const { checkUpdate } = await import('./utils/update-check.js');
+    setTimeout(() => checkUpdate(true), 1500);
 
     // Check release notes (after a short delay to let app settle)
     setTimeout(checkReleaseNotes, 1000);
