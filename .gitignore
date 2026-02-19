@@ -1,35 +1,43 @@
-# Node / npm
+# Node.js
 node_modules/
-npm-debug.log
-yarn-error.log
-.cache/
-coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Build outputs
+# Build and Tooling
 dist/
 dist-electron/
 release/
+.cache/
+.parcel-cache/
+.vite/
+.workspace/
 
-# Environment
+# Environment / Secret Files
 .env
 .env.local
 .env.*.local
+*.pem
 
-# OS
+# OS / Misc
 .DS_Store
 Thumbs.db
-
-# Temp / backup
-*.log
+desktop.ini
+$RECYCLE.BIN/
 *.bak
 *.tmp
-*.swp
-*~
+*.log
 
-# IDE
-.idea/
-*.sublime-*
+# IDEs
 .vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-#Some Shit Files 
+# Project Specific
 Assets/
+.agent/
+.antigravity/
