@@ -29,6 +29,67 @@ const pages = {
     'credits': renderCredits
 };
 
+const CURRENT_VERSION = '1.0.1';
+const LAST_VERSION_KEY = 'bsm-last-run-version';
+
+// Simple Markdown parser
+function parseMarkdown(md) {
+    if (!md) return '';
+    return md
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^\- (.*$)/gm, '<li>$1</li>')
+        .replace(/^\* (.*$)/gm, '<li>$1</li>')
+        .replace(/\n(<li>.*<\/li>)/g, '<ul>$1</ul>')
+        .replace(/<\/ul><ul>/g, '')
+        .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+}
+
+async function checkReleaseNotes() {
+    const lastVersion = localStorage.getItem(LAST_VERSION_KEY);
+
+    // Only show if version changed OR it's the very first time we track it and we are on 1.0.1
+    if (lastVersion !== CURRENT_VERSION) {
+        if (window.electronAPI) {
+            try {
+                const appPath = await window.electronAPI.getAppPath();
+                // Depending on structure (dev vs prod), path might vary.
+                // In dev, it's root. In prod, it might be resources/app.
+                // We'll try to find the Update folder.
+                const notePath = `${appPath}/Update/.md/v${CURRENT_VERSION}.md`;
+                const content = await window.electronAPI.readTextFile(notePath);
+
+                if (content) {
+                    const { showModal } = await import('./utils/modal.js');
+                    showModal({
+                        title: `✨ What's New in v${CURRENT_VERSION}`,
+                        content: `<div class="release-notes">${parseMarkdown(content)}</div>`,
+                        buttons: [
+                            { text: 'Awesome!', primary: true },
+                            {
+                                text: 'View All Notes',
+                                onClick: () => {
+                                    // Could navigate to a special 'Updates' page if we had one
+                                    // For now just console log or toast
+                                    import('./components/toast.js').then(({ showToast }) => {
+                                        showToast('All release notes are in the /Update folder', 'info');
+                                    });
+                                }
+                            }
+                        ]
+                    });
+                }
+            } catch (e) {
+                console.warn('Could not load release notes:', e);
+            }
+        }
+        localStorage.setItem(LAST_VERSION_KEY, CURRENT_VERSION);
+    }
+}
+
 // Initialize app
 async function init() {
     // Init i18n first
@@ -43,6 +104,9 @@ async function init() {
     // Render sidebar
     const sidebar = document.getElementById('sidebar');
     renderNav(sidebar);
+
+    // Check release notes (after a short delay to let app settle)
+    setTimeout(checkReleaseNotes, 1000);
 
     // Init onboarding
     const { initOnboarding } = await import('./pages/onboarding.js');

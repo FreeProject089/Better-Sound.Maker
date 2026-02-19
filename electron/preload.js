@@ -41,4 +41,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
      * @returns {Promise<ArrayBuffer|null>}
      */
     readFile: (filePath) => ipcRenderer.invoke('fs:readFile', filePath),
+
+    /**
+     * Read a file as UTF-8 text.
+     */
+    readTextFile: (filePath) => ipcRenderer.invoke('fs:readTextFile', filePath),
+
+    /**
+     * Get app root path
+     */
+    getAppPath: () => ipcRenderer.invoke('app:getPath'),
 });

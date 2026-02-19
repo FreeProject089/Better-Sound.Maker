@@ -246,16 +246,18 @@ function renderBubble(step, idx) {
          `;
     } else {
         const title = step.titleKey ? t(step.titleKey) : step.title;
-        const text = step.textKey ? t(step.textKey) : step.text;
-
         const dotsHtml = STEPS.map((_, i) =>
             `<div class="onboarding-dot ${i === idx ? 'active' : ''}"></div>`
         ).join('');
 
         contentHtml = `
+            <div class="onboarding-bubble-header">
+                <span class="onboarding-mascot-name">Tasky</span>
+                <div class="onboarding-bubble-dots">${dotsHtml}</div>
+            </div>
             <div class="onboarding-bubble-step">Step ${idx} / ${STEPS.length - 1}</div>
             <div class="onboarding-bubble-title">${title}</div>
-            <div class="onboarding-bubble-text">${text}</div>
+            <div class="onboarding-bubble-text" id="onboarding-text-content"></div>
             <div class="onboarding-bubble-actions">
                 ${idx > 1 ? `<button class="onboarding-btn-prev" id="onboarding-prev" style="background:transparent; border:1px solid var(--border-default); color:var(--text-secondary); padding:6px 12px; border-radius:6px; cursor:pointer;">←</button>` : ''}
                 <button class="onboarding-btn-next" id="onboarding-next">
@@ -263,11 +265,34 @@ function renderBubble(step, idx) {
                 </button>
                 <button class="onboarding-btn-skip" id="onboarding-skip">${t('tutorial.skip') || 'Skip'}</button>
             </div>
-            <div class="onboarding-dots">${dotsHtml}</div>
          `;
     }
 
     bubbleEl.innerHTML = contentHtml;
+
+    // Typewriter effect for text
+    const textTarget = document.getElementById('onboarding-text-content');
+    if (textTarget) {
+        const text = step.textKey ? t(step.textKey) : step.text;
+        let i = 0;
+        const speed = 10; // Fast
+        textTarget.innerHTML = '';
+
+        function type() {
+            if (i < text.length) {
+                // Handle basic HTML if present (like <br>)
+                if (text.substr(i, 4) === '<br>') {
+                    textTarget.innerHTML += '<br>';
+                    i += 4;
+                } else {
+                    textTarget.innerHTML += text.charAt(i);
+                    i++;
+                }
+                setTimeout(type, speed);
+            }
+        }
+        type();
+    }
 
     if (step.page === 'language-select') {
         document.getElementById('lang-en')?.addEventListener('click', () => {
