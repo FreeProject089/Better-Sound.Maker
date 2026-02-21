@@ -34,7 +34,7 @@ const pages = {
     'credits': renderCredits
 };
 
-const CURRENT_VERSION = '0.9.1';
+const CURRENT_VERSION = '1.0.3';
 const LAST_VERSION_KEY = 'bsm-last-run-version';
 
 // Simple Markdown parser
@@ -61,7 +61,7 @@ async function checkReleaseNotes() {
             try {
                 const appPath = await window.electronAPI.getAppPath();
                 // Release notes are kept for v1.0.1+
-                const notePath = `${appPath}/Update/.md/v1.0.1.md`;
+                const notePath = `${appPath}/Update/.md/PATCH_NOTES_v${CURRENT_VERSION}.md`;
                 const content = await window.electronAPI.readTextFile(notePath);
 
                 if (content) {

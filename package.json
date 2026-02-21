@@ -36,7 +36,8 @@
       {
         "provider": "github",
         "owner": "FreeProject089",
-        "repo": "Better-ModMaker"
+        "repo": "Better-ModMaker",
+        "vPrefixedTagName": false
       }
     ],
     "directories": {
@@ -49,7 +50,8 @@
       "public/**"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "artifactName": "${name}-setup-${version}.${ext}"
     },
     "mac": {
       "target": "dmg"
