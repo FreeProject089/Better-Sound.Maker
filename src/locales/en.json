@@ -53,7 +53,9 @@
         "dcsPathDesc": "Path to your local DCS World installation. Required to automatically update sounds lists and find mods.",
         "selectPath": "Select Folder",
         "autoScan": "Auto-scan Assets Library",
-        "autoScanDesc": "Automatically scans your DCS installation and updates the internal library on startup."
+        "autoScanDesc": "Automatically scans your DCS installation and updates the internal library on startup.",
+        "autoScanKeepMods": "Keep imported mod assets in Library",
+        "autoScanKeepModsDesc": "If enabled, manually imported mod assets (.zip) will not be cleared when scanning your DCS directory."
     },
     "presetsPage": {
         "title": "Presets & Templates",
@@ -581,6 +583,10 @@
         "q6": {
             "title": "Are ALL aircraft present in the Library?",
             "desc": "Yes, ALL default core aircraft and unencrypted mods are present in the Assets Library. However, finding specific sounds may be long and complex. We recommend using Community Presets to automatically filter sounds for specific actions."
+        },
+        "q7": {
+            "title": "How to import modded aircraft SDEFs into the Assets Library?",
+            "desc": "To import modded aircraft sounds, locate the mod's folder and find the 'Sounds' directory. For mods in 'Saved Games', it's usually at the root (e.g., <code>A4E/Sounds</code>). For 'CoreMods' (DCS root), search in <code>CoreMods\\aircraft\\{AIRCRAFTNAME}\\Sounds</code>. You can either zip the <code>Sounds</code> folder as a .zip file or simply zip the entire mod and use the <strong>Import Mod (.zip)</strong> option in the Library tab."
         }
     }
 }

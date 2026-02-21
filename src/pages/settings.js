@@ -5,7 +5,7 @@ import { showToast } from '../components/toast.js';
 
 export function renderSettings(container) {
   const state = getState();
-  const settings = state.globalSettings || { dcsPath: '', autoScan: false };
+  const settings = state.globalSettings || { dcsPath: '', autoScan: false, autoScanKeepMods: false };
 
   container.innerHTML = `
     <div class="page-header">
@@ -39,12 +39,24 @@ export function renderSettings(container) {
         ${getIcon('refresh-cw', 'w-4 h-4 mr-2')}
         ${t('settingsPage.autoScan')}
       </h2>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">${t('settingsPage.autoScanDesc')}</p>
       
-      <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
-        <input type="checkbox" id="settings-auto-scan" ${settings.autoScan ? 'checked' : ''} />
-        <span style="font-size: 14px; color: var(--text-primary);">${t('settingsPage.autoScan')}</span>
-      </label>
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">${t('settingsPage.autoScanDesc')}</p>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+            <input type="checkbox" id="settings-auto-scan" ${settings.autoScan ? 'checked' : ''} />
+            <span style="font-size: 14px; color: var(--text-primary);">${t('settingsPage.autoScan')}</span>
+          </label>
+        </div>
+
+        <div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">${t('settingsPage.autoScanKeepModsDesc')}</p>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+            <input type="checkbox" id="settings-auto-scan-keep-mods" ${settings.autoScanKeepMods ? 'checked' : ''} />
+            <span style="font-size: 14px; color: var(--text-primary);">${t('settingsPage.autoScanKeepMods')}</span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="flex-gap">
@@ -59,7 +71,12 @@ export function renderSettings(container) {
     if (window.electronAPI && window.electronAPI.selectDirectory) {
       const paths = await window.electronAPI.selectDirectory();
       if (paths && paths.length > 0) {
-        document.getElementById('settings-dcs-path').value = paths[0];
+        const input = document.getElementById('settings-dcs-path');
+        if (input) {
+          input.value = paths[0];
+          // Trigger input event to ensure any listeners are notified
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
       }
     }
   });
@@ -74,8 +91,11 @@ export function renderSettings(container) {
   document.getElementById('save-settings-btn').addEventListener('click', () => {
     const dcsPath = document.getElementById('settings-dcs-path').value.trim();
     const autoScan = document.getElementById('settings-auto-scan').checked;
+    const autoScanKeepMods = document.getElementById('settings-auto-scan-keep-mods').checked;
 
-    setGlobalSettings({ dcsPath, autoScan });
+    setGlobalSettings({ dcsPath, autoScan, autoScanKeepMods });
     showToast('Settings saved successfully', 'success');
   });
+
+  renderIcons(container);
 }

@@ -53,7 +53,9 @@
         "dcsPathDesc": "Emplacement de votre jeu DCS World. Nécessaire pour mettre à jour la liste de sons automatiquement et trouver les mods.",
         "selectPath": "Sélectionner un dossier",
         "autoScan": "Auto-scan de l'Assets Library",
-        "autoScanDesc": "Analyse votre installation DCS et met à jour automatiquement le référentiel de l'application au démarrage."
+        "autoScanDesc": "Analyse votre installation DCS et met à jour automatiquement le référentiel de l'application au démarrage.",
+        "autoScanKeepMods": "Garder les assets de mods importés",
+        "autoScanKeepModsDesc": "Si activé, les assets de mods importés manuellement (.zip) ne seront pas effacés lors du scan de votre dossier DCS."
     },
     "presetsPage": {
         "title": "Préréglages & Modèles",
@@ -555,6 +557,10 @@
         "q6": {
             "title": "Est-ce que TOUS les avions sont présents dans l'Assets Library ?",
             "desc": "Oui, TOUT ce qui est présent dans la base de données DCS (et non chiffré) est dans l'Assets Library, mais ça peut être long à chercher. C'est pourquoi l'onglet Presets contient un bouton 'Presets Communautaires' proposant des listes pré-faites expliquant l'utilité de chaque son in-game."
+        },
+        "q7": {
+            "title": "Comment importer les SDEF d'un avion moddé dans la Bibliothèque ?",
+            "desc": "Pour importer les sons d'un avion moddé, allez dans le dossier du mod et cherchez le dossier nommé 'Sounds'. Pour les mods dans 'Saved Games', il se trouve souvent à la racine (ex: <code>A4E/Sounds</code>). Pour les mods 'Core' (racine DCS), cherchez dans <code>CoreMods\\aircraft\\{AIRCRAFTNAME}\\Sounds</code>. Il vous suffit de zipper le dossier <code>Sounds</code> en .zip, ou bien de zipper tout le mod d'un coup, et de l'importer via l'option <strong>Import Mod (.zip)</strong> dans l'onglet Bibliothèque."
         }
     }
 }

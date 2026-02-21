@@ -136,6 +136,16 @@ async function init() {
                     const { parseSdefList } = await import('./data/sdef-parser.js');
                     const { setLibraryData, saveLibraryToStorage } = await import('./state/store.js');
                     const data = parseSdefList(text);
+
+                    // If keep mods is enabled, merge existing "Mod:" sections
+                    if (state.globalSettings?.autoScanKeepMods) {
+                        const existingData = state.libraryData;
+                        if (existingData && existingData.sections) {
+                            const modSections = existingData.sections.filter(s => s.name.startsWith('Mod:'));
+                            data.sections.push(...modSections);
+                        }
+                    }
+
                     setLibraryData(data);
                     await saveLibraryToStorage(data);
 

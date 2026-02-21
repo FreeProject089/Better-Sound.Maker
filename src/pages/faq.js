@@ -39,6 +39,11 @@ export function renderFaq(container) {
       <p style="color: var(--text-muted); line-height: 1.5;">${t('faq.q6.desc')}</p>
       <button id="faq-community-btn" class="btn btn-secondary btn-sm" style="margin-top: 12px;">${t('presetsPage.communityBtn')}</button>
     </div>
+
+    <div class="card" style="margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">${t('faq.q7.title')}</h3>
+      <p style="color: var(--text-muted); line-height: 1.5;">${t('faq.q7.desc')}</p>
+    </div>
   `;
 
   document.getElementById('faq-docs-link')?.addEventListener('click', (e) => {
