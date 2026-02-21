@@ -21,10 +21,10 @@
         "default": "Défaut",
         "description": "Description",
         "notes": "Notes",
-        "pageNotFound": "Page non trouvée"
+        "pageNotFound": "Page non trouvée",
+        "close": "Fermer"
     },
     "nav": {
-        "dashboard": "Tableau de Bord",
         "projects": "Projets",
         "library": "Bibliothèque Assets",
         "sdef": "Éditeur SDEF",
@@ -41,7 +41,9 @@
             "export": "EXPORT",
             "help": "AIDE"
         },
-        "tutorial": "Relancer Tuto"
+        "tutorial": "Relancer Tuto",
+        "faq": "F.A.Q",
+        "settings": "Paramètres"
     },
     "presetsPage": {
         "title": "Préréglages & Modèles",
@@ -71,7 +73,9 @@
         "deleteConfirm": {
             "title": "Supprimer le Préréglage",
             "content": "Êtes-vous sûr de vouloir supprimer ce préréglage ?"
-        }
+        },
+        "communityBtn": "Presets Communautaires",
+        "communityModalTitle": "Presets Communautaires"
     },
     "project": {
         "title": "Projets",
@@ -138,7 +142,6 @@
         "saved": "SDEF Enregistré",
         "noSelectionTitle": "Sélectionnez un fichier SDEF",
         "noSelectionText": "Choisissez un fichier dans la barre latérale pour commencer l'édition.",
-        "nofiles": "Aucun fichier .sdef trouvé dans Sounds/sdef/",
         "groups": {
             "include": "Héritage",
             "sample": "Échantillon Sonore",
@@ -212,8 +215,9 @@
         }
     },
     "tutorial": {
+        "sdeflistTitle": "📋 sdef_and_wave_list.txt",
+        "sdeflist": "L'index complet des événements sonores se trouve dans votre dossier DCS sous <code>\\\\DCS World\\\\Doc\\\\Sounds\\\\sdef_and_wave_list.txt</code>. Ouvrez l'onglet 'Liste SDEF' pour en savoir plus.",
         "welcome": "Bienvenue sur Better ModMaker !",
-        "intro": "Faisons un tour rapide pour bien démarrer.",
         "language": "Veuillez choisir votre langue pour commencer.",
         "library": "C'est ici que vous parcourez et sélectionnez les assets sonores DCS. Naviguez dans l'arborescence et cochez les fichiers à remplacer.",
         "project": "Configurez ici les détails de votre mod : nom, avion, version. Tous les assets sélectionnés apparaissent ici pour révision.",
@@ -224,8 +228,7 @@
         "build": "Quand vous êtes prêt, cliquez sur Build pour générer le dossier de mod complet — entry.lua, fichiers sdef et audio — prêt pour DCS Mods.",
         "docs": "Tout ce que vous devez savoir sur le modding sonore DCS : formats de fichiers, paramètres, astuces et exemples.",
         "credits": "Infos sur l'app, le développeur et liens utiles. C'est parti — bon modding ! 🎧",
-        "skip": "Passer",
-        "finished": "Vous êtes prêt ! Profitez du modding."
+        "skip": "Passer"
     },
     "docs": {
         "title": "Documentation",
@@ -234,6 +237,7 @@
             "audio": "Guide Audio",
             "sdef": "Guide SDEF",
             "f18": "Référence F/A-18C",
+            "sdeflist": "Liste SDEF",
             "theme": "Guide Thème",
             "install": "Installation"
         },
@@ -251,6 +255,12 @@
             "switch": "Exemple : Switch Simple (One-Shot)",
             "random": "Exemple : Sélection Aléatoire",
             "engine": "Exemple : Boucle Moteur avec Cône"
+        },
+        "sdeflist": {
+            "title": "Où trouver sdef_and_wave_list.txt",
+            "desc": "Le fichier <code>sdef_and_wave_list.txt</code> contient la liste complète et exhaustive de tous les événements sonores de DCS World.",
+            "location": "Emplacement du fichier",
+            "tip": "Il se trouve dans le répertoire d'installation de DCS World, généralement dans Program Files ou vos Parties Enregistrées."
         }
     },
     "docs_content": {
@@ -331,15 +341,8 @@
             "tip": "Le support de thème doit être activé dans le entry.lua avec une section <code>Skins</code>. La page Build le gère automatiquement si vous activez le Thème."
         },
         "install": {
-            "title": "📦 Installer un Mod Son DCS",
-            "steps": "Étapes d'installation",
-            "step1": "Allez dans votre dossier Parties Enregistrées DCS :",
-            "step2": "Copiez votre dossier de mod (ex: <code>SoundModBetterHornet/</code>) dans le dossier <code>resource</code>.",
-            "step3": "Lancez DCS World.",
-            "step4": "Votre mod devrait être automatiquement détecté !",
-            "trouble": "Dépannage",
-            "folderStructure": "Structure Finale des Dossiers",
-            "links": "Liens Utiles"
+            "title": "Comment Installer un Mod Sonore DCS",
+            "steps": "Étapes d'Installation"
         },
         "gain": {
             "title": "Modèle Gain-Distance",
@@ -405,6 +408,10 @@
         "ed": {
             "title": "Forums Eagle Dynamics",
             "sub": "Ressources de modding DCS World"
+        },
+        "license": {
+            "title": "Licence",
+            "sub": "Voir la licence Apache-2.0"
         }
     },
     "collabPage": {
@@ -505,6 +512,34 @@
         "action": {
             "build": "Construire & Exporter",
             "noAssets": "Aucun asset sélectionné — allez dans la Bibliothèque"
+        }
+    },
+    "faq": {
+        "title": "Foire Aux Questions",
+        "description": "Retrouvez les réponses aux questions les plus fréquentes sur Better ModMaker.",
+        "q1": {
+            "title": "Comment mettre à jour l'Assets Library ?",
+            "desc": "Allez dans l'onglet Docs, cliquez sur \"Recharger la Bibliothèque\", et assurez-vous que votre dossier DCS est correctement lié. L'application va scanner et s'actualiser."
+        },
+        "q2": {
+            "title": "Où se trouve le fichier sdef_and_wave_list.txt ?",
+            "desc": "Il est généré par DCS et se trouve dans le sous-dossier de votre installation DCS : <code>\\\\Doc\\\\Sounds\\\\sdef_and_wave_list.txt</code>. Better ModMaker s'y réfère automatiquement si bien configuré."
+        },
+        "q3": {
+            "title": "Est-il possible de faire un mod son pour un autre mod ?",
+            "desc": "Oui, tout à fait ! L'Assets Library intègre de manière transparente les avions moddés au même titre que les modules DCS officiels."
+        },
+        "q4": {
+            "title": "Comment installer un mod généré ?",
+            "desc": "Générez votre mod via l'onglet Build au format OVGME ou dossier standard. Déplacez ce dossier dans votre dossier Parties Enregistrées\\\\DCS\\\\Mods, ou utilisez un gestionnaire (OVGME/OpenModManager). Pour plus d'instructions :"
+        },
+        "q5": {
+            "title": "Comment participer au projet ou signaler un bug ?",
+            "desc": "Vous pouvez contribuer via GitHub (Faire un fork et proposer un commit / Pull Request) ou rejoindre le Discord pour signaler des problèmes ou proposer de l'aide. Toute contribution est grandement appréciée !"
+        },
+        "q6": {
+            "title": "Est-ce que TOUS les avions sont présents dans l'Assets Library ?",
+            "desc": "Oui, TOUT ce qui est présent dans la base de données DCS (et non chiffré) est dans l'Assets Library, mais ça peut être long à chercher. C'est pourquoi l'onglet Presets contient un bouton 'Presets Communautaires' proposant des listes pré-faites expliquant l'utilité de chaque son in-game."
         }
     }
 }

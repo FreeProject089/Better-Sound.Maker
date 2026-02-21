@@ -157,7 +157,8 @@ function renderSdefFileList() {
 function buildSdefTree(assets) {
   const root = {};
   for (const asset of assets) {
-    const parts = asset.path.split('/');
+    const tPath = asset.originalAsset?.treePath || asset.path;
+    const parts = tPath.split('/');
     let node = root;
     for (let i = 0; i < parts.length - 1; i++) {
       const seg = parts[i];
@@ -513,7 +514,9 @@ function collectVisualParams() {
 
   const waveEl = container.querySelector('[data-param="wave"]');
   if (waveEl && waveEl.value.trim()) {
-    const lines = waveEl.value.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    const lines = waveEl.value.trim().split('\n')
+      .map(l => l.replace(/["'{},\t]/g, '').trim())
+      .filter(Boolean);
     currentParams.wave = lines;
   }
 

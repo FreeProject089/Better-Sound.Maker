@@ -175,14 +175,8 @@ async function reloadLibrary() {
 function buildFolderTree(assets) {
   const root = {};
   for (const asset of assets) {
-    let pathStr = asset.sdefPath;
-    // CRITICAL: DCS uses both / and \. Splitting by regex handles both.
-    const parts = pathStr.replace(/\.sdef$/i, '').split(/[\\\/]/);
-
-    // Add displaySection (mod name) as root if not already there
-    if (asset.displaySection && parts[0] !== asset.displaySection) {
-      parts.unshift(asset.displaySection);
-    }
+    let pathStr = asset.treePath;
+    const parts = pathStr.split('/');
 
     let node = root;
     for (let i = 0; i < parts.length - 1; i++) {
@@ -400,26 +394,25 @@ function renderStats() {
 // ───────────────────────────────────────────────
 
 function applyFilter() {
-  // Collect assets from current folder
-  let base;
-  if (currentPath.length === 0) {
-    base = allAssets;
-  } else {
-    const node = getNodeAtPath(currentPath);
-    base = node ? collectAssets(node) : [];
-  }
-
-  // Search filter
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
-    base = base.filter(a =>
+    filteredAssetsCache = allAssets.filter(a =>
       a.sdefPath.toLowerCase().includes(q) ||
+      a.treePath.toLowerCase().includes(q) ||
       a.name.toLowerCase().includes(q) ||
       a.waves.some(w => w.toLowerCase().includes(q))
     );
+  } else {
+    // Collect assets from current folder
+    let base;
+    if (currentPath.length === 0) {
+      base = allAssets;
+    } else {
+      const node = getNodeAtPath(currentPath);
+      base = node ? collectAssets(node) : [];
+    }
+    filteredAssetsCache = base;
   }
-
-  filteredAssetsCache = base;
 
   const filteredEl = document.getElementById('filtered-count');
   if (filteredEl) filteredEl.textContent = filteredAssetsCache.length.toLocaleString();
@@ -600,7 +593,7 @@ function openDetailPanel(asset) {
         </button>
         <label class="btn btn-secondary btn-sm" style="cursor:pointer;" id="detail-audio-label-wrap">
           ${getIcon('music', 'w-4 h-4')} ${hasAudio ? t('library.replaceAudio') : t('library.uploadAudio')}
-          <input type="file" accept=".wav,.ogg,.mp3" class="hidden" id="detail-audio-input" />
+          <input type="file" accept=".wav,.ogg,.mp3" multiple class="hidden" id="detail-audio-input" />
         </label>
         ${hasAudio ? `<button class="btn btn-danger btn-sm" id="detail-audio-remove">${getIcon('trash-2', 'w-3 h-3')} ${t('library.remove')}</button>` : ''}
       </div>
@@ -637,13 +630,22 @@ function openDetailPanel(asset) {
 
   // Audio upload
   panel.querySelector('#detail-audio-input').addEventListener('change', async e => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
     if (!isAssetSelected(asset.sdefPath)) {
       selectAsset(asset.sdefPath, asset); // Auto-select when uploading
     }
-    setAudioFile(asset.sdefPath, file, { name: file.name, size: file.size });
-    showToast(`Audio uploaded: ${file.name}`, 'success');
+
+    if (files.length > 1 && asset.waves.length > 1) {
+      for (let i = 0; i < Math.min(files.length, asset.waves.length); i++) {
+        setWaveAudioFile(asset.sdefPath, asset.waves[i], files[i]);
+      }
+      showToast(`Audio uploaded: ${Math.min(files.length, asset.waves.length)} files assigned to waves`, 'success');
+    } else {
+      const file = files[0];
+      setAudioFile(asset.sdefPath, file, { name: file.name, size: file.size });
+      showToast(`Audio uploaded: ${file.name}`, 'success');
+    }
     openDetailPanel(asset);
     renderVirtualList();
   });
@@ -666,7 +668,7 @@ function openDetailPanel(asset) {
   // Wave notes
   panel.querySelectorAll('textarea[data-wave]').forEach(ta => {
     ta.addEventListener('input', debounce(() => {
-      setAssetNote(`wave::${ta.dataset.wave}`, ta.value);
+      setAssetNote(`wave:: ${ta.dataset.wave}`, ta.value);
     }, 500));
   });
 
@@ -680,7 +682,7 @@ function openDetailPanel(asset) {
       if (!isAssetSelected(asset.sdefPath)) selectAsset(asset.sdefPath, asset);
       setWaveAudioFile(asset.sdefPath, wavePath, file);
       const wi = inp.closest('[data-wi]')?.dataset.wi;
-      const nameEl = panel.querySelector(`#wave-audio-${wi}`);
+      const nameEl = panel.querySelector(`#wave - audio - ${wi}`);
       if (nameEl) nameEl.textContent = file.name;
       showToast(`Wave audio uploaded: ${file.name}`, 'success');
     });
@@ -688,14 +690,14 @@ function openDetailPanel(asset) {
 }
 
 // Wave-audio helpers (per wave path, stored as waveAudios map)
-const waveAudioFiles = new Map(); // `sdef::wave` → File
+const waveAudioFiles = new Map(); // `sdef:: wave` → File
 
 function setWaveAudioFile(sdefPath, wavePath, file) {
-  waveAudioFiles.set(`${sdefPath}::${wavePath}`, file);
+  waveAudioFiles.set(`${sdefPath}:: ${wavePath}`, file);
 }
 
 function getWaveAudioFileName(sdefPath, wavePath) {
-  const f = waveAudioFiles.get(`${sdefPath}::${wavePath}`);
+  const f = waveAudioFiles.get(`${sdefPath}:: ${wavePath}`);
   return f ? f.name : null;
 }
 

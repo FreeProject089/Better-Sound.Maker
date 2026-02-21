@@ -184,6 +184,15 @@ ipcMain.handle('fs:readTextFile', async (_event, filePath) => {
     }
 });
 
+// Read directory contents
+ipcMain.handle('fs:readDir', async (_event, dirPath) => {
+    try {
+        return fs.readdirSync(dirPath);
+    } catch (e) {
+        return [];
+    }
+});
+
 // Get app root path
 ipcMain.handle('app:getPath', () => app.getAppPath());
 

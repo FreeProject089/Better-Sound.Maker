@@ -3,6 +3,8 @@
  */
 import { t, updateTranslations } from '../utils/i18n.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
+import { showModal } from '../components/modal.js';
+import { GITHUB_REPO } from '../utils/version.js';
 
 export function renderCredits(container) {
   container.innerHTML = `
@@ -85,12 +87,42 @@ export function renderCredits(container) {
           <div class="credits-link-arrow">${getIcon('external-link', 'w-4 h-4')}</div>
         </a>
 
+        <a href="#" id="credits-license-btn" class="credits-link-card" style="color: var(--text-primary);">
+          <div class="credits-link-icon">
+            ${getIcon('file-text', 'w-6 h-6')}
+          </div>
+          <div class="credits-link-text">
+            <div class="credits-link-title" data-i18n="creditsPage.license.title">License</div>
+            <div class="credits-link-sub" data-i18n="creditsPage.license.sub">View Apache-2.0 License</div>
+          </div>
+          <div class="credits-link-arrow"></div>
+        </a>
+
       </div>
     </div>
   `;
 
   injectCreditsStyles();
   renderIcons(container);
+
+  const licenseBtn = container.querySelector('#credits-license-btn');
+  if (licenseBtn) {
+    licenseBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
+        const text = await resp.text();
+        const formattedText = text.replace(/</g, '&lt;').replace(/([^\n])\n([^\n])/g, '$1 $2').replace(/\n\n+/g, '<br><br>');
+        showModal({
+          title: t('creditsPage.license.title') || 'License',
+          content: `<div style="font-size: 12px; line-height: 1.6; max-height: 55vh; overflow-y: auto; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); color: var(--text-secondary); text-align: justify; font-family: var(--font-mono);">${formattedText}</div>`,
+          actions: [{ id: 'close', label: t('common.close') || 'Close', class: 'btn-secondary' }]
+        });
+      } catch (err) {
+        window.open(`https://github.com/${GITHUB_REPO}/blob/main/LICENSE`, '_blank');
+      }
+    });
+  }
 }
 
 function injectCreditsStyles() {
@@ -98,105 +130,28 @@ function injectCreditsStyles() {
   const style = document.createElement('style');
   style.id = 'credits-styles';
   style.textContent = `
-    .credits-logo-wrap {
-      width: 88px;
-      height: 88px;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      box-shadow: 0 0 30px rgba(59,130,246,0.2);
-    }
-    .credits-logo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 12px;
-    }
-    .credits-version-badge {
-      display: inline-block;
-      background: rgba(59,130,246,0.15);
-      color: var(--accent-blue);
-      border: 1px solid rgba(59,130,246,0.3);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      padding: 3px 10px;
-      border-radius: 100px;
-      margin-top: 6px;
-    }
-    .credits-info-card {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      padding: 20px;
-    }
-    .credits-card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-    .credits-card-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-    }
-    .credits-card-value {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .credits-card-sub {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-    .credits-link-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
-      text-decoration: none;
-      transition: all var(--transition-default);
-      background: rgba(255,255,255,0.02);
-    }
-    .credits-link-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
-    }
+    .credits-logo-wrap { width: 88px; height: 88px; border-radius: 22px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
+    .credits-logo-img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
+    .credits-version-badge { display: inline-block; background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 100px; margin-top: 6px; }
+    .credits-info-card { display: flex; flex-direction: column; gap: 4px; padding: 20px; }
+    .credits-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .credits-card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+    .credits-card-value { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .credits-card-sub { font-size: 12px; color: var(--text-secondary); }
+    .credits-link-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); text-decoration: none; transition: all var(--transition-default); background: rgba(255, 255, 255, 0.02); }
+    .credits-link-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .credits-link-github { color: var(--text-primary); }
-    .credits-link-github:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); }
+    .credits-link-github:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.15); }
     .credits-link-discord { color: #7289da; }
-    .credits-link-discord:hover { background: rgba(88,101,242,0.08); border-color: rgba(88,101,242,0.3); }
+    .credits-link-discord:hover { background: rgba(88, 101, 242, 0.08); border-color: rgba(88, 101, 242, 0.3); }
     .credits-link-ed { color: var(--accent-amber); }
-    .credits-link-ed:hover { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.25); }
-    .credits-link-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: rgba(255,255,255,0.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+    .credits-link-ed:hover { background: rgba(245, 158, 11, 0.06); border-color: rgba(245, 158, 11, 0.25); }
+    .credits-link-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .credits-link-text { flex: 1; }
     .credits-link-title { font-size: 14px; font-weight: 600; }
     .credits-link-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .credits-link-arrow { font-size: 18px; color: var(--text-muted); font-weight: 300; }
-    @media (max-width: 480px) {
-      .credits-hero { padding: 24px 16px !important; }
-    }
+    @media (max-width: 480px) { .credits-hero { padding: 24px 16px !important; } }
   `;
   document.head.appendChild(style);
 }

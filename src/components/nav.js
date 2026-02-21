@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { id: 'collaboration', icon: 'users', label: 'nav.collab', section: 'nav.section.team' },
   { id: 'build', icon: 'rocket', label: 'nav.builder', section: 'nav.section.export' },
   { id: 'docs', icon: 'book-open', label: 'nav.docs', section: 'nav.section.help' },
+  { id: 'faq', icon: 'help-circle', label: 'nav.faq', section: 'nav.section.help' },
   { id: 'credits', icon: 'star', label: 'nav.credits', section: 'nav.section.help' },
   { id: 'tutorial', icon: 'play-circle', label: 'nav.tutorial', section: 'nav.section.help' }
 ];

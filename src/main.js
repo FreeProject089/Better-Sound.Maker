@@ -12,6 +12,7 @@ import { renderTheme } from './pages/theme.js';
 import { renderPresets } from './pages/presets.js';
 import { renderBuild } from './pages/build.js';
 import { renderDocs } from './pages/docs.js';
+import { renderFaq } from './pages/faq.js';
 import { renderCredits } from './pages/credits.js';
 import { renderCollaboration } from './pages/collaboration.js';
 import { getState, subscribe, navigate } from './state/store.js';
@@ -26,6 +27,7 @@ const pages = {
     'collaboration': renderCollaboration,
     'build': renderBuild,
     'docs': renderDocs,
+    'faq': renderFaq,
     'credits': renderCredits
 };
 
@@ -156,4 +158,9 @@ if (document.readyState === 'loading') {
 window.addEventListener('languageChanged', () => {
     // Re-render current page to update translations
     renderCurrentPage();
+    // Re-render nav to update sidebar translations
+    import('./components/nav.js').then(({ renderNav }) => {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) renderNav(sidebar);
+    });
 });

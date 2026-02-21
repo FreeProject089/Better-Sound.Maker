@@ -2184,32 +2184,7 @@ body.onboarding-active #sidebar {
   border-radius: 4px;
 }
 
-/* Mobile Onboarding */
-@media (max-width: 600px) {
-  .onboarding-mascot-wrap {
-    flex-direction: column-reverse;
-    align-items: center;
-    left: 12px !important;
-    right: 12px;
-    bottom: 20px !important;
-  }
 
-  .mascot-image-container {
-    width: 60px;
-    height: 60px;
-    margin-right: 0;
-    margin-top: -30px;
-    /* Overlap bubble */
-    align-self: flex-start;
-    margin-left: 20px;
-  }
-
-  .onboarding-bubble {
-    width: 100%;
-    border-bottom-left-radius: 20px;
-    border-top-left-radius: 4px;
-  }
-}
 
 /* --- Improved Toggle (Radix UI Style) --- */
 .toggle {
@@ -2422,99 +2397,11 @@ body.onboarding-active #sidebar {
   backdrop-filter: blur(2px);
 }
 
-@media (max-width: 768px) {
-  #sidebar-toggle {
-    display: flex;
-  }
 
-  #sidebar-overlay {
-    display: block;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-  }
 
-  #sidebar {
-    position: fixed;
-    left: -280px;
-    top: 0;
-    bottom: 0;
-    z-index: 99;
-    transition: left 0.3s ease;
-    box-shadow: var(--shadow-lg);
-  }
 
-  #sidebar.sidebar-open {
-    left: 0;
-  }
 
-  #sidebar.sidebar-open~#sidebar-overlay,
-  body.sidebar-open #sidebar-overlay {
-    opacity: 1;
-    pointer-events: all;
-  }
 
-  #main-content {
-    width: 100%;
-    padding-top: 0;
-  }
-
-  #page-container {
-    padding: 16px;
-  }
-
-  .page-title {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  #page-container {
-    padding: 12px;
-  }
-
-  .card {
-    padding: 14px;
-  }
-
-  .grid-2 {
-    grid-template-columns: 1fr !important;
-  }
-
-  .grid-3 {
-    grid-template-columns: 1fr !important;
-  }
-
-  .btn {
-    font-size: 12px;
-    padding: 8px 14px;
-  }
-}
-
-@media (max-width: 400px) {
-  #page-container {
-    padding: 10px 8px;
-  }
-
-  .page-title {
-    font-size: 18px;
-  }
-
-  .card {
-    padding: 12px 10px;
-  }
-
-  .editor-layout {
-    flex-direction: column !important;
-  }
-
-  .editor-sidebar {
-    width: 100% !important;
-    min-width: unset !important;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-}
 
 /* ================================================================
    Onboarding Tutorial Overlay
@@ -2687,22 +2574,7 @@ body.onboarding-active #sidebar {
   }
 }
 
-@media (max-width: 500px) {
-  .onboarding-mascot-wrap {
-    flex-direction: column;
-    align-items: center;
-  }
 
-  .onboarding-bubble {
-    max-width: 90vw;
-    border-radius: 16px;
-  }
-
-  .onboarding-mascot {
-    width: 60px;
-    height: 60px;
-  }
-}
 
 .onboarding-mascot-img {
   width: 120px;
@@ -3057,200 +2929,9 @@ body.onboarding-active #sidebar {
   display: none;
 }
 
-/* --- Mobile Responsiveness --- */
-@media (max-width: 500px) {
-  .sidebar-lang {
-    padding: 12px;
-  }
 
-  .sdef-editor-topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
 
-  .sdef-editor-filepath {
-    width: 100%;
-    overflow: hidden;
-  }
 
-  .sdef-mode-toggle {
-    width: 100%;
-    display: flex;
-  }
-
-  .sdef-mode-btn {
-    flex: 1;
-    text-align: center;
-  }
-
-  /* Ensure inputs don't overflow */
-  .input-field {
-    min-width: 0;
-  }
-
-  .sdef-param-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  .sdef-param-control {
-    width: 100%;
-  }
-
-  .sdef-vec-input {
-    flex: 1;
-    min-width: 60px;
-  }
-}
-
-/* --- Mobile Responsive --- */
-@media (max-width: 768px) {
-  #app {
-    flex-direction: column;
-  }
-
-  /* Sidebar becomes bottom navigation */
-  #sidebar {
-    width: 100%;
-    min-width: 0;
-    height: auto;
-    flex-direction: row;
-    border-right: none;
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: none;
-    order: 2;
-    /* Move to bottom */
-    padding: 0;
-    justify-content: space-between;
-    background: var(--bg-secondary);
-    z-index: 1000;
-    transform: none !important;
-    /* Override any previous transform */
-    position: relative;
-  }
-
-  .sidebar-header,
-  .sidebar-lang,
-  .sidebar-footer {
-    display: none;
-    /* Hide header/footer on mobile to save space */
-  }
-
-  .sidebar-nav {
-    flex-direction: row;
-    overflow-x: auto;
-    padding: 4px;
-    gap: 4px;
-    width: 100%;
-  }
-
-  .nav-item {
-    flex-direction: column;
-    padding: 6px 4px;
-    font-size: 9px;
-    text-align: center;
-    gap: 4px;
-    min-width: 60px;
-    justify-content: center;
-    border-radius: 8px;
-  }
-
-  .nav-item .nav-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .nav-section-label {
-    display: none;
-    /* Hide section labels */
-  }
-
-  /* Main Content Adjustment */
-  #main-content {
-    order: 1;
-    padding-bottom: 70px;
-    /* Space for bottom nav */
-    height: calc(100vh - 60px);
-    /* Approx bottom nav height */
-  }
-
-  /* Library Page Column Stack */
-  .library-layout {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto 1fr;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-  }
-
-  .lib-col-folders,
-  .lib-col-files,
-  .lib-col-details {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-    height: 250px;
-    /* Fixed height for scrollable areas */
-    flex: none;
-  }
-
-  .lib-col-details {
-    height: auto;
-    flex: 1;
-    min-height: 400px;
-  }
-
-  /* SDEF Editor Mobile */
-  .sdef-layout {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .sdef-sidebar {
-    width: 100%;
-    height: 200px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-  }
-
-  /* Credits Page Grid */
-  .grid-2,
-  .grid-3,
-  .grid-4 {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Onboarding Adjustment */
-  .onboarding-mascot-wrap {
-    bottom: 70px !important;
-    /* Above bottom nav */
-    left: 10px !important;
-    flex-direction: column-reverse;
-  }
-
-  .onboarding-bubble {
-    width: 95vw;
-    margin: 0 auto;
-    left: 0;
-    bottom: 0;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  /* Adjust Modal for Mobile */
-  .modal-content {
-    width: 95vw;
-    max-height: 90vh;
-  }
-}
 
 /* --- Onboarding Z-Index Fixes --- */
 #onboarding-overlay {
@@ -3419,3 +3100,9 @@ body.onboarding-active #sidebar {
   gap: 12px;
   background: rgba(0, 0, 0, 0.15);
 }
+.color-swatch-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.color-swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s, border-color 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.active { border-color: white; transform: scale(1.15); box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
+
+.sdef-unsaved-dot { width: 6px; height: 6px; border-radius: 50%; background-color: var(--accent-amber); margin-left: 4px; flex-shrink: 0; }

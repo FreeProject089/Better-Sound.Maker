@@ -24,7 +24,6 @@
         "pageNotFound": "Page not found"
     },
     "nav": {
-        "dashboard": "Dashboard",
         "library": "Assets Library",
         "projects": "Projects",
         "sdef": "SDEF Editor",
@@ -211,8 +210,6 @@
         }
     },
     "tutorial": {
-        "welcome": "Welcome to Better ModMaker!",
-        "intro": "Let's take a quick tour to get you started.",
         "language": "Please select your language to get started.",
         "library": "This is where you browse and select DCS sound assets. Navigate the folder tree and check the files you want to replace with your custom audio.",
         "project": "Here you configure your mod details — name, aircraft, version. All selected assets appear here so you can review them.",
@@ -223,8 +220,7 @@
         "build": "When you're ready, hit Build to generate the complete mod folder — entry.lua, .sdef files, and your audio — ready to drop into DCS Mods.",
         "docs": "Everything you need to know about DCS sound modding: file formats, parameters, tips and examples.",
         "credits": "Info about the app, the developer, and useful community links. You're all set — happy modding! 🎧",
-        "skip": "Skip",
-        "finished": "You're all set! Enjoy modding."
+        "skip": "Skip"
     },
     "docs_content": {
         "defaults": {
@@ -387,7 +383,6 @@
         },
         "audio": {
             "title": "Audio Guide for DCS Sound Modding",
-            "monoVsStereo": "Mono vs Stereo",
             "mono": "Mono",
             "stereo": "Stereo",
             "loop": "Loop",
@@ -429,6 +424,10 @@
         "ed": {
             "title": "Eagle Dynamics Forums",
             "sub": "DCS World community & modding resources"
+        },
+        "license": {
+            "title": "License",
+            "sub": "View Apache-2.0 License"
         }
     },
     "collabPage": {

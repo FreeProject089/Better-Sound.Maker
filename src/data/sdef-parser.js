@@ -21,6 +21,24 @@ export function parseSdefList(text) {
     let currentAsset = null;
     let inWaveBlock = false;
 
+    function saveAsset(asset, section) {
+        if (!asset || !section) return;
+        if (asset.waves.length > 0) {
+            const wPath = asset.waves[0].replace(/\\/g, '/');
+            const wParts = wPath.split('/');
+            if (wParts.length > 1) {
+                wParts.pop(); // remove file name
+                const sName = asset.name.replace(/\.sdef$/i, '');
+                asset.treePath = wParts.join('/') + '/' + sName;
+            } else {
+                asset.treePath = asset.sdefPath.replace(/\.sdef$/i, '');
+            }
+        } else {
+            asset.treePath = asset.sdefPath.replace(/\.sdef$/i, '');
+        }
+        section.assets.push(asset);
+    }
+
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const trimmed = line.trim();
@@ -28,7 +46,7 @@ export function parseSdefList(text) {
         // Skip empty lines — push pending asset
         if (!trimmed) {
             if (currentAsset && currentSection) {
-                currentSection.assets.push(currentAsset);
+                saveAsset(currentAsset, currentSection);
                 currentAsset = null;
             }
             inWaveBlock = false;
@@ -44,7 +62,7 @@ export function parseSdefList(text) {
         if (trimmed.endsWith(':') && !line.startsWith('\t') && !trimmed.startsWith('wave')) {
             // Save previous asset if pending
             if (currentAsset && currentSection) {
-                currentSection.assets.push(currentAsset);
+                saveAsset(currentAsset, currentSection);
                 currentAsset = null;
             }
             const sectionName = trimmed.slice(0, -1);
@@ -77,7 +95,7 @@ export function parseSdefList(text) {
         if (!line.startsWith('\t') && currentSection) {
             // Save previous asset
             if (currentAsset) {
-                currentSection.assets.push(currentAsset);
+                saveAsset(currentAsset, currentSection);
             }
 
             // sdefPath as written in the file
@@ -138,7 +156,7 @@ export function parseSdefList(text) {
 
     // Don't forget last asset
     if (currentAsset && currentSection) {
-        currentSection.assets.push(currentAsset);
+        saveAsset(currentAsset, currentSection);
     }
 
     return { sections };

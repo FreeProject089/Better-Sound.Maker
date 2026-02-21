@@ -88,6 +88,14 @@ const STEPS = [
         image: IMG_TASKY
     },
     {
+        page: 'docs', // Will navigate to docs page (we can leave it so it stays there)
+        title: '📋 sdef_and_wave_list.txt',
+        titleKey: 'tutorial.sdeflistTitle',
+        text: 'The full index of sound events is located in your DCS folder at <code>\\DCS World\\Doc\\Sounds\\sdef_and_wave_list.txt</code>. Open the "Sdef List" tab to learn more.',
+        textKey: 'tutorial.sdeflist',
+        image: IMG_TASKY_EYES
+    },
+    {
         page: 'credits',
         title: '⭐ Credits',
         text: 'Info about the app, the developer, and useful community links. You\'re all set — happy modding! 🎧',
@@ -245,7 +253,7 @@ function renderBubble(step, idx) {
             </div>
          `;
     } else {
-        const title = step.titleKey ? t(step.titleKey) : step.title;
+        const title = step.titleKey && t(step.titleKey) !== step.titleKey ? t(step.titleKey) : step.title;
         const dotsHtml = STEPS.map((_, i) =>
             `<div class="onboarding-dot ${i === idx ? 'active' : ''}"></div>`
         ).join('');
@@ -273,7 +281,7 @@ function renderBubble(step, idx) {
     // Typewriter effect for text
     const textTarget = document.getElementById('onboarding-text-content');
     if (textTarget) {
-        const text = step.textKey ? t(step.textKey) : step.text;
+        const text = step.textKey && t(step.textKey) !== step.textKey ? t(step.textKey) : step.text;
         let i = 0;
         const speed = 10; // Fast
         textTarget.innerHTML = '';

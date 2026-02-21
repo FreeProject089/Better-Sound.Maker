@@ -1,0 +1,15 @@
+{
+  "name": "Engine Loop",
+  "color": "#e91e63",
+  "version": "1.0.2",
+  "params": {
+    "wave": "",
+    "inner_radius": 100,
+    "outer_radius": 5000,
+    "gain": 1,
+    "pitch": 1,
+    "detached": false,
+    "listmode": "ASR",
+    "loop": true
+  }
+}

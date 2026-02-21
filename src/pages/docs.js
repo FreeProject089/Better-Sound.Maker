@@ -16,6 +16,7 @@ export function renderDocs(container) {
     <div class="tabs" id="docs-tabs">
       <div class="tab active" data-tab="audio">${getIcon('music', 'w-4 h-4')} ${t('docs.tabs.audio')}</div>
       <div class="tab" data-tab="sdef">${getIcon('file-text', 'w-4 h-4')} ${t('docs.tabs.sdef')}</div>
+      <div class="tab" data-tab="sdeflist">${getIcon('list', 'w-4 h-4')} ${t('docs.tabs.sdeflist') || 'Sdef List'}</div>
       <div class="tab" data-tab="theme">${getIcon('image', 'w-4 h-4')} ${t('docs.tabs.theme')}</div>
       <div class="tab" data-tab="install">${getIcon('download', 'w-4 h-4')} ${t('docs.tabs.install')}</div>
     </div>
@@ -42,6 +43,7 @@ function showTab(tab) {
   switch (tab) {
     case 'audio': el.innerHTML = audioGuide(); break;
     case 'sdef': el.innerHTML = sdefGuide(); break;
+    case 'sdeflist': el.innerHTML = sdeflistGuide(); break;
     case 'theme': el.innerHTML = themeGuide(); break;
     case 'install': el.innerHTML = installGuide(); break;
   }
@@ -225,6 +227,19 @@ release = 0.2</pre>
          <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${t('docs_content.gain.falloff.title')}</div>
          <div style="font-size: 12px; color: var(--text-secondary);">${t('docs_content.gain.falloff.desc')}</div>
        </div>
+    </div>
+  `;
+}
+
+function sdeflistGuide() {
+  return `
+    <h2>${t('docs.sdeflist.title') || 'Where to find sdef_and_wave_list.txt'}</h2>
+    <p>${t('docs.sdeflist.desc') || 'The file <code>sdef_and_wave_list.txt</code> contains the full exhaustive list of all sound events and parameters inside DCS World.'}</p>
+    
+    <h3>${t('docs.sdeflist.location') || 'File Location'}</h3>
+    <pre>\\DCS World\\Doc\\Sounds\\sdef_and_wave_list.txt</pre>
+    <div class="tip-box">
+      ${t('docs.sdeflist.tip') || 'You can find it in the installation directory of DCS World. Usually located in your Program Files or Saved Games depending on your setup.'}
     </div>
   `;
 }

@@ -56,4 +56,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
      * Trigger the native autoUpdater to check for updates.
      */
     checkForUpdates: () => ipcRenderer.invoke('app:checkForUpdates'),
+
+    /**
+     * Read directory contents.
+     */
+    readDir: (dirPath) => ipcRenderer.invoke('fs:readDir', dirPath),
 });

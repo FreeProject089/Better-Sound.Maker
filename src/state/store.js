@@ -3,6 +3,7 @@
  */
 
 import { get, set, del, keys as idbKeys } from 'idb-keyval';
+import { APP_VERSION } from '../utils/version.js';
 
 const STORAGE_KEY = 'dcs-sound-mod-creator';
 const ASSET_FILES_PREFIX = 'audio::';
@@ -248,9 +249,11 @@ export function updateProjectConfig(updates) {
 }
 
 // --- Presets ---
-export function savePreset(name) {
+export function savePreset(name, color = '#3b82f6') {
     const preset = {
         name,
+        color,
+        version: APP_VERSION,
         date: new Date().toISOString(),
         assetPaths: Object.keys(state.selectedAssets)
     };
@@ -258,6 +261,14 @@ export function savePreset(name) {
     notify('presets');
     saveState();
     return preset;
+}
+
+export function updatePreset(index, pd) {
+    if (state.presets[index]) {
+        state.presets[index] = { ...state.presets[index], ...pd };
+        notify('presets');
+        saveState();
+    }
 }
 
 export function deletePreset(index) {

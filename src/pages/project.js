@@ -42,7 +42,8 @@ export function renderProject(container) {
   // Build tree from sdef paths
   const root = {};
   for (const [sdefPath, data] of entries) {
-    const parts = sdefPath.split('/');
+    const tPath = data.originalAsset?.treePath || sdefPath;
+    const parts = tPath.split('/');
     let node = root;
     for (let i = 0; i < parts.length - 1; i++) {
       const seg = parts[i];
