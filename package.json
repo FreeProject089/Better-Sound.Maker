@@ -51,7 +51,7 @@
     ],
     "win": {
       "target": "nsis",
-      "artifactName": "${name}-setup-${version}.${ext}"
+      "artifactName": "Better.Sound.Maker.Setup.${version}.${ext}"
     },
     "mac": {
       "target": "dmg"
