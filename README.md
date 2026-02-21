@@ -10,22 +10,22 @@
 
 ## ✨ Key Features
 
-### 📁 Assets Library
+###  Assets Library
 Browse thousands of DCS sound assets with ease. The library features a deep, recursive folder tree navigation, search functionality, and a detailed preview panel for every `.sdef` and `.wav` file.
 
-### 🎛️ Visual SDEF Editor
+###  Visual SDEF Editor
 Forget manual text editing. Tweak internal/external radii, gain, pitch, cones, and play modes (loop vs. one-shot) through a clean, intuitive interface. A real-time Gain-Distance model helps you visualize how the sound will behave in 3D space.
 
-### 📂 Project Management
+###  Project Management
 Organize your mod project in one place. Link your custom `.wav` or `.ogg` files to original DCS sound paths, track missing audio, and preview your changes instantly.
 
-### 💾 Presets & Templates
+###  Presets & Templates
 Save your favorite SDEF configurations as presets and apply them to other assets with a single click. Speed up your workflow by reusing proven distance and volume settings.
 
-### 🤝 GitHub Collaboration
+###  GitHub Collaboration
 Sync your project with your team. Built-in integration with GitHub allows you to push your full mod build, pull changes from teammates, share notes, and restore any previous version of your project.
 
-### 🚀 One-Click Build
+### One-Click Build
 Generate a complete, DCS-ready mod folder structure. The app automatically creates `entry.lua`, organizes the `Sounds` directory, and handles format conversions (WAV/OGG) for you.
 
 ---
