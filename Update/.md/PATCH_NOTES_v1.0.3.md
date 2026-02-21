@@ -1,5 +1,5 @@
 # Patch Notes - v1.0.3
-**Better ModMaker - Technical Update Details**
+**Better Sound.Maker - Technical Update Details**
 
 ## [v1.0.3] - 2026-02-21
 
