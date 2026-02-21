@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { id: 'presets', icon: 'save', label: 'nav.presets', section: 'nav.section.customization' },
   { id: 'collaboration', icon: 'users', label: 'nav.collab', section: 'nav.section.team' },
   { id: 'build', icon: 'rocket', label: 'nav.builder', section: 'nav.section.export' },
+  { id: 'settings', icon: 'settings', label: 'nav.settings', section: 'nav.section.help' },
   { id: 'docs', icon: 'book-open', label: 'nav.docs', section: 'nav.section.help' },
   { id: 'faq', icon: 'help-circle', label: 'nav.faq', section: 'nav.section.help' },
   { id: 'credits', icon: 'star', label: 'nav.credits', section: 'nav.section.help' },

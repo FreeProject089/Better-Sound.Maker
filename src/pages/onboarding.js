@@ -109,6 +109,14 @@ let currentStep = 0;
 let overlayEl = null;
 let spotlightEl = null;
 
+export function startOnboarding() {
+    localStorage.removeItem(ONBOARDING_KEY);
+    if (document.getElementById('onboarding-overlay')) document.getElementById('onboarding-overlay').remove();
+    if (document.getElementById('onboarding-mascot-wrap')) document.getElementById('onboarding-mascot-wrap').remove();
+    currentStep = 0;
+    initOnboarding();
+}
+
 export function initOnboarding() {
     // Don't show if already dismissed
     if (localStorage.getItem(ONBOARDING_KEY) === 'true') return;

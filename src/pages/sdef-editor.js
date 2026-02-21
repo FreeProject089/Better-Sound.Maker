@@ -3,7 +3,7 @@
  * Visual UI mode + raw text editor mode
  */
 
-import { getState, subscribe, setSdefContent, getSdefContent, navigate, setCurrentSdef, getAudioFile } from '../state/store.js';
+import { getState, subscribe, setSdefContent, getSdefContent, navigate, setCurrentSdef, getAudioFile, updateUnsavedSdef, clearUnsavedSdef } from '../state/store.js';
 import { SDEF_PARAMS, generateSdef, parseSdef } from '../utils/sdef-generator.js';
 import { showToast } from '../components/toast.js';
 import { detectSoundType, getTypeDefaults, SOUND_TYPES } from '../utils/audio-analyzer.js';
@@ -38,8 +38,10 @@ export function renderSdefEditor(container) {
 
   // Load current params
   if (currentSdef && selected[currentSdef]) {
+    const unsavedContent = state.unsavedSdefs[currentSdef];
     const content = getSdefContent(currentSdef);
-    currentParams = content ? parseSdef(content) : {};
+
+    currentParams = (unsavedContent || content) ? parseSdef(unsavedContent || content) : {};
     if (!currentParams.wave && selected[currentSdef].customWaves?.length) {
       currentParams.wave = selected[currentSdef].customWaves;
     }
@@ -126,7 +128,8 @@ function renderSdefFileList() {
       // Load params for editor
       const state = getState();
       const content = getSdefContent(clickedPath);
-      currentParams = content ? parseSdef(content) : {};
+      const unsavedContent = state.unsavedSdefs[clickedPath];
+      currentParams = (unsavedContent || content) ? parseSdef(unsavedContent || content) : {};
 
       const selectedAsset = state.selectedAssets[clickedPath];
       if (!currentParams.wave && selectedAsset?.customWaves?.length) {
@@ -203,10 +206,12 @@ function renderSdefTreeNode(node, parentPath = [], depth = 0) {
 
   if (node._files && node._files.length > 0) {
     node._files.sort((a, b) => a.path.localeCompare(b.path)).forEach(file => {
+      const state = getState();
       const parts = file.path.split('/');
       const name = parts.pop();
-      const isActive = file.path === currentSdef;
+      const isActive = file.path === state.currentSdef;
       const hasContent = !!file.sdefContent;
+      const isUnsaved = !!state.unsavedSdefs[file.path];
       const indent = (depth + 1) * 12;
 
       html += `
@@ -217,7 +222,7 @@ function renderSdefTreeNode(node, parentPath = [], depth = 0) {
                    ${getIcon('file-audio', 'w-3 h-3')}
                  </div>
                  <div class="sdef-file-name truncate">${name}</div>
-                 ${hasContent ? '<div class="sdef-modified-dot"></div>' : ''}
+                 ${isUnsaved ? '<div class="sdef-modified-dot" style="background-color: var(--accent-orange);"></div>' : (hasContent ? '<div class="sdef-modified-dot"></div>' : '')}
                </div>
              `;
     });
@@ -433,6 +438,27 @@ function attachEditorContentHandlers() {
     });
   });
 
+  // Change tracking for unsaved state
+  const rawTextarea = document.getElementById('raw-editor-textarea');
+  if (rawTextarea) {
+    rawTextarea.addEventListener('input', (e) => {
+      const state = getState();
+      if (state.currentSdef) updateUnsavedSdef(state.currentSdef, e.target.value);
+    });
+  }
+
+  document.querySelectorAll('#visual-editor input, #visual-editor select, #visual-editor textarea').forEach(el => {
+    const handleUpdate = () => {
+      const state = getState();
+      if (state.currentSdef) {
+        collectVisualParams();
+        updateUnsavedSdef(state.currentSdef, generateSdef(currentParams));
+      }
+    };
+    el.addEventListener('input', handleUpdate);
+    el.addEventListener('change', handleUpdate);
+  });
+
   // Save
   document.getElementById('save-sdef')?.addEventListener('click', () => {
     const state = getState();
@@ -449,6 +475,7 @@ function attachEditorContentHandlers() {
     }
 
     setSdefContent(currentSdef, content);
+    clearUnsavedSdef(currentSdef);
     renderSdefFileList();
     showToast(t('sdef.saved'), 'success');
   });

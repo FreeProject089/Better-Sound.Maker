@@ -105,7 +105,20 @@ function createWindow() {
 
     // In dev: load Vite dev server; in prod: load built HTML
     if (isDev) {
-        win.loadURL('http://localhost:5173');
+        const tryLoad = async (port) => {
+            try {
+                await win.loadURL(`http://localhost:${port}`);
+            } catch (err) {
+                if (port === 5173) {
+                    console.log('Port 5173 failed, trying 5174...');
+                    tryLoad(5174);
+                } else {
+                    console.log(`Port ${port} failed, retrying in 1s...`);
+                    setTimeout(() => tryLoad(5173), 1000);
+                }
+            }
+        };
+        tryLoad(5173);
         win.webContents.openDevTools({ mode: 'detach' });
     } else {
         win.loadFile(path.join(__dirname, '../dist/index.html'));
@@ -169,7 +182,7 @@ ipcMain.handle('fs:readFile', async (_event, filePath) => {
     try {
         return fs.readFileSync(filePath);
     } catch (e) {
-        console.error('Failed to read file:', filePath, e);
+        if (e.code !== 'ENOENT') console.error('Failed to read file:', filePath, e);
         return null;
     }
 });
@@ -179,7 +192,7 @@ ipcMain.handle('fs:readTextFile', async (_event, filePath) => {
     try {
         return fs.readFileSync(filePath, 'utf8');
     } catch (e) {
-        console.error('Failed to read text file:', filePath, e);
+        if (e.code !== 'ENOENT') console.error('Failed to read text file:', filePath, e);
         return null;
     }
 });
@@ -199,4 +212,9 @@ ipcMain.handle('app:getPath', () => app.getAppPath());
 // Check for updates manually
 ipcMain.handle('app:checkForUpdates', async () => {
     return checkUpdate(false);
+});
+
+// Open external path
+ipcMain.handle('app:openExternal', async (_event, targetPath) => {
+    return shell.openPath(targetPath);
 });

@@ -42,7 +42,16 @@ const defaultState = {
     currentSdef: null,
 
     // Library data (transient, not persisted)
-    libraryData: null
+    libraryData: null,
+
+    // Global settings
+    globalSettings: {
+        dcsPath: '',
+        autoScan: false
+    },
+
+    // Unsaved SDEF changes (transient)
+    unsavedSdefs: {}
 };
 
 let state = { ...defaultState };
@@ -112,8 +121,12 @@ export function setState(key, value) {
 
 // --- Asset Selection ---
 export function selectAsset(sdefPath, assetData) {
+    let defaultContent = '';
+    if (assetData && assetData.customSdefContent) {
+        defaultContent = assetData.customSdefContent;
+    }
     state.selectedAssets[sdefPath] = {
-        sdefContent: '',
+        sdefContent: defaultContent,
         audioFileName: null,
         audioMeta: null,
         customWaves: assetData.waves || [],
@@ -211,11 +224,24 @@ export function getAssetNote(key) {
 
 // --- SDEF Content ---
 export function setSdefContent(sdefPath, content) {
-    if (state.selectedAssets[sdefPath]) {
-        state.selectedAssets[sdefPath].sdefContent = content;
-        notify('selectedAssets');
-        saveState();
+    if (!state.selectedAssets[sdefPath]) {
+        // Automatically select if saving an unselected SDEF
+        let assetData = null;
+        if (state.libraryData && state.libraryData.sections) {
+            for (const sec of state.libraryData.sections) {
+                const found = sec.assets.find(a => a.sdefPath === sdefPath);
+                if (found) { assetData = found; break; }
+            }
+        }
+        if (assetData) {
+            selectAsset(sdefPath, assetData);
+        } else {
+            return;
+        }
     }
+    state.selectedAssets[sdefPath].sdefContent = content;
+    notify('selectedAssets');
+    saveState();
 }
 
 export function getSdefContent(sdefPath) {
@@ -241,6 +267,32 @@ export function removeThemeImage(slot) {
     saveState();
 }
 
+// --- Unsaved SDEFs ---
+export function updateUnsavedSdef(sdefPath, content) {
+    state.unsavedSdefs[sdefPath] = content;
+    notify('unsavedSdefs');
+}
+
+export function clearUnsavedSdef(sdefPath) {
+    if (state.unsavedSdefs[sdefPath] !== undefined) {
+        delete state.unsavedSdefs[sdefPath];
+        notify('unsavedSdefs');
+    }
+}
+
+export function saveAllUnsavedSdefs() {
+    for (const [sdefPath, content] of Object.entries(state.unsavedSdefs)) {
+        if (!state.selectedAssets[sdefPath]) {
+            state.selectedAssets[sdefPath] = {};
+        }
+        state.selectedAssets[sdefPath].sdefContent = content;
+    }
+    state.unsavedSdefs = {};
+    saveState();
+    notify('selectedAssets');
+    notify('unsavedSdefs');
+}
+
 // --- Project Config ---
 export function updateProjectConfig(updates) {
     state.projectConfig = { ...state.projectConfig, ...updates };
@@ -254,6 +306,7 @@ export function savePreset(name, color = '#3b82f6') {
         name,
         color,
         version: APP_VERSION,
+        UpdateNumber: 1,
         date: new Date().toISOString(),
         assetPaths: Object.keys(state.selectedAssets)
     };
@@ -284,6 +337,12 @@ export function importPreset(preset) {
 }
 
 // --- Navigation ---
+export function setGlobalSettings(settings) {
+    state.globalSettings = { ...state.globalSettings, ...settings };
+    saveState();
+    notify('globalSettings');
+}
+
 export function navigate(page) {
     state.currentPage = page;
     notify('currentPage');

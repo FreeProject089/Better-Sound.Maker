@@ -13,7 +13,8 @@ import { t, updateTranslations } from '../utils/i18n.js';
 import { parseSdefList } from '../data/sdef-parser.js';
 import { showToast } from '../components/toast.js';
 import { guessLoopType, detectSoundType, SOUND_TYPES } from '../utils/audio-analyzer.js';
-import { pickTextFile } from '../utils/file-picker.js';
+import { pickTextFile, pickJsonFile } from '../utils/file-picker.js';
+import { showModal } from '../components/modal.js';
 
 let allAssets = [];
 // currentPath is an array of folder segments (e.g. ['Aircrafts', 'AH-64D'])
@@ -46,6 +47,8 @@ export async function renderLibrary(container) {
       <div class="flex-gap">
         <button class="btn btn-secondary btn-sm" id="select-filtered-btn" data-i18n="library.selectAll">Select All Visible</button>
         <button class="btn btn-danger btn-sm" id="deselect-all-btn" data-i18n="library.clearSelection">Clear Selection</button>
+        <button class="btn btn-secondary btn-sm" id="import-btn" title="Import Data">${getIcon('download', 'icon-sm')} Import</button>
+        <button class="btn btn-secondary btn-sm" id="export-library-btn" title="Export Library Data">${getIcon('upload-cloud', 'icon-sm')} Export</button>
         <button class="btn btn-secondary btn-sm" id="reload-library-btn">${getIcon('refresh-cw', 'icon-sm')} <span data-i18n="library.reload">Reload</span></button>
       </div>
     </div>
@@ -97,11 +100,14 @@ export async function renderLibrary(container) {
 
   document.getElementById('select-filtered-btn').addEventListener('click', selectAllVisible);
   document.getElementById('deselect-all-btn').addEventListener('click', deselectAll);
+  document.getElementById('import-btn')?.addEventListener('click', handleImportClick);
+  document.getElementById('export-library-btn')?.addEventListener('click', exportLibrary);
   document.getElementById('reload-library-btn').addEventListener('click', reloadLibrary);
 
   listContainer = document.getElementById('asset-list');
   listContainer.addEventListener('scroll', () => renderVirtualList());
 
+  renderIcons(container);
   updateTranslations();
 }
 
@@ -110,24 +116,37 @@ export async function renderLibrary(container) {
 // ───────────────────────────────────────────────
 
 async function loadLibraryData() {
+  const loaderSub = document.getElementById('loader-subtext');
   try {
+    if (loaderSub) loaderSub.textContent = t('library.restoringCache') || "Checking local storage cache...";
     // Try IDB first
     const cached = await loadLibraryFromStorage();
     if (cached) {
+      if (loaderSub) loaderSub.textContent = t('library.buildingInterface') || "Cache found! Building interface...";
+      // Allow DOM to paint progress text
+      await new Promise(r => setTimeout(r, 10));
       allAssets = cached.sections.flatMap(s => s.assets);
       folderTree = buildFolderTree(allAssets);
-      showToast(`Restored ${allAssets.length} assets from storage`, 'success');
+      showToast(t('library.restoredAssets', { count: allAssets.length }) || `Restored ${allAssets.length} assets from storage`, 'success');
       return;
     }
 
+    if (loaderSub) loaderSub.textContent = t('library.downloadingData') || "Downloading DCS Data...";
     // Fallback to fetch default (now from public folder) with cache busting
     const resp = await fetch(`./sdef_and_wave_list.txt?v=${Date.now()}`);
     const text = await resp.text();
+
+    if (loaderSub) loaderSub.textContent = t('library.parsingData') || "Parsing database models... This may take a moment.";
+    // Allow DOM to yield the heavy parsing to display text
+    await new Promise(r => setTimeout(r, 20));
+
     const data = parseSdefList(text);
 
     setLibraryData(data);
     await saveLibraryToStorage(data);
 
+    if (loaderSub) loaderSub.textContent = t('library.buildingFolders') || "Building folder structures...";
+    await new Promise(r => setTimeout(r, 10));
     allAssets = data.sections.flatMap(s => s.assets);
     folderTree = buildFolderTree(allAssets);
     showToast(`Loaded ${allAssets.length} assets`, 'success');
@@ -164,6 +183,165 @@ async function reloadLibrary() {
   }
 }
 
+function exportLibrary() {
+  const data = getState().libraryData;
+  if (!data) return;
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `assets_library_export.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Library exported successfully', 'success');
+}
+
+async function handleImportClick() {
+  const action = await showModal({
+    title: 'Import',
+    content: '<p style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">What would you like to import?</p>',
+    actions: [
+      { id: 'import-mod', label: `${getIcon('folder-plus', 'w-4 h-4')} Import Mod (.zip)`, class: 'btn-primary' },
+      { id: 'import-lib', label: `${getIcon('file-text', 'w-4 h-4')} Import Library (.json)`, class: 'btn-secondary' },
+      { id: 'cancel', label: t('common.cancel'), class: 'btn-secondary' }
+    ]
+  });
+
+  if (action === 'import-mod') {
+    importModZips();
+  } else if (action === 'import-lib') {
+    importLibraryData();
+  }
+}
+
+async function importLibraryData() {
+  try {
+    const file = await pickJsonFile();
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (data && data.sections) {
+      setLibraryData(data);
+      await saveLibraryToStorage(data);
+      allAssets = data.sections.flatMap(s => s.assets);
+      folderTree = buildFolderTree(allAssets);
+      currentPath = [];
+      renderFolderTree();
+      applyFilter();
+      renderStats();
+      showToast('Library data imported successfully', 'success');
+      renderIcons(document.getElementById('page-container'));
+      updateTranslations();
+    } else {
+      showToast('Invalid library data format', 'error');
+    }
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      showToast('Failed to import library: ' + e.message, 'error');
+    }
+  }
+}
+
+async function importModZips() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.zip';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      showToast(`Extracting ${file.name}...`, 'info');
+      const JSZip = (await import('jszip')).default;
+      const zip = await JSZip.loadAsync(file);
+      const sdefFiles = Object.keys(zip.files).filter(k => k.toLowerCase().endsWith('.sdef') && !zip.files[k].dir);
+
+      const modSectionName = `Mod: ${file.name.replace('.zip', '')}`;
+      let libraryData = getState().libraryData;
+      if (!libraryData) {
+        showToast('Library not loaded yet!', 'error');
+        return;
+      }
+
+      let modSection = libraryData.sections.find(s => s.name === modSectionName);
+      if (!modSection) {
+        modSection = { name: modSectionName, assets: [] };
+        libraryData.sections.push(modSection);
+      }
+
+      let importedCount = 0;
+      for (const zPath of sdefFiles) {
+        const content = await zip.files[zPath].async('string');
+        const asset = parseSingleSdefFromMod(zPath, content, modSectionName);
+        if (asset) {
+          if (!modSection.assets.find(a => a.sdefPath === asset.sdefPath)) {
+            modSection.assets.push(asset);
+            importedCount++;
+          }
+        }
+      }
+
+      if (importedCount > 0) {
+        await saveLibraryToStorage(libraryData);
+        allAssets = libraryData.sections.flatMap(s => s.assets);
+        folderTree = buildFolderTree(allAssets);
+        currentPath = [];
+        renderFolderTree();
+        applyFilter();
+        renderStats();
+        showToast(`Imported ${importedCount} assets from Mod`, 'success');
+      } else {
+        showToast('No valid .sdef files found in this mod zip', 'warning');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to import mod zip: ' + err.message, 'error');
+    }
+  };
+  input.click();
+}
+
+function parseSingleSdefFromMod(zipPath, content, modSectionName) {
+  const lines = content.split('\\n');
+  const waves = [];
+
+  for (const l of lines) {
+    const line = l.trim();
+    if (line.toLowerCase().startsWith('wave')) {
+      const match = line.match(/"([^"]+)"/);
+      if (match) waves.push(match[1].replace(/\\\\/g, '/'));
+    }
+  }
+
+  let sPath = zipPath.replace(/\\\\/g, '/');
+  if (sPath.toLowerCase().includes('sounds/sdef/')) {
+    sPath = sPath.substring(sPath.toLowerCase().indexOf('sounds/sdef/') + 'sounds/sdef/'.length);
+  }
+
+  const asset = {
+    sdefPath: sPath,
+    name: sPath.split('/').pop(),
+    waves: waves,
+    treePath: sPath.replace(/\\.sdef$/i, ''),
+    customSdefContent: content
+  };
+
+  if (asset.waves.length > 0) {
+    const wPath = asset.waves[0];
+    const wParts = wPath.split('/');
+    if (wParts.length > 1) {
+      wParts.pop();
+      const sName = asset.name.replace(/\\.sdef$/i, '');
+      asset.treePath = `[Mods]/${modSectionName}/${wParts.join('/')}/${sName}`;
+    } else {
+      asset.treePath = `[Mods]/${modSectionName}/${asset.treePath}`;
+    }
+  } else {
+    asset.treePath = `[Mods]/${modSectionName}/${asset.treePath}`;
+  }
+  return asset;
+}
+
+
 // ───────────────────────────────────────────────
 // FOLDER TREE (deep, recursive)
 // ───────────────────────────────────────────────
@@ -175,7 +353,9 @@ async function reloadLibrary() {
 function buildFolderTree(assets) {
   const root = {};
   for (const asset of assets) {
-    let pathStr = asset.treePath;
+    if (!asset) continue;
+    let pathStr = asset.treePath || asset.sdefPath || 'Unknown';
+    if (pathStr.includes('\\')) pathStr = pathStr.replace(/\\/g, '/');
     const parts = pathStr.split('/');
 
     let node = root;

@@ -3,7 +3,7 @@
  * Configure entry.lua and export complete mod folder
  */
 
-import { getState, updateProjectConfig, subscribe } from '../state/store.js';
+import { getState, updateProjectConfig, saveAllUnsavedSdefs, setCurrentSdef, navigate } from '../state/store.js';
 import { generateEntryLua } from '../utils/entry-generator.js';
 import { buildMod } from '../utils/mod-builder.js';
 import { showToast } from '../components/toast.js';
@@ -17,6 +17,7 @@ export function renderBuild(container) {
   const selectedCount = Object.keys(selected).length;
   const audioCount = Object.values(selected).filter(d => d.audioFileName).length;
   const sdefCount = Object.values(selected).filter(d => d.sdefContent).length;
+  const unsavedSdefs = Object.keys(state.unsavedSdefs || {});
 
   const entryPreview = generateEntryLua(config);
 
@@ -137,7 +138,7 @@ export function renderBuild(container) {
             ${getIcon('folder', 'w-4 h-4')} ${t('build.preview.structure')}
           </div>
           <div class="build-preview" style="color: var(--text-secondary); font-size: 12px;">
-SoundMod${config.modName || '{Name}'}/
+<span id="preview-mod-name">SoundMod${config.modName || '{Name}'}</span>/
 ├── entry.lua
 ${config.themeEnabled ? `├── Theme/
 │   ├── icon.png
@@ -153,6 +154,33 @@ ${config.themeEnabled ? `├── Theme/
         └── (${selectedCount} sdef files)
           </div>
         </div>
+
+        ${unsavedSdefs.length > 0 ? `
+          <div class="card" style="margin-bottom: 20px; border-left: 4px solid var(--accent-orange); padding: 12px 16px;">
+            <div class="flex-between" style="align-items: center;">
+               <div>
+                  <div style="font-weight: 600; color: var(--accent-orange); display: flex; align-items: center; gap: 8px; font-size: 13px;">
+                     ${getIcon('alert-triangle', 'w-4 h-4')} Unsaved SDEF changes
+                  </div>
+                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; max-width: 250px;">
+                     Build ignores unsaved changes. Select to view:
+                  </div>
+               </div>
+               <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                   <select class="input-field" id="build-unsaved-select" style="width: 140px; font-size: 11px; padding: 4px;">
+                      <option value="" disabled selected>Files (${unsavedSdefs.length})</option>
+                      ${unsavedSdefs.map(p => `<option value="${p}">${p.split('/').pop()}</option>`).join('')}
+                   </select>
+                   <button class="btn btn-secondary btn-sm" id="build-edit-unsaved-btn" style="padding: 4px 8px; font-size: 12px; display: none;" title="Edit SDEF">
+                      ${getIcon('edit', 'w-3 h-3')} Edit
+                   </button>
+                   <button class="btn btn-warning btn-sm" id="build-save-unsaved-btn" style="padding: 4px 8px; font-size: 12px;">
+                      ${getIcon('save', 'w-3 h-3')} Save All
+                   </button>
+               </div>
+            </div>
+          </div>
+        ` : ''}
 
         <button class="btn btn-success btn-lg" id="build-mod-btn" style="width: 100%; font-size: 16px; padding: 16px;">
           ${getIcon('package', 'w-5 h-5')} ${t('build.action.build')}
@@ -176,6 +204,8 @@ ${config.themeEnabled ? `├── Theme/
 
   // Save config on input change
   const saveConfig = () => {
+    const configTheme = document.getElementById('cfg-themeEnabled')?.checked || false;
+    const oldConfig = getState().projectConfig;
     const updates = {
       modName: document.getElementById('cfg-modName')?.value || '',
       displayName: document.getElementById('cfg-displayName')?.value || '',
@@ -185,9 +215,16 @@ ${config.themeEnabled ? `├── Theme/
       description: document.getElementById('cfg-description')?.value || '',
       url: document.getElementById('cfg-url')?.value || '',
       credits: document.getElementById('cfg-credits')?.value || '',
-      themeEnabled: document.getElementById('cfg-themeEnabled')?.checked || false
+      themeEnabled: configTheme
     };
     updateProjectConfig(updates);
+
+    if (oldConfig.themeEnabled !== configTheme) {
+      setTimeout(() => renderBuild(container), 10);
+    }
+
+    const previewModName = document.getElementById('preview-mod-name');
+    if (previewModName) previewModName.textContent = `SoundMod${updates.modName || '{Name}'}`;
 
     // Update preview
     const preview = document.getElementById('entry-preview');
@@ -204,6 +241,29 @@ ${config.themeEnabled ? `├── Theme/
     el.addEventListener('input', saveConfig);
     el.addEventListener('change', saveConfig);
   });
+
+  const saveUnsavedBtn = document.getElementById('build-save-unsaved-btn');
+  if (saveUnsavedBtn) {
+    saveUnsavedBtn.addEventListener('click', () => {
+      saveAllUnsavedSdefs();
+      showToast('All unsaved SDEFs saved', 'success');
+      renderBuild(container);
+    });
+  }
+
+  const unsavedSelect = document.getElementById('build-unsaved-select');
+  const editUnsavedBtn = document.getElementById('build-edit-unsaved-btn');
+  if (unsavedSelect && editUnsavedBtn) {
+    unsavedSelect.addEventListener('change', () => {
+      editUnsavedBtn.style.display = unsavedSelect.value ? 'inline-flex' : 'none';
+    });
+    editUnsavedBtn.addEventListener('click', () => {
+      if (unsavedSelect.value) {
+        setCurrentSdef(unsavedSelect.value);
+        navigate('sdef-editor');
+      }
+    });
+  }
 
   // Build button
   document.getElementById('build-mod-btn')?.addEventListener('click', async () => {

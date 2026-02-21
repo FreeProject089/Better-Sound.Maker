@@ -22,7 +22,8 @@
         "description": "Description",
         "notes": "Notes",
         "pageNotFound": "Page non trouvée",
-        "close": "Fermer"
+        "close": "Fermer",
+        "ready": "Prêt !"
     },
     "nav": {
         "projects": "Projets",
@@ -44,6 +45,15 @@
         "tutorial": "Relancer Tuto",
         "faq": "F.A.Q",
         "settings": "Paramètres"
+    },
+    "settingsPage": {
+        "title": "Paramètres",
+        "desc": "Gérez les paramètres globaux de l'application.",
+        "dcsPath": "Dossier d'installation de DCS World",
+        "dcsPathDesc": "Emplacement de votre jeu DCS World. Nécessaire pour mettre à jour la liste de sons automatiquement et trouver les mods.",
+        "selectPath": "Sélectionner un dossier",
+        "autoScan": "Auto-scan de l'Assets Library",
+        "autoScanDesc": "Analyse votre installation DCS et met à jour automatiquement le référentiel de l'application au démarrage."
     },
     "presetsPage": {
         "title": "Préréglages & Modèles",
@@ -131,7 +141,12 @@
         "uploadAudio": "Ajouter Audio",
         "deselect": "Désélectionner",
         "select": "Sélectionner",
-        "remove": "Retirer Audio"
+        "remove": "Retirer Audio",
+        "restoringCache": "Vérification du cache de stockage...",
+        "buildingInterface": "Cache trouvé ! Création de l'interface...",
+        "downloadingData": "Téléchargement des données DCS...",
+        "parsingData": "Analyse des modèles... Cela peut prendre un instant.",
+        "buildingFolders": "Construction des dossiers..."
     },
     "sdef": {
         "title": "Éditeur SDEF",

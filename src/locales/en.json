@@ -22,7 +22,8 @@
         "description": "Description",
         "notes": "Notes",
         "pageNotFound": "Page not found",
-        "close": "Close"
+        "close": "Close",
+        "ready": "Ready !"
     },
     "nav": {
         "library": "Assets Library",
@@ -44,6 +45,15 @@
         },
         "faq": "F.A.Q",
         "settings": "Settings"
+    },
+    "settingsPage": {
+        "title": "Settings",
+        "desc": "Manage global application settings.",
+        "dcsPath": "DCS World Directory",
+        "dcsPathDesc": "Path to your local DCS World installation. Required to automatically update sounds lists and find mods.",
+        "selectPath": "Select Folder",
+        "autoScan": "Auto-scan Assets Library",
+        "autoScanDesc": "Automatically scans your DCS installation and updates the internal library on startup."
     },
     "presetsPage": {
         "title": "Presets & Templates",
@@ -131,7 +141,12 @@
         "uploadAudio": "Upload Audio",
         "deselect": "Deselect",
         "select": "Select",
-        "remove": "Remove Audio"
+        "remove": "Remove Audio",
+        "restoringCache": "Checking local storage cache...",
+        "buildingInterface": "Cache found! Building interface...",
+        "downloadingData": "Downloading DCS Data...",
+        "parsingData": "Parsing database models... This may take a moment.",
+        "buildingFolders": "Building folder structures..."
     },
     "sdef": {
         "title": "SDEF Editor",

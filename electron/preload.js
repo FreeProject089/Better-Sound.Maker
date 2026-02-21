@@ -61,4 +61,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
      * Read directory contents.
      */
     readDir: (dirPath) => ipcRenderer.invoke('fs:readDir', dirPath),
+
+    /**
+     * Open a file or folder in OS default handler.
+     */
+    openExternal: (targetPath) => ipcRenderer.invoke('app:openExternal', targetPath),
 });

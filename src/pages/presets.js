@@ -10,6 +10,10 @@ import { showToast } from '../components/toast.js';
 import { showModal } from '../components/modal.js';
 import { pickJsonFile } from '../utils/file-picker.js';
 import { parseSdefList } from '../data/sdef-parser.js';
+import { APP_VERSION } from '../utils/version.js';
+
+import Pickr from '@simonwep/pickr';
+import '@simonwep/pickr/dist/themes/nano.min.css';
 
 const PRESET_COLORS = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722', '#795548', '#607d8b'];
 
@@ -52,11 +56,10 @@ export async function renderPresets(container) {
               <input type="text" class="input-field" id="preset-name" placeholder="${t('presetsPage.namePlaceholder')}" style="flex: 1;" />
               <div style="display: flex; gap: 4px; align-items: center; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding-right: 4px;">
                 <input type="text" id="preset-color" value="#3b82f6" style="width: 75px; background: transparent; border: none; font-family: monospace; font-size: 13px; text-transform: uppercase; padding: 0 8px; color: var(--text-primary); outline: none;" maxlength="7" />
-                <div id="preset-color-preview" style="width: 20px; height: 20px; border-radius: 4px; background-color: #3b82f6;"></div>
+                 <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                    <div id="preset-color-picker"></div>
+                 </div>
               </div>
-            </div>
-            <div class="color-swatch-picker" id="preset-swatch-container">
-              ${PRESET_COLORS.map(c => `<div class="color-swatch ${c === '#3f51b5' ? 'active' : ''}" data-color="${c}" style="background-color: ${c};"></div>`).join('')}
             </div>
           </div>
         </div>
@@ -130,23 +133,31 @@ export async function renderPresets(container) {
   // Event handlers
   // Swatch logic for create
   const createColorInput = container.querySelector('#preset-color');
-  const createColorPreview = container.querySelector('#preset-color-preview');
 
-  function updateCreateHex(c) {
-    createColorInput.value = c;
-    createColorPreview.style.backgroundColor = c;
-    container.querySelectorAll('#preset-swatch-container .color-swatch').forEach(s => {
-      s.classList.toggle('active', s.dataset.color.toLowerCase() === c.toLowerCase());
-    });
-  }
-
-  createColorInput?.addEventListener('input', (e) => {
-    const val = e.target.value;
-    if (/^#[0-9A-F]{6}$/i.test(val)) updateCreateHex(val);
+  const pickr = Pickr.create({
+    el: container.querySelector('#preset-color-picker'),
+    theme: 'nano',
+    default: '#3b82f6',
+    components: {
+      preview: true,
+      hue: true,
+      interaction: { hex: true, input: true, save: true }
+    }
   });
 
-  container.querySelectorAll('#preset-swatch-container .color-swatch').forEach(sw => {
-    sw.addEventListener('click', (e) => updateCreateHex(e.target.dataset.color));
+  createColorInput?.addEventListener('input', (e) => {
+    let val = e.target.value;
+    if (!val.startsWith('#')) val = '#' + val;
+    if (/^#[0-9A-F]{6}$/i.test(val)) {
+      pickr.setColor(val);
+    }
+  });
+
+  pickr.on('change', (color) => {
+    createColorInput.value = color.toHEXA().toString().toUpperCase();
+  }).on('save', (color) => {
+    createColorInput.value = color.toHEXA().toString().toUpperCase();
+    pickr.hide();
   });
 
   document.getElementById('save-preset-btn')?.addEventListener('click', () => {
@@ -237,11 +248,25 @@ export async function renderPresets(container) {
               <label class="input-label">Color</label>
               <div style="display: flex; gap: 4px; align-items: center; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding-right: 4px; width: fit-content; margin-bottom: 8px;">
                 <input type="text" id="edit-preset-color" value="${preset.color || '#3b82f6'}" style="width: 75px; background: transparent; border: none; font-family: monospace; font-size: 13px; text-transform: uppercase; padding: 0 8px; color: var(--text-primary); outline: none;" maxlength="7" />
-                <div id="edit-preset-preview" style="width: 20px; height: 20px; border-radius: 4px; background-color: ${preset.color || '#3b82f6'};"></div>
+                 <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                    <div id="edit-preset-picker"></div>
+                 </div>
               </div>
-              <div class="color-swatch-picker" id="edit-preset-swatch-container">
-                ${PRESET_COLORS.map(c => `<div class="color-swatch ${c === (preset.color || '#3b82f6') ? 'active' : ''}" data-color="${c}" style="background-color: ${c};"></div>`).join('')}
-              </div>
+            </div>
+
+            <div class="input-group" style="padding-top: 12px; border-top: 1px solid var(--border);">
+              <label class="input-label" style="display: flex; justify-content: space-between;">
+                <span>Asset Contents</span>
+                <span class="tag tag-blue">${preset.assetPaths?.length || 0} Assets</span>
+              </label>
+              
+              <label style="display: flex; align-items: flex-start; gap: 8px; margin-top: 8px; background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: var(--radius-sm); cursor: pointer; border: 1px solid rgba(16, 185, 129, 0.2);">
+                <input type="checkbox" id="edit-preset-update-assets" style="margin-top: 2px;" ${Object.keys(state.selectedAssets).length === 0 ? 'disabled' : ''} />
+                <div style="font-size: 13px; color: var(--text-primary);">
+                  <div style="font-weight: 600; margin-bottom: 2px;">Replace with current selection</div>
+                  <div style="color: var(--text-muted); font-size: 11px;">Update this preset to contain your currently selected <b>${Object.keys(state.selectedAssets).length}</b> project assets.</div>
+                </div>
+              </label>
             </div>
           </div>
         `,
@@ -251,34 +276,60 @@ export async function renderPresets(container) {
         ]
       });
 
-      // Synchronously attach event listeners to swatches right after modal is injected
+      let newName = preset.name;
+      let newColor = preset.color || '#3b82f6';
+      let doUpdateAssets = false;
+
+      setTimeout(() => {
+        const nameInp = document.getElementById('edit-preset-name');
+        const updateInp = document.getElementById('edit-preset-update-assets');
+        if (nameInp) nameInp.addEventListener('input', e => newName = e.target.value);
+        if (updateInp) updateInp.addEventListener('change', e => doUpdateAssets = e.target.checked);
+      }, 50);
+
       const editColorInput = document.getElementById('edit-preset-color');
-      const editColorPreview = document.getElementById('edit-preset-preview');
 
-      function updateEditHex(c) {
-        editColorInput.value = c;
-        editColorPreview.style.backgroundColor = c;
-        document.querySelectorAll('#edit-preset-swatch-container .color-swatch').forEach(s => {
-          s.classList.toggle('active', s.dataset.color.toLowerCase() === c.toLowerCase());
-        });
-      }
-
-      editColorInput?.addEventListener('input', (e) => {
-        const val = e.target.value;
-        if (/^#[0-9A-F]{6}$/i.test(val)) updateEditHex(val);
+      const editPickr = Pickr.create({
+        el: '#edit-preset-picker',
+        theme: 'nano',
+        default: preset.color || '#3b82f6',
+        components: {
+          preview: true,
+          hue: true,
+          interaction: { hex: true, input: true, save: true }
+        }
       });
 
-      document.querySelectorAll('#edit-preset-swatch-container .color-swatch').forEach(sw => {
-        sw.addEventListener('click', (e) => updateEditHex(e.target.dataset.color));
+      editColorInput?.addEventListener('input', (e) => {
+        let val = e.target.value;
+        newColor = val;
+        if (!val.startsWith('#')) val = '#' + val;
+        if (/^#[0-9A-F]{6}$/i.test(val)) {
+          editPickr.setColor(val);
+        }
+      });
+
+      editPickr.on('change', (color) => {
+        newColor = color.toHEXA().toString().toUpperCase();
+        editColorInput.value = newColor;
+      }).on('save', (color) => {
+        newColor = color.toHEXA().toString().toUpperCase();
+        editColorInput.value = newColor;
+        editPickr.hide();
       });
 
       const result = await resultPromise;
 
       if (result === 'save') {
-        const newName = document.getElementById('edit-preset-name')?.value.trim();
-        const newColor = document.getElementById('edit-preset-color')?.value;
-        if (newName) {
-          updatePreset(idx, { name: newName, color: newColor });
+        const finalName = newName.trim();
+        if (finalName) {
+          const updates = { name: finalName, color: newColor };
+          if (doUpdateAssets) {
+            updates.assetPaths = Object.keys(getState().selectedAssets);
+            updates.UpdateNumber = (preset.UpdateNumber || 1) + 1;
+            updates.date = new Date().toISOString();
+          }
+          updatePreset(idx, updates);
           renderPresets(container);
           showToast('Preset updated', 'success');
         }
@@ -347,10 +398,53 @@ async function applyPreset(idx, container) {
   renderPresets(container);
 }
 
-function exportPreset(idx) {
+async function exportPreset(idx) {
   const state = getState();
   const preset = state.presets[idx];
   if (!preset) return;
+
+  let versionVal = preset.version || '1.0.0';
+  let updateNumVal = preset.UpdateNumber || 1;
+
+  setTimeout(() => {
+    const vInput = document.getElementById('export-version');
+    const uInput = document.getElementById('export-updatenum');
+    if (vInput) vInput.addEventListener('input', e => versionVal = e.target.value);
+    if (uInput) uInput.addEventListener('input', e => {
+      const val = parseInt(e.target.value, 10);
+      if (!isNaN(val)) updateNumVal = val;
+    });
+  }, 50);
+
+  const action = await showModal({
+    title: t('presetsPage.exportConfirmTitle') || `Export Preset: ${preset.name}`,
+    content: `
+      <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 13px;">
+        ${t('presetsPage.exportConfirmDesc') || 'Confirm the version and update number before exporting.'}
+      </p>
+      <div class="input-group">
+        <label class="input-label">${t('project.version') || 'Version'} (e.g. 1.0.2)</label>
+        <input type="text" id="export-version" class="input-field" value="${versionVal}" />
+      </div>
+      <div class="input-group" style="margin-top: 12px;">
+        <label class="input-label">${t('presetsPage.updateNumberLabel') || 'Update Number'} (increment for updates)</label>
+        <input type="number" id="export-updatenum" class="input-field" value="${updateNumVal}" min="1" />
+      </div>
+    `,
+    actions: [
+      { id: 'cancel', label: t('common.cancel') || 'Cancel', class: 'btn-secondary' },
+      { id: 'export', label: `${getIcon('download', 'w-4 h-4')} Export`, class: 'btn-primary' }
+    ]
+  });
+
+  if (action !== 'export') return;
+
+  preset.version = versionVal;
+  preset.UpdateNumber = updateNumVal;
+
+  import('../state/store.js').then(({ updatePreset }) => {
+    updatePreset(idx, { version: versionVal, UpdateNumber: updateNumVal });
+  });
 
   const json = JSON.stringify(preset, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
@@ -385,96 +479,193 @@ async function importPresetFromFile(container) {
 }
 
 async function showCommunityPresets(container) {
-  if (!window.electronAPI) {
-    showToast('Community presets require desktop app mode for now.', 'warning');
-    return;
-  }
-
   const state = getState();
   const presets = state.presets || [];
   let availablePresets = [];
 
+  // 1. Try Github Fetch first
   try {
-    const appPath = await window.electronAPI.getAppPath();
-    const presetsDir = appPath.endsWith('app.asar')
-      ? appPath.replace('app.asar', 'app.asar.unpacked/public/presets')
-      : appPath + '/public/presets';
-    const files = await window.electronAPI.readDir(presetsDir);
+    const gResp = await fetch(`https://api.github.com/repos/BetterDCS/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
+    if (gResp.ok) {
+      const ghFiles = await gResp.json();
+      for (const meta of ghFiles) {
+        if (meta.name.startsWith('preset_') && meta.download_url) {
+          const txtResp = await fetch(`${meta.download_url}?t=${Date.now()}`);
+          const text = await txtResp.text();
+          try {
+            const data = JSON.parse(text);
+            if (data.name !== undefined && data.color !== undefined && data.version !== undefined && data.date !== undefined && Array.isArray(data.assetPaths)) {
+              const localPreset = presets.find(p => p.name === data.name);
+              const isImported = !!localPreset;
+              let isUpdateAvailable = false;
 
-    if (files && files.length) {
-      for (const f of files) {
-        if (f.endsWith('.json')) {
-          const text = await window.electronAPI.readTextFile(presetsDir + '/' + f);
-          if (text) {
-            try {
-              const data = JSON.parse(text);
-              if (data.type === 'BetterSoundMod_Preset') {
-                const isImported = presets.some(p => p.name === data.name);
-                availablePresets.push({ file: f, data, isImported });
+              if (isImported) {
+                const localUpdateNum = localPreset.UpdateNumber || 0;
+                const remoteUpdateNum = data.UpdateNumber || 0;
+
+                if (remoteUpdateNum > localUpdateNum) {
+                  isUpdateAvailable = true;
+                } else if (localPreset.version !== undefined && !data.UpdateNumber) {
+                  // Fallback to basic semantic version check if no UpdateNumber is used
+                  const localV = localPreset.version.split('.').map(Number);
+                  const remoteV = (data.version || '0.0.0').split('.').map(Number);
+                  for (let i = 0; i < Math.max(localV.length, remoteV.length); i++) {
+                    const l = localV[i] || 0;
+                    const r = remoteV[i] || 0;
+                    if (r > l) { isUpdateAvailable = true; break; }
+                    if (r < l) break;
+                  }
+                }
               }
-            } catch (e) { }
-          }
+
+              availablePresets.push({ file: meta.name, data, isImported, isUpdateAvailable });
+            }
+          } catch (e) { }
         }
       }
     }
-  } catch (e) {
-    showToast('Failed to load community presets.', 'error');
-    console.warn(e);
-    return;
+  } catch (err) {
+    console.warn('Web fetch presets failed, falling back to local:', err);
+  }
+
+  // 2. Fallback to Local Directory if no presets loaded yet AND we're in Electron
+  if (availablePresets.length === 0 && window.electronAPI) {
+    try {
+      const appPath = await window.electronAPI.getAppPath();
+      const presetsDir = appPath.endsWith('app.asar')
+        ? appPath.replace('app.asar', 'app.asar.unpacked/public/presets')
+        : appPath + '/public/presets';
+      const files = await window.electronAPI.readDir(presetsDir);
+
+      if (files && files.length) {
+        for (const f of files) {
+          if (f.startsWith('preset_')) {
+            const text = await window.electronAPI.readTextFile(presetsDir + '/' + f);
+            if (text) {
+              try {
+                const data = JSON.parse(text);
+                if (data.name !== undefined && data.color !== undefined && data.version !== undefined && data.date !== undefined && Array.isArray(data.assetPaths)) {
+                  // Only push if not already loaded by GitHub
+                  if (!availablePresets.some(ap => ap.data.name === data.name)) {
+                    const localPreset = presets.find(p => p.name === data.name);
+                    const isImported = !!localPreset;
+                    availablePresets.push({ file: f, data, isImported, isUpdateAvailable: false }); // Local doesn't have "updates" generally
+                  }
+                }
+              } catch (e) { }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      showToast('Failed to load community presets.', 'error');
+      console.warn(e);
+      return;
+    }
   }
 
   if (availablePresets.length === 0) {
-    showModal({
+    const emptyAction = await showModal({
       title: t('presetsPage.communityModalTitle') || 'Community Presets',
       content: '<p>No community presets found.</p>',
-      actions: [{ id: 'close', label: t('common.close') || 'Close', class: 'btn-secondary' }]
+      actions: [
+        { id: 'refresh', label: getIcon('refresh-cw', 'w-4 h-4') + ' Refresh', class: 'btn-primary' },
+        { id: 'close', label: t('common.close') || 'Close', class: 'btn-secondary' }
+      ]
     });
+    if (emptyAction === 'refresh') {
+      showToast('Refreshing...', 'info');
+      showCommunityPresets(container);
+    }
     return;
   }
 
   const contentHtml = `
-    <div style="max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 8px;">
-      ${availablePresets.map(p => `
-        <div class="card flex-between" style="padding: 12px; margin: 0; align-items: center; border: 1px solid var(--border); background: var(--bg-surface);">
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <div style="color: ${p.data.color || 'var(--accent-blue)'};">
-              ${getIcon('layers', 'w-5 h-5')}
+    <div style="max-height: 500px; overflow-y: auto; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); padding: 8px;">
+      ${availablePresets.map(p => {
+    const pColor = p.data.color || 'var(--accent-blue)';
+    return `
+        <div class="card hover-fx" style="padding: 0; margin: 0; display: flex; flex-direction: column; border: 1px solid var(--border); background: var(--bg-surface); border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <div style="height: 6px; width: 100%; background: ${pColor};"></div>
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <div style="color: ${pColor}; background: ${pColor}15; padding: 12px; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; flex-shrink: 0; border: 1px solid ${pColor}30;">
+                ${getIcon('package', 'w-6 h-6')}
+              </div>
+              <div style="padding-top: 4px;">
+                <div style="font-weight: 800; font-size: 17px; color: ${pColor}; margin-bottom: 4px; line-height: 1.2;">
+                  ${p.data.name}
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                  ${getIcon('file-audio', 'w-3.5 h-3.5')} <span>${p.data.assetPaths.length} Sounds</span>
+                </div>
+                ${p.data.version ? `<div style="font-size: 11px; color: var(--text-muted); opacity: 0.7; margin-top: 4px; display: flex; align-items: center; gap: 4px;">${getIcon('tag', 'w-3 h-3')} v${p.data.version}</div>` : ''}
+              </div>
             </div>
-            <div>
-              <div style="font-weight: 600; color: var(--text-primary);">${p.data.name}</div>
-              <div style="font-size: 12px; color: var(--text-muted);">${p.data.assetPaths.length} assets</div>
+            
+            <div style="margin-top: 8px;">
+              ${p.isImported
+        ? (p.isUpdateAvailable
+          ? `<button class="btn btn-warning community-import-btn" style="width: 100%; border-radius: var(--radius-sm); height: 36px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px;" data-preset-name="${p.data.name.replace(/"/g, '&quot;')}">
+                  ${getIcon('refresh-cw', 'w-4 h-4')} Update Available
+                </button>`
+          : `<div style="width: 100%; border: 1px solid var(--border); text-align: center; background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 8px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px;">
+                  ${getIcon('check', 'w-4 h-4')} Imported
+                </div>`
+        )
+        : `<button class="btn btn-primary community-import-btn" style="width: 100%; border-radius: var(--radius-sm); height: 36px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px; background: ${pColor}; border: none; color: #fff;" data-preset-name="${p.data.name.replace(/"/g, '&quot;')}">
+                     ${getIcon('download-cloud', 'w-4 h-4')} Install Preset
+                   </button>`
+      }
             </div>
-          </div>
-          <div>
-            ${p.isImported
-      ? `<span class="tag tag-green">Imported</span>`
-      : `<button class="btn btn-primary btn-sm community-import-btn" data-preset-name="${p.data.name.replace(/"/g, '&quot;')}">Import</button>`
-    }
           </div>
         </div>
-      `).join('')}
+      `}).join('')}
     </div>
   `;
 
-  const resultPromise = showModal({
+  const actionPromise = showModal({
     title: t('presetsPage.communityModalTitle') || 'Community Presets',
     content: contentHtml,
-    actions: [{ id: 'close', label: t('common.close') || 'Close', class: 'btn-secondary' }]
+    actions: [
+      { id: 'refresh', label: getIcon('refresh-cw', 'w-4 h-4') + ' Refresh', class: 'btn-secondary' },
+      { id: 'close', label: t('common.close') || 'Close', class: 'btn-primary' }
+    ]
   });
 
   // Attach import listeners
   document.querySelectorAll('.community-import-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const name = e.target.dataset.presetName;
+      const btnEl = e.currentTarget;
+      const name = btnEl.dataset.presetName;
       const presetData = availablePresets.find(p => p.data.name === name)?.data;
       if (presetData) {
-        importPreset(presetData);
-        e.target.parentElement.innerHTML = '<span class="tag tag-green">Imported</span>';
+        // If updating an existing preset, we might want to override.
+        // importPreset automatically pushes or overwrites depending on name
+        const existingIdx = presets.findIndex(p => p.name === presetData.name);
+        if (existingIdx >= 0) {
+          presets[existingIdx] = presetData;
+          getState().presets = presets;
+          // Explicitly force save for manual replacement
+          saveLibraryToStorage(getState().libraryData).catch(() => { });
+        } else {
+          importPreset(presetData);
+        }
+
+        btnEl.parentElement.innerHTML = `
+          <div style="width: 100%; border: 1px solid var(--border); text-align: center; background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 8px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px;">
+            ${getIcon('check', 'w-4 h-4')} Imported
+          </div>
+        `;
         renderPresets(container); // Re-render background page silently
-        showToast(`Preset "${name}" imported`, 'success');
+        showToast(`Preset "${name}" imported / updated`, 'success');
       }
     });
   });
 
-  await resultPromise;
+  const finalAction = await actionPromise;
+  if (finalAction === 'refresh') {
+    showToast('Refreshing network data...', 'info');
+    showCommunityPresets(container);
+  }
 }

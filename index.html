@@ -14,9 +14,107 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="./src/style.css" />
+  <style>
+    /* Global Loader Styles */
+    #global-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--bg-body, #0b1120);
+      /* Fallback */
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+
+    #global-loader.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-image-container {
+      width: 128px;
+      height: 128px;
+      position: relative;
+    }
+
+    .loader-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      animation: spin 3s linear infinite;
+    }
+
+    .loader-image-happy {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+
+    .loader-text {
+      margin-top: 24px;
+      color: var(--text-primary, #ffffff);
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.6;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="global-loader">
+    <div class="loader-image-container">
+      <img src="/Tasky.webp" id="loader-img-spin" class="loader-image" alt="Loading..." />
+      <img src="/Tasky_Happy.webp" id="loader-img-happy" class="loader-image-happy" alt="Ready!" />
+    </div>
+    <div class="loader-text" id="loader-text">Loading Better Sound.Maker...</div>
+    <div id="loader-subtext"
+      style="font-size: 11px; margin-top: 8px; color: var(--text-muted, #9ca3af); font-family: monospace;"></div>
+  </div>
+
+  <script>
+    (function () {
+      var lang = localStorage.getItem('dcs-sound-mod-creator::language') || 'en';
+      var textEl = document.getElementById('loader-text');
+      if (textEl) {
+        textEl.textContent = lang === 'fr' ? 'Chargement de Better Sound.Maker...' : 'Loading Better Sound.Maker...';
+      }
+    })();
+  </script>
   <!-- Mobile hamburger button -->
   <button id="sidebar-toggle" aria-label="Toggle menu">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"

@@ -4,7 +4,7 @@
 import { t, updateTranslations } from '../utils/i18n.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { showModal } from '../components/modal.js';
-import { GITHUB_REPO } from '../utils/version.js';
+import { GITHUB_REPO, APP_VERSION } from '../utils/version.js';
 
 export function renderCredits(container) {
   container.innerHTML = `
@@ -20,7 +20,7 @@ export function renderCredits(container) {
         </div>
       </div>
       <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;">Better Sound.Maker</h2>
-      <div class="credits-version-badge">v1.0.0</div>
+      <div class="credits-version-badge">v${APP_VERSION}</div>
       <div class="accent-line" style="max-width:180px;margin:18px auto;"></div>
       <p style="color:var(--text-secondary);max-width:480px;margin:0 auto;font-size:14px;line-height:1.7;">
         ${t('creditsPage.appDescription')}
