@@ -339,6 +339,92 @@ export async function renderPresets(container) {
 
   // Render icons (Lucide)
   renderIcons(container);
+
+  // Background check for community updates on local presets
+  checkUpdatesForLocalPresets(container);
+}
+
+// ───────────────────────────────────────────────
+// BACKGROUND COMMUNITY UPDATE CHECK
+// ───────────────────────────────────────────────
+let gCommunityPresetsCache = null;
+let gCommunityPresetsTime = 0;
+
+async function checkUpdatesForLocalPresets(container) {
+  const state = getState();
+  const list = state.presets || [];
+  if (list.length === 0) return;
+
+  // Use cache if checked within 5 mins
+  if (!gCommunityPresetsCache || Date.now() - gCommunityPresetsTime > 5 * 60 * 1000) {
+    try {
+      const gResp = await fetch(`https://api.github.com/repos/BetterDCS/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
+      if (gResp.ok) {
+        gCommunityPresetsCache = await gResp.json();
+        gCommunityPresetsTime = Date.now();
+      } else {
+        return;
+      }
+    } catch {
+      return;
+    }
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    const preset = list[i];
+
+    // Find if the Github cache has a file corresponding to this preset
+    const expectedName = `preset_${preset.name.replace(/\\s+/g, '_')}.json`;
+    const meta = gCommunityPresetsCache.find(f =>
+      f.name === expectedName ||
+      (f.name.startsWith('preset_') && f.name.replace('preset_', '').replace('.json', '') === preset.name)
+    );
+
+    if (meta && meta.download_url) {
+      // Avoid refetching if DOM already has the button
+      const btnGroup = container.querySelector(`[data-apply-preset="${i}"]`)?.parentElement;
+      if (!btnGroup || btnGroup.querySelector('.local-update-btn')) continue;
+
+      try {
+        const txtResp = await fetch(`${meta.download_url}?t=${Date.now()}`);
+        const text = await txtResp.text();
+        const remoteData = JSON.parse(text);
+
+        const localUpdateNum = preset.UpdateNumber || ((preset.version) ? 0 : 1);
+        const remoteUpdateNum = remoteData.UpdateNumber || 0;
+
+        let isUpdate = false;
+        if (remoteUpdateNum > localUpdateNum) {
+          isUpdate = true;
+        } else if (!remoteData.UpdateNumber && preset.version) {
+          const localV = preset.version.split('.').map(Number);
+          const remoteV = (remoteData.version || '0.0.0').split('.').map(Number);
+          for (let j = 0; j < Math.max(localV.length, remoteV.length); j++) {
+            const l = localV[j] || 0;
+            const r = remoteV[j] || 0;
+            if (r > l) { isUpdate = true; break; }
+            if (r < l) break;
+          }
+        }
+
+        if (isUpdate) {
+          const updateBtn = document.createElement('button');
+          updateBtn.className = 'btn btn-warning btn-sm local-update-btn';
+          updateBtn.innerHTML = `${getIcon('refresh-cw', 'w-4 h-4')} Update Available`;
+          updateBtn.onclick = () => {
+            // Push new data onto idx
+            import('../state/store.js').then(({ updatePreset }) => {
+              updatePreset(i, remoteData);
+              showToast(`Preset "${preset.name}" updated successfully!`, 'success');
+              renderPresets(container);
+            });
+          };
+          btnGroup.prepend(updateBtn);
+          renderIcons(container);
+        }
+      } catch (e) { }
+    }
+  }
 }
 
 async function applyPreset(idx, container) {

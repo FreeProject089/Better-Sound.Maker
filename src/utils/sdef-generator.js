@@ -89,7 +89,10 @@ export function generateSdef(params) {
  */
 export function parseSdef(text) {
     const params = {};
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('--'));
+    const lines = text.split(/\r?\n/).map(line => {
+        const hashIdx = line.indexOf('--');
+        return hashIdx >= 0 ? line.substring(0, hashIdx).trim() : line.trim();
+    }).filter(Boolean);
 
     let inWaveList = false;
     const waveList = [];

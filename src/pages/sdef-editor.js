@@ -253,7 +253,19 @@ function renderEditorContent() {
   const state = getState();
   const currentSdef = state.currentSdef;
 
-  const rawContent = currentParams ? generateSdef(currentParams) : '';
+  // If we have unsaved raw content, use it for raw mode
+  // Otherwise generate it from currentParams
+  let rawContent = '';
+  if (currentSdef) {
+    const storedRaw = state.unsavedSdefs[currentSdef] || getSdefContent(currentSdef);
+    if (storedRaw && (currentMode === 'raw')) {
+      rawContent = storedRaw;
+    } else {
+      rawContent = generateSdef(currentParams);
+    }
+  } else if (currentParams) {
+    rawContent = generateSdef(currentParams);
+  }
 
   // Group params by group
   const groups = {};
@@ -409,7 +421,24 @@ function attachEditorHandlers(container) {
 
 function attachEditorContentHandlers() {
   // Mode toggle
+  // Mode toggle
   document.getElementById('mode-visual')?.addEventListener('click', () => {
+    if (currentMode === 'raw') {
+      const textarea = document.getElementById('raw-editor-textarea');
+      if (textarea) {
+        currentParams = parseSdef(textarea.value);
+        // We need to update the visual UI fields because they are outdated
+        const mainEl = document.getElementById('editor-main');
+        if (mainEl) {
+          currentMode = 'visual'; // set before re-render
+          mainEl.innerHTML = renderEditorContent();
+          renderIcons(mainEl);
+          attachEditorContentHandlers();
+        }
+        return;
+      }
+    }
+
     currentMode = 'visual';
     document.getElementById('visual-editor')?.classList.remove('hidden');
     document.getElementById('raw-editor-container')?.classList.add('hidden');
@@ -418,10 +447,16 @@ function attachEditorContentHandlers() {
   });
 
   document.getElementById('mode-raw')?.addEventListener('click', () => {
-    collectVisualParams();
-    const raw = generateSdef(currentParams);
-    const textarea = document.getElementById('raw-editor-textarea');
-    if (textarea) textarea.value = raw;
+    if (currentMode === 'visual') {
+      collectVisualParams();
+      const raw = generateSdef(currentParams);
+      const textarea = document.getElementById('raw-editor-textarea');
+      if (textarea) textarea.value = raw;
+
+      // Also update the unsaved state so if we switch away and back, it's there
+      const state = getState();
+      if (state.currentSdef) updateUnsavedSdef(state.currentSdef, raw);
+    }
 
     currentMode = 'raw';
     document.getElementById('visual-editor')?.classList.add('hidden');
@@ -537,14 +572,19 @@ function collectVisualParams() {
   const container = document.getElementById('visual-editor');
   if (!container) return;
 
-  currentParams = {};
+  // Preserve existing currentParams to keep custom fields
+  if (!currentParams) currentParams = {};
 
   const waveEl = container.querySelector('[data-param="wave"]');
-  if (waveEl && waveEl.value.trim()) {
+  if (waveEl) {
     const lines = waveEl.value.trim().split('\n')
       .map(l => l.replace(/["'{},\t]/g, '').trim())
       .filter(Boolean);
-    currentParams.wave = lines;
+    if (lines.length > 0) {
+      currentParams.wave = lines;
+    } else {
+      delete currentParams.wave;
+    }
   }
 
   container.querySelectorAll('[data-param]').forEach(el => {
@@ -560,11 +600,19 @@ function collectVisualParams() {
       if (!currentParams[key]) currentParams[key] = [0, 0, 0];
       currentParams[key][idx] = parseFloat(el.value) || 0;
     } else if (paramDef.type === 'number') {
-      if (el.value !== '') currentParams[key] = parseFloat(el.value);
+      if (el.value !== '') {
+        currentParams[key] = parseFloat(el.value);
+      } else {
+        delete currentParams[key];
+      }
     } else if (paramDef.type === 'enum') {
       currentParams[key] = el.value;
     } else {
-      if (el.value) currentParams[key] = el.value;
+      if (el.value) {
+        currentParams[key] = el.value;
+      } else {
+        delete currentParams[key];
+      }
     }
   });
 }
