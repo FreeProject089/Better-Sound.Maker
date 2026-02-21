@@ -20,4 +20,4 @@
 - **General Fixes:** Countless small bugs found by the community have been squashed!
 
 ---
-*Thanks for using Better ModMaker! Your feedback makes the tool better every day.*
+*Thanks for using Better Sound.Maker! Your feedback makes the tool better every day.*
