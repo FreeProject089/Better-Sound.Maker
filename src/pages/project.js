@@ -57,9 +57,16 @@ export function renderProject(container) {
   const projectTreeHtml = renderProjectTreeNode(root);
 
   container.innerHTML = `
-    <div class="page-header">
-      <h1 class="page-title">Project</h1>
-      <p class="page-description">${t('project.manageSubtitle', { count: entries.length })}</p>
+    <div class="page-header flex-between">
+      <div>
+        <h1 class="page-title">Project</h1>
+        <p class="page-description">${t('project.manageSubtitle', { count: entries.length })}</p>
+      </div>
+      <div class="flex-gap">
+        <button class="btn btn-secondary" id="load-mod-btn">
+          ${getIcon('upload-cloud', 'w-4 h-4')} <span>Load Existing Mod</span>
+        </button>
+      </div>
     </div>
     <div class="stats-bar">
       <div class="stat-card">
@@ -305,6 +312,52 @@ function attachProjectHandlers(container) {
       renderProject(document.getElementById('page-container'));
       showToast('Asset removed from project', 'info');
     });
+  });
+
+  // Load Mod
+  document.getElementById('load-mod-btn')?.addEventListener('click', async () => {
+    const state = getState();
+    const hasAssets = Object.keys(state.selectedAssets).length > 0;
+
+    if (hasAssets) {
+      const { showModal } = await import('../components/modal.js');
+      const { saveAllUnsavedSdefs } = await import('../state/store.js');
+
+      const choice = await showModal({
+        title: 'Load Existing Mod?',
+        content: '<p>Loading a new mod will clear your current project. Do you want to save your current SDEF changes first?</p>',
+        actions: [
+          { id: 'cancel', label: 'Cancel', class: 'btn-secondary' },
+          { id: 'load-only', label: 'Load & Close', class: 'btn-danger' },
+          { id: 'save-load', label: 'Save & Load', class: 'btn-success' }
+        ]
+      });
+
+      if (choice === 'cancel' || !choice) return;
+      if (choice === 'save-load') {
+        saveAllUnsavedSdefs();
+      }
+    }
+
+    try {
+      const { pickFiles } = await import('../utils/file-picker.js');
+      const files = await pickFiles({ accept: '.zip' });
+      if (files.length === 0) return;
+
+      showToast('Loading mod...', 'info');
+      const { loadModFromZip } = await import('../utils/mod-loader.js');
+      const modData = await loadModFromZip(files[0]);
+
+      const { importModData } = await import('../state/store.js');
+      await importModData(modData);
+
+      showToast('Mod loaded successfully', 'success');
+      renderProject(document.getElementById('page-container'));
+    } catch (e) {
+      if (e.name !== 'AbortError') {
+        showToast('Failed to load mod: ' + e.message, 'error');
+      }
+    }
   });
 
   // Play buttons

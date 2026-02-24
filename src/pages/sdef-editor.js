@@ -335,9 +335,21 @@ function renderEditorContent() {
         const v = Array.isArray(val) ? val : [0, 0, 0];
         inputHtml = `
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input class="input-field sdef-vec-input" type="number" step="any" data-param="${param.key}" data-idx="0" value="${v[0]}" placeholder="fwd" />
-            <input class="input-field sdef-vec-input" type="number" step="any" data-param="${param.key}" data-idx="1" value="${v[1]}" placeholder="up" />
-            <input class="input-field sdef-vec-input" type="number" step="any" data-param="${param.key}" data-idx="2" value="${v[2]}" placeholder="right" />
+            <div class="sdef-stepper">
+              <button class="sdef-stepper-btn" data-stepper-dec="${param.key}" data-idx="0">${getIcon('minus', 'w-3 h-3')}</button>
+              <input class="sdef-stepper-input sdef-vec-input" type="number" step="any" data-param="${param.key}" data-idx="0" value="${v[0]}" placeholder="fwd" />
+              <button class="sdef-stepper-btn" data-stepper-inc="${param.key}" data-idx="0">${getIcon('plus', 'w-3 h-3')}</button>
+            </div>
+            <div class="sdef-stepper">
+              <button class="sdef-stepper-btn" data-stepper-dec="${param.key}" data-idx="1">${getIcon('minus', 'w-3 h-3')}</button>
+              <input class="sdef-stepper-input sdef-vec-input" type="number" step="any" data-param="${param.key}" data-idx="1" value="${v[1]}" placeholder="up" />
+              <button class="sdef-stepper-btn" data-stepper-inc="${param.key}" data-idx="1">${getIcon('plus', 'w-3 h-3')}</button>
+            </div>
+            <div class="sdef-stepper">
+              <button class="sdef-stepper-btn" data-stepper-dec="${param.key}" data-idx="2">${getIcon('minus', 'w-3 h-3')}</button>
+              <input class="sdef-stepper-input sdef-vec-input" type="number" step="any" data-param="${param.key}" data-idx="2" value="${v[2]}" placeholder="right" />
+              <button class="sdef-stepper-btn" data-stepper-inc="${param.key}" data-idx="2">${getIcon('plus', 'w-3 h-3')}</button>
+            </div>
           </div>
         `;
       } else if (param.type === 'enum') {
@@ -347,7 +359,13 @@ function renderEditorContent() {
           </select>
         `;
       } else if (param.type === 'number') {
-        inputHtml = `<input class="input-field sdef-num-input" type="number" step="any" data-param="${param.key}" value="${val}" placeholder="${param.default}" />`;
+        inputHtml = `
+          <div class="sdef-stepper">
+            <button class="sdef-stepper-btn" data-stepper-dec="${param.key}">${getIcon('minus', 'w-3 h-3')}</button>
+            <input class="sdef-stepper-input sdef-num-input" type="number" step="any" data-param="${param.key}" value="${val}" placeholder="${param.default}" />
+            <button class="sdef-stepper-btn" data-stepper-inc="${param.key}">${getIcon('plus', 'w-3 h-3')}</button>
+          </div>
+        `;
       } else {
         inputHtml = `<input class="input-field" type="text" data-param="${param.key}" value="${val}" placeholder="${param.default}" />`;
       }
@@ -492,6 +510,33 @@ function attachEditorContentHandlers() {
     };
     el.addEventListener('input', handleUpdate);
     el.addEventListener('change', handleUpdate);
+  });
+
+  // Stepper buttons
+  document.querySelectorAll('[data-stepper-dec]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.stepperDec;
+      const input = btn.parentElement.querySelector('input');
+      if (input) {
+        const step = parseFloat(input.step) || 1;
+        const val = parseFloat(input.value) || 0;
+        input.value = Math.round((val - step) * 1000) / 1000;
+        input.dispatchEvent(new Event('input'));
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-stepper-inc]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.stepperInc;
+      const input = btn.parentElement.querySelector('input');
+      if (input) {
+        const step = parseFloat(input.step) || 1;
+        const val = parseFloat(input.value) || 0;
+        input.value = Math.round((val + step) * 1000) / 1000;
+        input.dispatchEvent(new Event('input'));
+      }
+    });
   });
 
   // Save

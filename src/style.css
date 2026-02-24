@@ -1438,6 +1438,67 @@ select.input-field {
   padding: 8px 0;
 }
 
+/* --- Styled Stepper --- */
+.sdef-stepper {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  max-width: 160px;
+  transition: all var(--transition-fast);
+}
+
+.sdef-stepper:focus-within {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--accent-blue-glow);
+}
+
+.sdef-stepper-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-size: 16px;
+}
+
+.sdef-stepper-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.sdef-stepper-btn:active {
+  background: var(--accent-blue-glow);
+}
+
+.sdef-stepper-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
+  padding: 0 4px;
+  outline: none;
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+.sdef-stepper-input::-webkit-outer-spin-button,
+.sdef-stepper-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .sdef-param-name {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -3100,9 +3161,39 @@ body.onboarding-active #sidebar {
   gap: 12px;
   background: rgba(0, 0, 0, 0.15);
 }
-.color-swatch-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-.color-swatch { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.1s, border-color 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-.color-swatch:hover { transform: scale(1.1); }
-.color-swatch.active { border-color: white; transform: scale(1.15); box-shadow: 0 0 0 2px rgba(255,255,255,0.2); }
 
-.sdef-unsaved-dot { width: 6px; height: 6px; border-radius: 50%; background-color: var(--accent-amber); margin-left: 4px; flex-shrink: 0; }
+.color-swatch-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.1s, border-color 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.active {
+  border-color: white;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.sdef-unsaved-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-amber);
+  margin-left: 4px;
+  flex-shrink: 0;
+}

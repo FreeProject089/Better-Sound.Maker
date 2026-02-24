@@ -383,17 +383,40 @@ export async function loadLibraryFromStorage() {
     return null;
 }
 
-// --- Reset ---
-export function resetProject() {
-    audioFiles.clear();
-    themeFiles.clear();
+// --- Mod Import ---
+export async function importModData({ assets, config, audioBlobs }) {
+    // 1. Reset current project
     state.selectedAssets = {};
-    state.themeImages = {};
-    state.projectConfig = { ...defaultState.projectConfig };
-    state.currentSdef = null;
+    audioFiles.clear();
+    state.unsavedSdefs = {};
+
+    // 2. Update config
+    state.projectConfig = { ...defaultState.projectConfig, ...config };
+
+    // 3. Import assets and audio
+    for (const [sdefPath, data] of Object.entries(assets)) {
+        state.selectedAssets[sdefPath] = {
+            ...data,
+            originalAsset: { sdefPath, treePath: sdefPath }
+        };
+
+        const file = audioBlobs.get(sdefPath);
+        if (file) {
+            audioFiles.set(sdefPath, file);
+            // Analyze meta for each file
+            try {
+                const { analyzeAudioFile } = await import('../utils/audio-analyzer.js');
+                const meta = await analyzeAudioFile(file);
+                state.selectedAssets[sdefPath].audioMeta = meta;
+            } catch (e) {
+                console.warn(`Failed to analyze ${sdefPath}`, e);
+            }
+        }
+    }
+
     notify('selectedAssets');
-    notify('themeImages');
     notify('projectConfig');
+    notify('unsavedSdefs');
     saveState();
 }
 
