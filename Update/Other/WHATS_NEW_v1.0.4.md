@@ -10,6 +10,9 @@ Ever wanted to tweak a mod you already made or downloaded? Now you can! Just dro
 ### 🎛 Precision SDEF Editing
 No more manual typing (unless you want to)! Every slider and number field in the SDEF editor now has precision buttons to increment or decrement values. This includes the complex 3D Position and Direction fields.
 
+### 📜 Release Notes Archive
+Missed an update? Click "View All Notes" in the update popup to browse and read all historical patch notes and announcements directly within the app.
+
 ### 🛠 Temporary Service Changes
 Due to a temporary suspension of our GitHub organization, the **Auto-Update** and **Community Presets** features have been locally disabled in this version for stability. They will return once our infrastructure is restored.
 

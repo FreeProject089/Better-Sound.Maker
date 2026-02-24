@@ -49,7 +49,15 @@ function parseMarkdown(md) {
         .replace(/\n(<li>.*<\/li>)/g, '<ul>$1</ul>')
         .replace(/<\/ul><ul>/g, '')
         .replace(/\*\*(.*)\*\*/g, '<strong>$1</strong>')
+        .replace(/__(.*)__/g, '<strong>$1</strong>')
+        .replace(/\*(.*)\*/g, '<em>$1</em>')
+        .replace(/_(.*)_/g, '<em>$1</em>')
+        .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+        .replace(/^---$/gm, '<hr>')
         .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:8px; margin:10px 0;" />')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+        .replace(/\n\n/g, '<p></p>')
         .replace(/\n/g, '<br>');
 }
 
@@ -73,11 +81,7 @@ async function checkReleaseNotes() {
                             { text: 'Awesome!', primary: true },
                             {
                                 text: 'View All Notes',
-                                onClick: () => {
-                                    import('./components/toast.js').then(({ showToast }) => {
-                                        showToast('All release notes are in the /Update folder', 'info');
-                                    });
-                                }
+                                onClick: () => showAllReleaseNotes()
                             }
                         ]
                     });
@@ -87,6 +91,100 @@ async function checkReleaseNotes() {
             }
         }
         localStorage.setItem(LAST_VERSION_KEY, CURRENT_VERSION);
+    }
+}
+
+async function showAllReleaseNotes() {
+    try {
+        const { showModal } = await import('./utils/modal.js');
+        const isElectron = !!window.electronAPI;
+        let mdFiles = [];
+        let otherFiles = [];
+        let appPath = '';
+
+        if (isElectron) {
+            appPath = await window.electronAPI.getAppPath();
+            mdFiles = await window.electronAPI.readDir(`${appPath}/Update/.md`).catch(() => []);
+            otherFiles = await window.electronAPI.readDir(`${appPath}/Update/Other`).catch(() => []);
+        } else {
+            // Fallback for browser: hardcoded list of major versions
+            mdFiles = ['PATCH_NOTES_v1.0.3.md', 'PATCH_NOTES_v1.0.4.md'];
+            otherFiles = ['WHATS_NEW_v1.0.3.md', 'WHATS_NEW_v1.0.4.md', 'v1.0.1.md', 'v1.0.2.md'];
+        }
+
+        const allFiles = [
+            ...mdFiles.map(f => ({ name: f, path: `Update/.md/${f}`, group: 'Patch Notes' })),
+            ...otherFiles.map(f => ({ name: f, path: `Update/Other/${f}`, group: 'What\'s New / Other' }))
+        ].filter(f => f.name.endsWith('.md'));
+
+        if (allFiles.length === 0) {
+            const { showToast } = await import('./components/toast.js');
+            showToast('No release notes found in Update folder', 'info');
+            return;
+        }
+
+        const renderFileList = () => {
+            return `
+                <div class="release-notes-list" style="max-height: 400px; overflow-y: auto; padding: 10px;">
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Select a file to view its content:</p>
+                    ${['Patch Notes', 'What\'s New / Other'].map(group => {
+                const groupFiles = allFiles.filter(f => f.group === group);
+                if (groupFiles.length === 0) return '';
+                return `
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--accent-blue); margin-bottom: 8px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;">${group}</div>
+                                <div style="display: grid; gap: 4px;">
+                                    ${groupFiles.map(f => `
+                                        <button class="btn btn-secondary btn-sm" style="text-align: left; justify-content: flex-start; padding: 8px 12px;" data-note-path="${f.path}">
+                                            ${f.name}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+            }).join('')}
+                </div>
+            `;
+        };
+
+        const modal = showModal({
+            title: '📜 Release Notes Archive',
+            content: renderFileList(),
+            buttons: [{ text: 'Close', primary: false }]
+        });
+
+        // Attach listeners after a short delay for modal to render
+        setTimeout(() => {
+            document.querySelectorAll('[data-note-path]').forEach(btn => {
+                btn.onclick = async () => {
+                    const path = btn.dataset.notePath;
+                    try {
+                        let content = '';
+                        if (isElectron) {
+                            content = await window.electronAPI.readTextFile(`${appPath}/${path}`);
+                        } else {
+                            const resp = await fetch(`./${path}`);
+                            content = await resp.text();
+                        }
+
+                        showModal({
+                            title: `📄 ${path.split('/').pop()}`,
+                            content: `<div class="release-notes">${parseMarkdown(content)}</div>`,
+                            buttons: [
+                                { text: 'Back to List', onClick: () => showAllReleaseNotes() },
+                                { text: 'Close', primary: true }
+                            ]
+                        });
+                    } catch (e) {
+                        const { showToast } = await import('./components/toast.js');
+                        showToast('Failed to read file', 'error');
+                    }
+                };
+            });
+        }, 100);
+
+    } catch (e) {
+        console.error('Error showing release notes archive:', e);
     }
 }
 
@@ -167,6 +265,9 @@ async function init() {
     // Init onboarding
     const { initOnboarding } = await import('./pages/onboarding.js');
     initOnboarding();
+
+    // Expose utility globally
+    window.showAllReleaseNotes = showAllReleaseNotes;
 
     // Listen for page changes
     subscribe('currentPage', renderCurrentPage);

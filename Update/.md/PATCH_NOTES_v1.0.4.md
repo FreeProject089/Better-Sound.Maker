@@ -4,6 +4,7 @@
 - **SDEF Editor Improvements**: Added stylish stepper buttons (+/-) for all numerical parameters, including 3D vectors (Position and Direction).
 - **Sound Mod Loading**: You can now import existing DCS sound mods directly from ZIP files. The app will automatically match SDEF files with their audio assets.
 - **Enhanced Mod Import Modal**: New options when loading a mod to either "Save & Load" (keeping your current work) or "Load & Close" (fresh start).
+- **Release Notes Archive**: The "View All Notes" button now opens a complete archive of all past patch notes and announcements stored in the `/Update` folder.
 
 ## 🛠 Improvements & Fixes
 - **Maintenance Update**: Temporarily disabled Auto-Updates and Community Presets feature flags in `Load.cfg` due to primary GitHub repository suspension.

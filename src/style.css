@@ -495,7 +495,94 @@ textarea.input-field {
   resize: vertical;
   min-height: 80px;
   font-family: var(--font-mono);
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+/* Release Notes Markdown Styling */
+.release-notes {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.release-notes h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.release-notes h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  margin: 1.5rem 0 0.8rem;
+}
+
+.release-notes h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 1.2rem 0 0.5rem;
+}
+
+.release-notes ul {
+  margin: 0.8rem 0;
+  padding-left: 1.5rem;
+  list-style-type: none;
+}
+
+.release-notes li {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.release-notes li::before {
+  content: "•";
+  position: absolute;
+  left: -1.2rem;
+  color: var(--accent-blue);
+  font-weight: bold;
+}
+
+.release-notes code {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--accent-amber);
+}
+
+.release-notes strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.release-notes hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 2rem 0;
+}
+
+.release-notes blockquote {
+  margin: 1rem 0;
+  padding: 0.8rem 1.2rem;
+  border-left: 4px solid var(--accent-blue);
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+.release-notes-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.release-notes-list::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 10px;
 }
 
 select.input-field {
@@ -1491,6 +1578,14 @@ select.input-field {
   outline: none;
   appearance: none;
   -moz-appearance: textfield;
+}
+
+.version-badge-clickable:hover {
+  background: rgba(100, 255, 218, 0.1) !important;
+  border-color: rgba(100, 255, 218, 0.3) !important;
+  color: var(--accent-green);
+  opacity: 1 !important;
+  transform: translateY(-1px);
 }
 
 .sdef-stepper-input::-webkit-outer-spin-button,
