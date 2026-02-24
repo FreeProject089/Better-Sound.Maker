@@ -34,7 +34,7 @@ const pages = {
     'credits': renderCredits
 };
 
-const CURRENT_VERSION = '1.0.3';
+const CURRENT_VERSION = '1.0.4';
 const LAST_VERSION_KEY = 'bsm-last-run-version';
 
 // Simple Markdown parser
@@ -116,7 +116,9 @@ async function init() {
 
     // Check for updates
     const { checkUpdate } = await import('./utils/update-check.js');
-    setTimeout(() => checkUpdate(true), 1500);
+    if (window.APP_CONFIG?.DisableAutoUpdate !== 'true') {
+        setTimeout(() => checkUpdate(true), 1500);
+    }
 
     // Check release notes (after a short delay to let app settle)
     setTimeout(checkReleaseNotes, 1000);
@@ -211,6 +213,8 @@ function initDebugPanel() {
             cfg[k.trim()] = v.trim();
         }
     });
+
+    window.APP_CONFIG = cfg;
 
     if (cfg['ProdMode'] === 'false') {
         const panel = document.createElement('div');

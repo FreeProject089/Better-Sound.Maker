@@ -74,7 +74,7 @@ export async function renderPresets(container) {
       <h2 style="font-size: 18px; font-weight: 600;">${t('presetsPage.savedPresets', { count: presets.length })}</h2>
       <div class="flex-gap">
         ${!isLibraryLoaded ? `<button class="btn btn-warning btn-sm" id="load-library-presets-btn">${getIcon('refresh-cw', 'w-4 h-4')} ${t('presetsPage.loadLibraryBtn')}</button>` : ''}
-        <button class="btn btn-secondary btn-sm" id="community-presets-btn">${getIcon('users', 'w-4 h-4')} ${t('presetsPage.communityBtn')}</button>
+        ${window.APP_CONFIG?.DisableCommunityPresets !== 'true' ? `<button class="btn btn-secondary btn-sm" id="community-presets-btn">${getIcon('users', 'w-4 h-4')} ${t('presetsPage.communityBtn')}</button>` : ''}
         <button class="btn btn-secondary btn-sm" id="import-preset-btn">${getIcon('download', 'w-4 h-4')} ${t('presetsPage.importBtn')}</button>
       </div>
     </div>

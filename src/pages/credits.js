@@ -110,8 +110,17 @@ export function renderCredits(container) {
     licenseBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       try {
-        const resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
-        const text = await resp.text();
+        let text;
+        if (window.electronAPI) {
+          const appPath = await window.electronAPI.getAppPath();
+          // Load local LICENSE file
+          text = await window.electronAPI.readTextFile(`${appPath}/LICENSE`);
+        } else {
+          const resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
+          text = await resp.text();
+        }
+
+        if (!text) throw new Error('No content');
         const formattedText = text.replace(/</g, '&lt;').replace(/([^\n])\n([^\n])/g, '$1 $2').replace(/\n\n+/g, '<br><br>');
         showModal({
           title: t('creditsPage.license.title') || 'License',
