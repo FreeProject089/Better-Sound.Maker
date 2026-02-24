@@ -115,16 +115,39 @@ export function renderCredits(container) {
           const appPath = await window.electronAPI.getAppPath();
           // Load local LICENSE file
           text = await window.electronAPI.readTextFile(`${appPath}/LICENSE`);
+        } else if (window.APP_CONFIG?.LocalLicense === 'true') {
+          // Load from local web server path
+          const resp = await fetch('./LICENSE');
+          text = await resp.text();
         } else {
           const resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
           text = await resp.text();
         }
 
         if (!text) throw new Error('No content');
-        const formattedText = text.replace(/</g, '&lt;').replace(/([^\n])\n([^\n])/g, '$1 $2').replace(/\n\n+/g, '<br><br>');
+
+        // BETTER FORMATTING: Convert plain text license to clean HTML
+        const formattedText = text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\r\n/g, '\n')
+          // Split into paragraphs by double newlines
+          .split(/\n\n+/)
+          .map(para => {
+            para = para.trim();
+            if (!para) return '';
+            // If it's a section header (all caps or numbered)
+            if (/^([0-9]+\.|[A-Z\s]{5,})$/.test(para.split('\n')[0])) {
+              return `<h3 style="color:var(--text-primary); font-size:14px; margin: 20px 0 10px; border-bottom:1px solid var(--border-subtle); padding-bottom:5px;">${para}</h3>`;
+            }
+            return `<p style="margin-bottom: 12px; text-align: justify;">${para.replace(/\n/g, ' ')}</p>`;
+          })
+          .join('');
+
         showModal({
           title: t('creditsPage.license.title') || 'License',
-          content: `<div style="font-size: 12px; line-height: 1.6; max-height: 55vh; overflow-y: auto; padding: 16px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); color: var(--text-secondary); text-align: justify; font-family: var(--font-mono);">${formattedText}</div>`,
+          content: `<div style="font-size: 13px; line-height: 1.6; max-height: 55vh; overflow-y: auto; padding: 24px; background: var(--bg-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); color: var(--text-secondary); font-family: 'Inter', sans-serif;">${formattedText}</div>`,
           actions: [{ id: 'close', label: t('common.close') || 'Close', class: 'btn-secondary' }]
         });
       } catch (err) {

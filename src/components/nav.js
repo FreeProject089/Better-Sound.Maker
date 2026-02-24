@@ -105,6 +105,15 @@ export function renderNav(container) {
   const updateBtn = container.querySelector('#sidebar-update-btn');
   if (updateBtn) {
     updateBtn.addEventListener('click', async () => {
+      if (window.APP_CONFIG?.DisableAutoUpdate === 'true') {
+        const { showModal } = await import('../utils/modal.js');
+        showModal({
+          title: 'Updates Disabled',
+          content: '<p>The auto-update feature has been disabled via the configuration file (Load.cfg).</p><p style="margin-top: 10px; color: var(--text-muted); font-size: 13px;">Please check the official repository manually for new versions.</p>',
+          buttons: [{ text: 'OK', primary: true }]
+        });
+        return;
+      }
       const { checkUpdate } = await import('../utils/update-check.js');
       checkUpdate(false); // quiet = false to show feedback if up to date
     });

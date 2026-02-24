@@ -48,7 +48,9 @@
       "dist/**",
       "electron/**",
       "Bm.png",
-      "public/**"
+      "public/**",
+      "Update/**",
+      "LICENSE"
     ],
     "win": {
       "target": "nsis",
