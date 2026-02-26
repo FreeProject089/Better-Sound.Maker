@@ -36,11 +36,19 @@ export function renderSettings(container) {
 
     <div class="card" style="margin-bottom: 20px;">
       <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-        ${getIcon('refresh-cw', 'w-4 h-4 mr-2')}
-        ${t('settingsPage.autoScan')}
+        ${getIcon('cog', 'w-4 h-4 mr-2')}
+        ${t('settingsPage.behavior') || 'Behavior & Scanning'}
       </h2>
       
       <div style="display: flex; flex-direction: column; gap: 16px;">
+        
+        <div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">${t('settingsPage.playWithSdefConfigDesc')}</p>
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+            <input type="checkbox" id="settings-play-sdef" ${settings.playWithSdefConfig ? 'checked' : ''} />
+            <span style="font-size: 14px; color: var(--text-primary);">${t('settingsPage.playWithSdefConfig')}</span>
+          </label>
+        </div>
         <div>
           <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">${t('settingsPage.autoScanDesc')}</p>
           <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
@@ -59,9 +67,9 @@ export function renderSettings(container) {
       </div>
     </div>
 
-    <div class="flex-gap">
-      <button class="btn btn-primary" id="save-settings-btn">
-        ${getIcon('save', 'w-4 h-4')} ${t('common.save')}
+    <div class="flex-gap" style="margin-top: 20px;">
+      <button class="btn btn-primary" id="save-settings-btn" style="display: flex; align-items: center; gap: 8px;">
+        ${getIcon('save', 'w-4 h-4')} <span>${t('common.save') || 'Save'}</span>
       </button>
     </div>
   `;
@@ -92,8 +100,9 @@ export function renderSettings(container) {
     const dcsPath = document.getElementById('settings-dcs-path').value.trim();
     const autoScan = document.getElementById('settings-auto-scan').checked;
     const autoScanKeepMods = document.getElementById('settings-auto-scan-keep-mods').checked;
+    const playWithSdefConfig = document.getElementById('settings-play-sdef').checked;
 
-    setGlobalSettings({ dcsPath, autoScan, autoScanKeepMods });
+    setGlobalSettings({ dcsPath, autoScan, autoScanKeepMods, playWithSdefConfig });
     showToast('Settings saved successfully', 'success');
   });
 

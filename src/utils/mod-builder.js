@@ -21,7 +21,7 @@
  */
 
 import JSZip from 'jszip';
-import { getState, getAudioFile, getThemeFile } from '../state/store.js';
+import { getState, getAudioFile, getThemeFile, getWaveAudioFile } from '../state/store.js';
 import { generateEntryLua } from './entry-generator.js';
 import { generateSdef } from './sdef-generator.js';
 import { detectSoundType, getTypeDefaults } from './audio-analyzer.js';
@@ -119,22 +119,42 @@ async function processSdefToFolderElectron(sdefBasePath, effectsBasePath, assetK
     const waves = assetData.customWaves || assetData.originalAsset?.waves || [];
     const audioFile = getAudioFile(assetKey);
 
-    if (!audioFile || waves.length === 0) return;
+    if (waves.length === 0) return;
+    // We may not have a global audioFile if using per-wave files
+    if (!audioFile && (!assetData.waveAudioFiles || Object.keys(assetData.waveAudioFiles).length === 0)) return;
 
-    const converted = await convertAudioIfNeeded(audioFile, audioFormat);
-    const ext = getOutExt(audioFile.name, audioFormat);
-    const arrayBuf = await converted.arrayBuffer();
+    let defaultConverted = null;
+    let defaultExt = 'wav';
+    let defaultArrayBuf = null;
+    if (audioFile) {
+        defaultConverted = await convertAudioIfNeeded(audioFile, audioFormat);
+        defaultExt = getOutExt(audioFile.name, audioFormat);
+        defaultArrayBuf = await defaultConverted.arrayBuffer();
+    }
 
     for (const wavePath of waves) {
+        // Check if there is a dedicated file for this specific wave
+        const waveFile = getWaveAudioFile(assetKey, wavePath);
+
+        let currentExt = defaultExt;
+        let currentArrayBuf = defaultArrayBuf;
+
+        if (waveFile) {
+            const currentConverted = await convertAudioIfNeeded(waveFile, audioFormat);
+            currentExt = getOutExt(waveFile.name, audioFormat);
+            currentArrayBuf = await currentConverted.arrayBuffer();
+        }
+
+        if (!currentArrayBuf) continue; // skip if no audio at all
+
         // wavePath may look like "Effects/Aircrafts/FA-18/..." or "Aircrafts/FA-18/..."
         const parts = wavePath.split('/');
         if (parts[0] === 'Effects') parts.shift();
-        // Strip any existing extension and replace
         const withoutExt = parts.join('/').replace(/\.[^.]+$/, '');
-        const finalPath = `${effectsBasePath}/${withoutExt}.${ext}`;
+        const finalPath = `${effectsBasePath}/${withoutExt}.${currentExt}`;
         const finalDir = finalPath.substring(0, finalPath.lastIndexOf('/'));
         await window.electronAPI.mkdir(finalDir);
-        await window.electronAPI.writeBuffer(finalPath, arrayBuf);
+        await window.electronAPI.writeBuffer(finalPath, currentArrayBuf);
     }
 }
 
@@ -208,18 +228,36 @@ async function processSdefToFolder(sdefRootDir, effectsDir, assetKey, assetData,
     const waves = assetData.customWaves || assetData.originalAsset?.waves || [];
     const audioFile = getAudioFile(assetKey);
 
-    if (!audioFile || waves.length === 0) return;
+    if (waves.length === 0) return;
+    if (!audioFile && (!assetData.waveAudioFiles || Object.keys(assetData.waveAudioFiles).length === 0)) return;
 
-    const converted = await convertAudioIfNeeded(audioFile, audioFormat);
-    const ext = getOutExt(audioFile.name, audioFormat);
-    const arrayBuf = await converted.arrayBuffer();
-    const convertedBlob = new Blob([arrayBuf]);
+    let defaultBlob = null;
+    let defaultExt = 'wav';
+    if (audioFile) {
+        const converted = await convertAudioIfNeeded(audioFile, audioFormat);
+        defaultExt = getOutExt(audioFile.name, audioFormat);
+        const arrayBuf = await converted.arrayBuffer();
+        defaultBlob = new Blob([arrayBuf]);
+    }
 
     for (const wavePath of waves) {
+        const waveFile = getWaveAudioFile(assetKey, wavePath);
+
+        let currentBlob = defaultBlob;
+        let currentExt = defaultExt;
+
+        if (waveFile) {
+            const buf = await convertAudioIfNeeded(waveFile, audioFormat);
+            currentExt = getOutExt(waveFile.name, audioFormat);
+            const aBuf = await buf.arrayBuffer();
+            currentBlob = new Blob([aBuf]);
+        }
+
+        if (!currentBlob) continue;
+
         const parts = wavePath.split('/');
         if (parts[0] === 'Effects') parts.shift();
 
-        // Last element is the filename (may have extension or not)
         const rawFileName = parts.pop();
         const baseName = rawFileName.replace(/\.[^.]+$/, '');
 
@@ -227,7 +265,7 @@ async function processSdefToFolder(sdefRootDir, effectsDir, assetKey, assetData,
         for (const part of parts) {
             efDir = await efDir.getDirectoryHandle(part, { create: true });
         }
-        await writeBlobFS(efDir, `${baseName}.${ext}`, convertedBlob);
+        await writeBlobFS(efDir, `${baseName}.${currentExt}`, currentBlob);
     }
 }
 
@@ -304,21 +342,39 @@ async function processSdefToZip(sdefFolder, effectsFolder, assetKey, assetData, 
     const waves = assetData.customWaves || assetData.originalAsset?.waves || [];
     const audioFile = getAudioFile(assetKey);
 
-    if (!audioFile || waves.length === 0) return;
+    if (waves.length === 0) return;
+    if (!audioFile && (!assetData.waveAudioFiles || Object.keys(assetData.waveAudioFiles).length === 0)) return;
 
-    const converted = await convertAudioIfNeeded(audioFile, audioFormat);
-    const ext = getOutExt(audioFile.name, audioFormat);
-    const arrayBuf = await converted.arrayBuffer();
+    let defaultArrayBuf = null;
+    let defaultExt = 'wav';
+    if (audioFile) {
+        const converted = await convertAudioIfNeeded(audioFile, audioFormat);
+        defaultExt = getOutExt(audioFile.name, audioFormat);
+        defaultArrayBuf = await converted.arrayBuffer();
+    }
 
     for (const wavePath of waves) {
+        const waveFile = getWaveAudioFile(assetKey, wavePath);
+
+        let currentArrayBuf = defaultArrayBuf;
+        let currentExt = defaultExt;
+
+        if (waveFile) {
+            const buf = await convertAudioIfNeeded(waveFile, audioFormat);
+            currentExt = getOutExt(waveFile.name, audioFormat);
+            currentArrayBuf = await buf.arrayBuffer();
+        }
+
+        if (!currentArrayBuf) continue;
+
         const parts = wavePath.split('/');
         if (parts[0] === 'Effects') parts.shift();
 
         const rawFileName = parts.pop();
         const baseName = rawFileName.replace(/\.[^.]+$/, '');
-        const fullPath = [...parts, `${baseName}.${ext}`].join('/');
+        const fullPath = [...parts, `${baseName}.${currentExt}`].join('/');
 
-        effectsFolder.file(fullPath, arrayBuf);
+        effectsFolder.file(fullPath, currentArrayBuf);
     }
 }
 

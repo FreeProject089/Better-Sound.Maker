@@ -55,7 +55,10 @@
         "autoScan": "Auto-scan Assets Library",
         "autoScanDesc": "Automatically scans your DCS installation and updates the internal library on startup.",
         "autoScanKeepMods": "Keep imported mod assets in Library",
-        "autoScanKeepModsDesc": "If enabled, manually imported mod assets (.zip) will not be cleared when scanning your DCS directory."
+        "autoScanKeepModsDesc": "If enabled, manually imported mod assets (.zip) will not be cleared when scanning your DCS directory.",
+        "behavior": "Behavior & Scanning",
+        "playWithSdefConfig": "Apply SDEF Params on Playback",
+        "playWithSdefConfigDesc": "Applies the gain, pitch, and loop mode from the current SDEF when previewing a sound in the Projects page."
     },
     "presetsPage": {
         "title": "Presets & Templates",
@@ -288,6 +291,20 @@
                 "title": "What is a .sdef file?",
                 "p1": "A <code>.sdef</code> (Source DEFinition) file tells DCS how to play a sound. It defines which audio file to use, its volume, spatial properties, playback mode, and more.",
                 "p2": "SDEF files live in <code>Sounds/sdef/</code> and reference audio files in <code>Sounds/Effects/</code>."
+            },
+            "detailed": {
+                "title": "Detailed Parameters Explanation",
+                "listmodeTitle": "Sound Lists & Modes (listmode)",
+                "listmodeDesc": "Instead of playing a single file, you can provide a list of multiple `wave` files. DCS will pick one to avoid repetition. The `listmode` parameter determines how DCS picks :",
+                "listmodeRandom": "<strong>RANDOM</strong>: DCS picks a random sound from the list. Best for explosions, voices, gunshots.",
+                "listmodeSeq": "<strong>SEQ</strong> (Sequential): Plays the sounds in the order they are listed.",
+                "listmodeASR": "<strong>ASR</strong>: Attack-Sustain-Release. Plays the 1st file on start, loops the 2nd file, and plays the 3rd file on stop.",
+                "dopplerTitle": "The Doppler Effect (nodoppler)",
+                "dopplerDesc": "The Doppler effect is the change in frequency (pitch) when an object approaches and then moves away from you (like an ambulance siren).",
+                "dopplerTrue": "<strong>nodoppler = false (Default if not specified)</strong>: DCS automatically calculates pitch distortion based on the aircraft/missile speed. Use for external physical objects (engines, missiles, flybys).",
+                "dopplerFalse": "<strong>nodoppler = true</strong>: Disables the artificial Doppler effect. Essential for internal cockpit sounds (since you move at the same speed as the plane) and UI sounds.",
+                "coneTitle": "Cone and Directionality (cone_inner / outer)",
+                "coneDesc": "By default, a sound radiates in all directions (sphere). With `direction` and cones (`cone_inner_angle`, `cone_outer_angle`), you can shape the sound to only project in a specific angle, like a jet exhaust pointing backward."
             }
         },
         "theme": {
@@ -315,7 +332,7 @@
                 "png": "All files must be <strong>PNG format</strong>",
                 "resolution": "Use the exact recommended resolutions for best results",
                 "transparency": "The icon supports <strong>transparency</strong>",
-                "hd": "Loading and menu backgrounds should be <strong>1920×1080</strong> for full HD displays",
+                "hd": "Loading and menu backgrounds should be <strong>1920×1080 minimum</strong> but can be larger (variable)",
                 "vram": "Larger images may work but will use more VRAM"
             },
             "folderStructure": {

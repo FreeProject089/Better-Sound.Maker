@@ -130,6 +130,40 @@ function sdefGuide() {
       <tr><td><code>distance_filter_offset</code></td><td>number</td><td>0</td><td>${t('sdef.params.distance_filter_offset')}</td></tr>
     </table>
 
+    <div class="detailed-params-section" style="margin-top: 32px; margin-bottom: 32px;">
+      <h3>${t('docs_content.sdef.detailed.title')}</h3>
+      
+      <div class="card" style="margin-bottom: 16px;">
+        <h4 style="margin-top: 0; margin-bottom: 8px; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+            ${getIcon('list', 'w-4 h-4')} ${t('docs_content.sdef.detailed.listmodeTitle')}
+        </h4>
+        <p style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">${t('docs_content.sdef.detailed.listmodeDesc')}</p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+          <li>${t('docs_content.sdef.detailed.listmodeRandom')}</li>
+          <li>${t('docs_content.sdef.detailed.listmodeSeq')}</li>
+          <li>${t('docs_content.sdef.detailed.listmodeASR')}</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px;">
+        <h4 style="margin-top: 0; margin-bottom: 8px; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+            ${getIcon('activity', 'w-4 h-4')} ${t('docs_content.sdef.detailed.dopplerTitle')}
+        </h4>
+        <p style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">${t('docs_content.sdef.detailed.dopplerDesc')}</p>
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+          <li>${t('docs_content.sdef.detailed.dopplerTrue')}</li>
+          <li>${t('docs_content.sdef.detailed.dopplerFalse')}</li>
+        </ul>
+      </div>
+
+      <div class="card" style="margin-bottom: 16px;">
+        <h4 style="margin-top: 0; margin-bottom: 8px; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+            ${getIcon('crosshair', 'w-4 h-4')} ${t('docs_content.sdef.detailed.coneTitle')}
+        </h4>
+        <p style="margin-bottom: 0; font-size: 14px; color: var(--text-secondary);">${t('docs_content.sdef.detailed.coneDesc')}</p>
+      </div>
+    </div>
+
     <h3>${t('docs.examples.switch')}</h3>
     <pre>wave = "Effects/Aircrafts/A-10C_2/Cockpit/SW_07_Up"
 inner_radius = 50
@@ -142,10 +176,11 @@ gain = 1</pre>
     "Effects/Aircrafts/A-10C_2/Cockpit/SW_01_3",
     "Effects/Aircrafts/A-10C_2/Cockpit/SW_01_4",
 }
+listmode = RANDOM
 inner_radius = 50
 gain = 1</pre>
     <div class="tip-box">
-      ${t('docs_content.f18.tips.randomListDesc')}
+      ${t('docs_content.f18.tips.randomListDesc') || 'Using multiple wave files with RANDOM listmode will play a random sound each time. You can also use SEQUENCE (plays in order) or ASR (Attack-Sustain-Release: first file on start, loops second, plays third on stop).'}
     </div>
 
     <h3>${t('docs.examples.engine')}</h3>
@@ -327,11 +362,11 @@ function themeGuide() {
     <h3>${t('docs_content.theme.fileRequirements.title')}</h3>
     <table>
       <tr><th>${t('docs_content.theme.fileRequirements.file')}</th><th>${t('docs_content.theme.fileRequirements.location')}</th><th>${t('docs_content.theme.fileRequirements.size')}</th><th>${t('docs_content.theme.fileRequirements.usage')}</th></tr>
-      <tr><td><code>icon.png</code></td><td>Theme/</td><td>128 × 128 px</td><td>${t('docs_content.theme.fileRequirements.iconUsage')}</td></tr>
+      <tr><td><code>icon.png</code></td><td>Theme/</td><td>86 × 86 px</td><td>${t('docs_content.theme.fileRequirements.iconUsage')}</td></tr>
       <tr><td><code>MainMenulogo.png</code></td><td>Theme/ME/</td><td>${t('docs_content.theme.fileRequirements.logoSize')}</td><td>${t('docs_content.theme.fileRequirements.logoUsage')}</td></tr>
-      <tr><td><code>loading-window.png</code></td><td>Theme/ME/</td><td>1920 × 1080 px</td><td>${t('docs_content.theme.fileRequirements.loadingUsage')}</td></tr>
+      <tr><td><code>loading-window.png</code></td><td>Theme/ME/</td><td>1920 × 1080 px (min)</td><td>${t('docs_content.theme.fileRequirements.loadingUsage')}</td></tr>
       <tr><td><code>briefing-map-default.png</code></td><td>Theme/ME/</td><td>${t('docs_content.theme.fileRequirements.briefingSize')}</td><td>${t('docs_content.theme.fileRequirements.briefingUsage')}</td></tr>
-      <tr><td><code>base-menu-window.png</code></td><td>Theme/ME/</td><td>1920 × 1080 px</td><td>${t('docs_content.theme.fileRequirements.menuUsage')}</td></tr>
+      <tr><td><code>base-menu-window.png</code></td><td>Theme/ME/</td><td>1920 × 1080 px (min)</td><td>${t('docs_content.theme.fileRequirements.menuUsage')}</td></tr>
     </table>
 
     <h3>${t('docs_content.theme.formatRecommendations.title')}</h3>

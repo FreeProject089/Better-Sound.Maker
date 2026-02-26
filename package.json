@@ -1,6 +1,7 @@
 {
-  "name": "better-sound-maker",
-  "version": "1.0.4",
+  "name": "better-modmaker",
+  "private": true,
+  "version": "1.0.5",
   "description": "Better Sound.Maker — Create DCS World sound mods easily",
   "type": "module",
   "main": "electron/main.js",

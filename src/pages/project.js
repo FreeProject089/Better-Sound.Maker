@@ -3,7 +3,7 @@
  * Manage selected assets, upload audio, view metadata
  */
 
-import { getState, subscribe, setAudioFile, removeAudioFile, getAudioFile, deselectAsset, navigate, setCurrentSdef } from '../state/store.js';
+import { getState, subscribe, setAudioFile, removeAudioFile, getAudioFile, deselectAsset, navigate, setCurrentSdef, setSdefContent, getWaveAudioFile, removeWaveAudioFile, setWaveAudioFile } from '../state/store.js';
 import { SDEF_PARAMS, generateSdef, parseSdef } from '../utils/sdef-generator.js';
 import { analyzeAudioFile, guessLoopType, detectSoundType, getTypeDefaults, SOUND_TYPES } from '../utils/audio-analyzer.js';
 import { showToast } from '../components/toast.js';
@@ -24,9 +24,16 @@ export function renderProject(container) {
 
   if (entries.length === 0) {
     container.innerHTML = `
-      <div class="page-header">
-        <h1 class="page-title" data-i18n="project.title">Project</h1>
-        <p class="page-description" data-i18n="project.description">Manage your selected sound assets and upload custom audio files.</p>
+      <div class="page-header flex-between">
+        <div>
+          <h1 class="page-title" data-i18n="project.title">Project</h1>
+          <p class="page-description" data-i18n="project.description">Manage your selected sound assets and upload custom audio files.</p>
+        </div>
+        <div class="flex-gap">
+          <button class="btn btn-secondary" id="load-mod-btn">
+            ${getIcon('upload-cloud', 'w-4 h-4')} <span>Load Existing Mod</span>
+          </button>
+        </div>
       </div>
       <div class="empty-state">
         <div class="empty-state-icon">${getIcon('folder', 'icon-xl')}</div>
@@ -36,6 +43,8 @@ export function renderProject(container) {
       </div>
     `;
     document.getElementById('go-library-btn')?.addEventListener('click', () => navigate('library'));
+    attachProjectHandlers(container);
+    renderIcons(container);
     return;
   }
 
@@ -87,7 +96,6 @@ export function renderProject(container) {
         <thead>
           <tr>
             <th data-i18n="library.assets" style="width: 300px;">Asset / Path</th>
-            <th style="width: 140px;">${t('library.type')}</th>
             <th>${t('project.audioFile')}</th>
             <th style="width: 100px;">${t('common.actions')}</th>
             <th style="width: 60px;">${t('common.edit')}</th>
@@ -120,7 +128,7 @@ function renderProjectTreeNode(node, parentPath = [], depth = 0) {
 
     html += `
             <tr class="folder-row" data-folder-path="${pathStr}">
-                <td colspan="6" style="padding-left: ${16 + indent}px; background: var(--bg-card); cursor: pointer;" class="project-folder-toggle">
+                <td colspan="5" style="padding-left: ${16 + indent}px; background: var(--bg-card); cursor: pointer;" class="project-folder-toggle">
                     <div style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); font-weight: 600;">
                         <span class="folder-arrow ${isOpen ? 'open' : ''}" style="transition: transform 0.2s;">
                             ${getIcon('chevron-right', 'w-3 h-3')}
@@ -163,53 +171,69 @@ function renderAssetRow(asset, depth) {
   const name = parts.pop();
   const indent = depth * 20;
 
-  // Determine current loop type from SDEF content or defaults
-  let params = {};
-  if (asset.sdefContent) {
-    params = parseSdef(asset.sdefContent);
-  } else {
-    const soundType = detectSoundType(asset.sdefPath);
-    params = getTypeDefaults(soundType);
-  }
-
-  // Detached = true usually means One-Shot (explosion, click)
-  // Detached = false usually means attached to source (loop, engine)
-  const isOneShot = params.detached === true;
-  const currentLoopType = isOneShot ? 'one-shot' : 'loop';
-
   let audioInfo = '';
-  if (hasAudio && meta && hasFile) {
-    // Normal player
-    audioInfo = `
-          <div class="audio-player">
-            <button class="audio-play-btn" data-play="${asset.sdefPath}" title="${t('project.play')}">${getIcon('play')}</button>
-            <div class="audio-info">
-              <div class="audio-filename">${asset.audioFileName}</div>
-              <div class="audio-meta">
-                <span class="tag ${meta.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${meta.channelType}</span>
-                <span>${meta.sampleRate}Hz</span>
-                <span>${meta.durationFormatted}</span>
+  // Multiple Waves View
+  if (asset.customWaves && asset.customWaves.length > 1) {
+    const waveRows = asset.customWaves.map((wavePath, i) => {
+      const waveFile = asset.waveAudioFiles ? asset.waveAudioFiles[wavePath] : null;
+      const waveShort = wavePath.split('/').pop();
+      if (waveFile && waveFile.fileName) {
+        return `
+            <div class="audio-player" style="margin-bottom:4px; margin-top:4px; display:flex; align-items:center; gap:6px;">
+              <button class="audio-play-btn" data-play-wave="${asset.sdefPath}" data-wave-path="${wavePath}" title="${t('project.play')}">${getIcon('play')}</button>
+              <div class="audio-info" style="flex:1; min-width:0;">
+                <div class="audio-filename" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${waveFile.fileName}</div>
+                <div class="audio-meta" style="display:flex; gap:4px; flex-wrap:wrap;">
+                  <span class="tag tag-blue" style="font-size:10px;">${waveShort}</span>
+                  <span class="tag ${waveFile.audioMeta?.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${waveFile.audioMeta?.channelType || '?'}</span>
+                </div>
               </div>
+              <button class="btn-icon danger" style="flex-shrink:0; width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center;" data-remove-wave="${asset.sdefPath}" data-wave-path="${wavePath}" title="${t('project.removeAudio')}">${getIcon('trash-2', 'w-4 h-4')}</button>
             </div>
-          </div>
         `;
-    if (meta.recommendations?.length > 0) {
-      // Shorten recommendations for table view
-      const count = meta.recommendations.length;
-      audioInfo += `<div class="tag tag-amber" style="margin-top:4px; font-size:10px;">${count} issue${count > 1 ? 's' : ''}</div>`;
-    }
-  } else if (hasAudio && !hasFile) {
-    audioInfo = `
-          <div class="drop-zone warning" data-drop="${asset.sdefPath}">
-            ${getIcon('refresh-cw', 'w-3 h-3')} ${t('project.reupload')} ${asset.audioFileName}
-          </div>
+      } else {
+        return `
+            <div class="drop-zone" data-drop-wave="${asset.sdefPath}" data-wave-path="${wavePath}" style="margin-bottom:4px; margin-top:4px; padding:6px 8px; display:flex; align-items:center; gap:6px;">
+              ${getIcon('upload', 'w-3 h-3')} ${t('project.clickDragUpload')} <span style="font-family:monospace; font-size:10px; opacity:0.7;">(${waveShort})</span>
+            </div>
         `;
+      }
+    }).join('');
+
+    audioInfo = `<div style="display:flex; flex-direction:column; gap:2px;">${waveRows}</div>`;
   } else {
-    audioInfo = `
-          <div class="drop-zone" data-drop="${asset.sdefPath}">
-            ${getIcon('upload', 'w-3 h-3')} ${t('project.clickDragUpload')}
-          </div>
-        `;
+    // Single Wave View
+    if (hasAudio && meta && hasFile) {
+      // Normal player
+      audioInfo = `
+              <div class="audio-player">
+                <button class="audio-play-btn" data-play="${asset.sdefPath}" title="${t('project.play')}">${getIcon('play')}</button>
+                <div class="audio-info">
+                  <div class="audio-filename">${asset.audioFileName}</div>
+                  <div class="audio-meta">
+                    <span class="tag ${meta.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${meta.channelType}</span>
+                    <span>${meta.sampleRate}Hz</span>
+                    <span>${meta.durationFormatted}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+      if (meta.recommendations?.length > 0) {
+        audioInfo += `<div class="tag tag-amber" style="margin-top:4px; font-size:10px;">${meta.recommendations.length} issue${meta.recommendations.length > 1 ? 's' : ''}</div>`;
+      }
+    } else if (hasAudio && !hasFile) {
+      audioInfo = `
+              <div class="drop-zone warning" data-drop="${asset.sdefPath}">
+                ${getIcon('refresh-cw', 'w-3 h-3')} ${t('project.reupload')} ${asset.audioFileName}
+              </div>
+            `;
+    } else {
+      audioInfo = `
+              <div class="drop-zone" data-drop="${asset.sdefPath}">
+                ${getIcon('upload', 'w-3 h-3')} ${t('project.clickDragUpload')}
+              </div>
+            `;
+    }
   }
 
   return `
@@ -218,19 +242,11 @@ function renderAssetRow(asset, depth) {
             <div class="project-asset-name">${name}</div>
             <div class="project-asset-path">${asset.sdefPath}</div>
           </td>
-          <td>
-             <div class="custom-select-wrapper" style="width: 110px;">
-                <select class="input-field" style="padding: 4px 8px; font-size: 11px; height: auto;" data-loop-type="${asset.sdefPath}">
-                    <option value="one-shot" ${currentLoopType === 'one-shot' ? 'selected' : ''}>One-Shot</option>
-                    <option value="loop" ${currentLoopType === 'loop' ? 'selected' : ''}>Loop</option>
-                </select>
-             </div>
-          </td>
           <td>${audioInfo}</td>
           <td>
             <div class="flex-gap">
-                ${hasAudio ? `<button class="btn-icon" data-change="${asset.sdefPath}" title="${t('project.replace')}">${getIcon('refresh-cw')}</button>` : ''}
-                ${hasAudio ? `<button class="btn-icon danger" data-remove-audio="${asset.sdefPath}" title="${t('project.removeAudio')}">${getIcon('trash-2')}</button>` : ''}
+                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn-icon" data-change="${asset.sdefPath}" title="${t('project.replace')}">${getIcon('refresh-cw')}</button>` : ''}
+                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn-icon danger" data-remove-audio="${asset.sdefPath}" title="${t('project.removeAudio')}">${getIcon('trash-2')}</button>` : ''}
             </div>
           </td>
           <td>
@@ -259,16 +275,7 @@ function attachFolderHandlers(container) {
 }
 
 function attachProjectHandlers(container) {
-  // Loop type change
-  container.querySelectorAll('[data-loop-type]').forEach(select => {
-    select.addEventListener('change', (e) => {
-      const sdefPath = e.target.dataset.loopType;
-      const newType = e.target.value;
-      updateAssetLoopType(sdefPath, newType);
-    });
-  });
-
-  // Upload zones (click)
+  // Upload zones (click) single
   container.querySelectorAll('[data-drop]').forEach(zone => {
     zone.addEventListener('click', () => pickAudioFile(zone.dataset.drop));
     zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
@@ -281,18 +288,40 @@ function attachProjectHandlers(container) {
     });
   });
 
+  // Upload zones per wave
+  container.querySelectorAll('[data-drop-wave]').forEach(zone => {
+    zone.addEventListener('click', () => pickWaveAudioFile(zone.dataset.dropWave, zone.dataset.wavePath));
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) handleWaveAudioUpload(zone.dataset.dropWave, zone.dataset.wavePath, file);
+    });
+  });
+
   // Change buttons
   container.querySelectorAll('[data-change]').forEach(btn => {
     btn.addEventListener('click', () => pickAudioFile(btn.dataset.change));
   });
 
-  // Remove audio
+  // Remove audio (single)
   container.querySelectorAll('[data-remove-audio]').forEach(btn => {
     btn.addEventListener('click', () => {
       removeAudioFile(btn.dataset.removeAudio);
       // Re-render whole project to update
       renderProject(document.getElementById('page-container'));
       showToast('Audio removed', 'info');
+    });
+  });
+
+  // Remove wave audio
+  container.querySelectorAll('[data-remove-wave]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await removeWaveAudioFile(btn.dataset.removeWave, btn.dataset.wavePath);
+      renderProject(document.getElementById('page-container'));
+      showToast('Wave audio removed', 'info');
     });
   });
 
@@ -360,41 +389,15 @@ function attachProjectHandlers(container) {
     }
   });
 
-  // Play buttons
+  // Play buttons (single)
   container.querySelectorAll('[data-play]').forEach(btn => {
-    btn.addEventListener('click', () => playAudio(btn.dataset.play, btn));
+    btn.addEventListener('click', () => playAudio(btn.dataset.play, null, btn));
   });
-}
 
-function updateAssetLoopType(sdefPath, type) {
-  const state = getState();
-  const asset = state.selectedAssets[sdefPath];
-  if (!asset) return;
-
-  let params = {};
-  if (asset.sdefContent) {
-    params = parseSdef(asset.sdefContent);
-  } else {
-    const soundType = detectSoundType(sdefPath);
-    params = getTypeDefaults(soundType);
-  }
-
-  // Update params based on type
-  if (type === 'one-shot') {
-    params.detached = true;
-    // Optionally ensure listmode is RANDOM?
-    // params.listmode = 'RANDOM'; 
-  } else {
-    params.detached = false;
-    // params.listmode = 'ASR'; // Optional?
-  }
-
-  const newContent = generateSdef(params);
-  setCurrentSdef(sdefPath); // Just to ensure state knows what we touched? Not needed really.
-  // We need to set content
-  setSdefContent(sdefPath, newContent);
-
-  showToast(`Updated ${sdefPath} to ${type}`, 'success');
+  // Play buttons (wave)
+  container.querySelectorAll('[data-play-wave]').forEach(btn => {
+    btn.addEventListener('click', () => playAudio(btn.dataset.playWave, btn.dataset.wavePath, btn));
+  });
 }
 
 async function pickAudioFile(sdefPath) {
@@ -428,7 +431,34 @@ async function handleAudioUpload(sdefPath, file) {
   }
 }
 
-function playAudio(sdefPath, btn) {
+async function pickWaveAudioFile(sdefPath, wavePath) {
+  try {
+    const file = await pickAudioFileFn();
+    await handleWaveAudioUpload(sdefPath, wavePath, file);
+  } catch (e) {
+    if (e.name !== 'AbortError') {
+      showToast('Failed to open file: ' + e.message, 'error');
+    }
+  }
+}
+
+async function handleWaveAudioUpload(sdefPath, wavePath, file) {
+  try {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['wav', 'ogg'].includes(ext)) {
+      showToast('Only .wav and .ogg files are supported', 'warning');
+      return;
+    }
+    const meta = await analyzeAudioFile(file);
+    await setWaveAudioFile(sdefPath, wavePath, file, meta);
+    showToast(`Wave audio assigned: ${file.name}`, 'success');
+    renderProject(document.getElementById('page-container'));
+  } catch (e) {
+    showToast('Failed to analyze wave audio: ' + e.message, 'error');
+  }
+}
+
+function playAudio(sdefPath, wavePath, btn) {
   // If currently playing this sound, stop it
   if (currentAudioSource) {
     if (currentAudioSource.stop) currentAudioSource.stop(); // If AudioBufferSourceNode
@@ -442,31 +472,96 @@ function playAudio(sdefPath, btn) {
         URL.revokeObjectURL(oldBtn._objectUrl);
         oldBtn._objectUrl = null;
       }
+      renderIcons(oldBtn);
+
+      // If clicking same button, we just want to stop/pause, not replay
+      if (btn === oldBtn) {
+        currentAudioSource = null;
+        return;
+      }
     }
     currentAudioSource = null;
-
-    // If clicking same button, we are done
-    if (btn.dataset.playing === 'true') return;
   }
 
-  const file = getAudioFile(sdefPath);
-  if (!file) return;
+  let file = null;
+  if (wavePath) {
+    file = getWaveAudioFile(sdefPath, wavePath);
+    startPlayback(file);
+  } else {
+    file = getAudioFile(sdefPath);
+    startPlayback(file);
+  }
 
-  const url = URL.createObjectURL(file);
-  const audio = new Audio(url);
-  currentAudioSource = audio;
-  btn._objectUrl = url;
-  btn.innerHTML = getIcon('pause');
-  btn.dataset.playing = 'true';
-
-  audio.play();
-  audio.onended = () => {
-    btn.innerHTML = getIcon('play');
-    btn.dataset.playing = 'false';
-    URL.revokeObjectURL(url);
-    btn._objectUrl = null;
-    currentAudioSource = null;
+  function startPlayback(f) {
+    if (!f) return;
+    const url = URL.createObjectURL(f);
+    const audio = new Audio(url);
+    currentAudioSource = audio;
+    btn._objectUrl = url;
+    btn.innerHTML = getIcon('pause');
+    btn.dataset.playing = 'true';
     renderIcons(btn);
-  };
-  renderIcons(btn);
+
+    // Always apply SDEF parameters so user hears sound as DCS would play it
+    const state = getState();
+    const asset = state.selectedAssets[sdefPath];
+    let params = {};
+    if (asset && asset.sdefContent) {
+      params = parseSdef(asset.sdefContent);
+    } else {
+      const soundType = detectSoundType(sdefPath);
+      params = getTypeDefaults(soundType);
+    }
+    let finalVolume = params.gain !== undefined ? Math.max(params.gain, 0) : 1;
+    if (params.pitch !== undefined) audio.playbackRate = Math.max(0.1, params.pitch);
+    if (params.detached === false || params.listmode === 'LOOP') audio.loop = true;
+
+    // Apply stereo panning & distance attenuation based on SDEF position
+    if (params.position && Array.isArray(params.position) && params.position.length >= 3) {
+      const [fwd, up, right] = params.position;
+      const distance = Math.sqrt(fwd * fwd + up * up + right * right);
+
+      // Distance Volume Attenuation
+      if (distance > 0) {
+        const innerRadius = params.inner_radius || 50;
+        if (distance > innerRadius) {
+          finalVolume *= (innerRadius / distance);
+        }
+      }
+
+      audio.volume = Math.min(finalVolume, 1);
+
+      try {
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') audioContext.resume();
+
+        const source = audioContext.createMediaElementSource(audio);
+
+        if (audioContext.createStereoPanner) {
+          const panner = audioContext.createStereoPanner();
+          // Calculate natural pan value (-1 to 1) based on angle
+          const panValue = distance > 0 ? (right / distance) : 0;
+          panner.pan.value = Math.max(-1, Math.min(1, panValue));
+          source.connect(panner);
+          panner.connect(audioContext.destination);
+        } else {
+          source.connect(audioContext.destination);
+        }
+      } catch (e) {
+        console.warn('AudioContext setup failed', e);
+      }
+    } else {
+      audio.volume = Math.min(finalVolume, 1);
+    }
+
+    audio.play();
+    audio.onended = () => {
+      btn.innerHTML = getIcon('play');
+      btn.dataset.playing = 'false';
+      URL.revokeObjectURL(url);
+      btn._objectUrl = null;
+      currentAudioSource = null;
+      renderIcons(btn);
+    };
+  }
 }

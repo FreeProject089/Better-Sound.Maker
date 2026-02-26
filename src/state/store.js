@@ -129,6 +129,7 @@ export function selectAsset(sdefPath, assetData) {
         sdefContent: defaultContent,
         audioFileName: null,
         audioMeta: null,
+        waveAudioFiles: {},
         customWaves: assetData.waves || [],
         originalAsset: assetData,
         note: '',
@@ -201,6 +202,60 @@ export async function removeAudioFile(sdefPath) {
             await del(ASSET_FILES_PREFIX + sdefPath);
         } catch (e) { /* ignore */ }
 
+        // Also remove all associated wave audio files
+        if (state.selectedAssets[sdefPath].waveAudioFiles) {
+            for (const wavePath of Object.keys(state.selectedAssets[sdefPath].waveAudioFiles)) {
+                const key = `${sdefPath}::${wavePath}`;
+                audioFiles.delete(key);
+                try {
+                    await del(ASSET_FILES_PREFIX + key);
+                } catch (e) { }
+            }
+            state.selectedAssets[sdefPath].waveAudioFiles = {};
+        }
+
+        notify('selectedAssets');
+        saveState();
+    }
+}
+
+export async function setWaveAudioFile(sdefPath, wavePath, file, meta) {
+    const key = `${sdefPath}::${wavePath}`;
+    audioFiles.set(key, file);
+    if (state.selectedAssets[sdefPath]) {
+        if (!state.selectedAssets[sdefPath].waveAudioFiles) {
+            state.selectedAssets[sdefPath].waveAudioFiles = {};
+        }
+        state.selectedAssets[sdefPath].waveAudioFiles[wavePath] = {
+            fileName: file.name,
+            audioMeta: meta,
+            audioPath: file.path || null
+        };
+
+        if (!file.path) {
+            try {
+                await set(ASSET_FILES_PREFIX + key, file);
+            } catch (e) {
+                console.warn('Failed to save wave audio to IDB', e);
+            }
+        }
+        notify('selectedAssets');
+        saveState();
+    }
+}
+
+export function getWaveAudioFile(sdefPath, wavePath) {
+    return audioFiles.get(`${sdefPath}::${wavePath}`);
+}
+
+export async function removeWaveAudioFile(sdefPath, wavePath) {
+    const key = `${sdefPath}::${wavePath}`;
+    audioFiles.delete(key);
+    if (state.selectedAssets[sdefPath] && state.selectedAssets[sdefPath].waveAudioFiles) {
+        delete state.selectedAssets[sdefPath].waveAudioFiles[wavePath];
+        try {
+            await del(ASSET_FILES_PREFIX + key);
+        } catch (e) { /* ignore */ }
         notify('selectedAssets');
         saveState();
     }
@@ -408,6 +463,13 @@ export async function importModData({ assets, config, audioBlobs }) {
                 const { analyzeAudioFile } = await import('../utils/audio-analyzer.js');
                 const meta = await analyzeAudioFile(file);
                 state.selectedAssets[sdefPath].audioMeta = meta;
+
+                // Persist the audio to IDB so it survives refresh
+                try {
+                    await set(ASSET_FILES_PREFIX + sdefPath, file);
+                } catch (e) {
+                    console.warn(`Failed to save imported audio to IDB for ${sdefPath}`, e);
+                }
             } catch (e) {
                 console.warn(`Failed to analyze ${sdefPath}`, e);
             }
@@ -452,6 +514,25 @@ loadState();
                     }
                 } catch (e) {
                     console.warn(`Failed to restore audio for ${key} from ${asset.audioPath}`, e);
+                }
+            }
+            if (asset.waveAudioFiles) {
+                for (const wavePath of Object.keys(asset.waveAudioFiles)) {
+                    const waveData = asset.waveAudioFiles[wavePath];
+                    const waveKey = `${key}::${wavePath}`;
+                    if (waveData.audioPath && !audioFiles.has(waveKey)) {
+                        try {
+                            const buffer = await window.electronAPI.readFile(waveData.audioPath);
+                            if (buffer) {
+                                const type = waveData.fileName?.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav';
+                                const blob = new Blob([buffer], { type });
+                                blob.name = waveData.fileName || 'restored_wave';
+                                blob.path = waveData.audioPath;
+                                audioFiles.set(waveKey, blob);
+                                restoredCount++;
+                            }
+                        } catch (e) { }
+                    }
                 }
             }
         }

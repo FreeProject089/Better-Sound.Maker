@@ -55,7 +55,10 @@
         "autoScan": "Auto-scan de l'Assets Library",
         "autoScanDesc": "Analyse votre installation DCS et met à jour automatiquement le référentiel de l'application au démarrage.",
         "autoScanKeepMods": "Garder les assets de mods importés",
-        "autoScanKeepModsDesc": "Si activé, les assets de mods importés manuellement (.zip) ne seront pas effacés lors du scan de votre dossier DCS."
+        "autoScanKeepModsDesc": "Si activé, les assets de mods importés manuellement (.zip) ne seront pas effacés lors du scan de votre dossier DCS.",
+        "behavior": "Comportement & Scan",
+        "playWithSdefConfig": "Appliquer Paramètres SDEF en Lecture",
+        "playWithSdefConfigDesc": "Applique le gain, le pitch et le mode de boucle du SDEF actuel lors de la lecture d'un son dans la page Projets."
     },
     "presetsPage": {
         "title": "Préréglages & Modèles",
@@ -271,6 +274,10 @@
         "examples": {
             "switch": "Exemple : Switch Simple (One-Shot)",
             "random": "Exemple : Sélection Aléatoire",
+            "sequence": "Exemple : Liste de Séquence (Mode SEQUENCE)",
+            "seqDesc": "Le mode SEQUENCE jouera les fichiers audio exactement dans l'ordre où ils sont définis.",
+            "asr": "Exemple : Attack-Sustain-Release (Mode ASR)",
+            "asrDesc": "Le mode ASR joue le premier son au démarrage, boucle sur le deuxième pendant que le son est actif, et joue le troisième au moment de l'arrêt.",
             "engine": "Exemple : Boucle Moteur avec Cône"
         },
         "sdeflist": {
@@ -322,6 +329,20 @@
                 "title": "Qu'est-ce qu'un fichier .sdef ?",
                 "p1": "Un fichier <code>.sdef</code> indique à DCS comment jouer un son. Il définit le fichier audio, le volume, la spatialisation, etc.",
                 "p2": "Les SDEF sont dans <code>Sounds/sdef/</code> et référencent les audios dans <code>Sounds/Effects/</code>."
+            },
+            "detailed": {
+                "title": "Explications Détaillées des Paramètres",
+                "listmodeTitle": "Liste de Sons & Modes (listmode)",
+                "listmodeDesc": "Plutôt que de jouer un seul fichier, vous pouvez fournir une liste de plusieurs fichiers `wave`. DCS en choisira un pour éviter la répétition. Le paramètre `listmode` détermine comment DCS choisit :",
+                "listmodeRandom": "<strong>RANDOM</strong> (Aléatoire) : DCS choisit un son au hasard. Idéal pour les explosions, voix, tirs.",
+                "listmodeSeq": "<strong>SEQ</strong> (Séquentiel) : Joue les sons dans l'ordre de la liste.",
+                "listmodeASR": "<strong>ASR</strong> : Attack-Sustain-Release. Joue le 1er fichier au début, boucle sur le 2ème, puis joue le 3ème à la fin.",
+                "dopplerTitle": "L'Effet Doppler (nodoppler)",
+                "dopplerDesc": "L'effet Doppler est le changement de fréquence (hauteur du son) lorsqu'un objet s'approche puis s'éloigne de vous (comme une sirène d'ambulance).",
+                "dopplerTrue": "<strong>nodoppler = false (Désactivé par défaut si non spécifié)</strong> : DCS calcule automatiquement la déformation du son selon la vitesse de l'avion/missile. À utiliser pour les éléments physiques externes (moteurs, missiles, avions qui passent).",
+                "dopplerFalse": "<strong>nodoppler = true</strong> : Désactive l'effet Doppler artificiel. Indispensable pour les sons internes du cockpit (car vous bougez à la même vitesse que l'avion) et l'interface.",
+                "coneTitle": "Cône et Directivité (cone_inner / outer)",
+                "coneDesc": "Par défaut, un son rayonne dans toutes les directions (comme une sphère). Avec `direction` et les cônes (`cone_inner_angle`, `cone_outer_angle`), vous pouvez obliger le son à n'être projeté que dans un angle précis, comme la tuyère d'un réacteur orientée vers l'arrière."
             }
         },
         "theme": {
@@ -349,7 +370,7 @@
                 "png": "Tous les fichiers doivent être au format <strong>PNG</strong>",
                 "resolution": "Utilisez les résolutions recommandées pour de meilleurs résultats",
                 "transparency": "L'icône supporte la <strong>transparence</strong>",
-                "hd": "Les fonds d'écran doivent être en <strong>1920×1080</strong> pour le Full HD",
+                "hd": "Les fonds d'écran doivent être en <strong>1920×1080 minimum</strong>, mais peuvent être plus grands (variable)",
                 "vram": "Des images plus grandes peuvent fonctionner mais utiliseront plus de VRAM"
             },
             "folderStructure": {

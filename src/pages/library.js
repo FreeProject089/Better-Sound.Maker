@@ -6,13 +6,14 @@
 import {
   getState, isAssetSelected, toggleAsset, selectAsset, deselectAsset,
   setLibraryData, setAudioFile, getAudioFile, removeAudioFile,
-  setAssetNote, getAssetNote, loadLibraryFromStorage, saveLibraryToStorage
+  setAssetNote, getAssetNote, loadLibraryFromStorage, saveLibraryToStorage,
+  setWaveAudioFile, getWaveAudioFile
 } from '../state/store.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { t, updateTranslations } from '../utils/i18n.js';
 import { parseSdefList } from '../data/sdef-parser.js';
 import { showToast } from '../components/toast.js';
-import { guessLoopType, detectSoundType, SOUND_TYPES } from '../utils/audio-analyzer.js';
+import { guessLoopType, detectSoundType, SOUND_TYPES, analyzeAudioFile } from '../utils/audio-analyzer.js';
 import { pickTextFile, pickJsonFile } from '../utils/file-picker.js';
 import { showModal } from '../components/modal.js';
 
@@ -90,10 +91,18 @@ export async function renderLibrary(container) {
 
   renderStats();
   renderFolderTree();
+
+  // Restore search query if one was persisted
+  const searchInput = document.getElementById('library-search');
+  if (searchQuery) {
+    searchInput.value = searchQuery;
+  } else {
+    searchQuery = '';
+  }
   applyFilter();
 
   // Search
-  document.getElementById('library-search').addEventListener('input', debounce(e => {
+  searchInput.addEventListener('input', debounce(e => {
     searchQuery = e.target.value;
     applyFilter();
   }, 200));
@@ -818,7 +827,12 @@ function openDetailPanel(asset) {
 
     if (files.length > 1 && asset.waves.length > 1) {
       for (let i = 0; i < Math.min(files.length, asset.waves.length); i++) {
-        setWaveAudioFile(asset.sdefPath, asset.waves[i], files[i]);
+        try {
+          const meta = await analyzeAudioFile(files[i]);
+          await setWaveAudioFile(asset.sdefPath, asset.waves[i], files[i], meta);
+        } catch (e) {
+          console.warn('Failed to analyze audio', e);
+        }
       }
       showToast(`Audio uploaded: ${Math.min(files.length, asset.waves.length)} files assigned to waves`, 'success');
     } else {
@@ -854,31 +868,27 @@ function openDetailPanel(asset) {
 
   // Wave audio uploads
   panel.querySelectorAll('input[data-wave-upload]').forEach(inp => {
-    inp.addEventListener('change', e => {
+    inp.addEventListener('change', async e => {
       const file = e.target.files[0];
       if (!file) return;
       const wavePath = inp.dataset.waveUpload;
       // Store wave-specific audio
       if (!isAssetSelected(asset.sdefPath)) selectAsset(asset.sdefPath, asset);
-      setWaveAudioFile(asset.sdefPath, wavePath, file);
-      const wi = inp.closest('[data-wi]')?.dataset.wi;
-      const nameEl = panel.querySelector(`#wave - audio - ${wi}`);
-      if (nameEl) nameEl.textContent = file.name;
-      showToast(`Wave audio uploaded: ${file.name}`, 'success');
+      try {
+        const meta = await analyzeAudioFile(file);
+        setWaveAudioFile(asset.sdefPath, wavePath, file, meta);
+        openDetailPanel(asset); // Re-render panel completely to update names
+        showToast(`Wave audio uploaded: ${file.name}`, 'success');
+      } catch (err) {
+        showToast(`Failed to analyze wave audio: ${err.message}`, 'error');
+      }
     });
   });
 }
 
-// Wave-audio helpers (per wave path, stored as waveAudios map)
-const waveAudioFiles = new Map(); // `sdef:: wave` → File
-
-function setWaveAudioFile(sdefPath, wavePath, file) {
-  waveAudioFiles.set(`${sdefPath}:: ${wavePath}`, file);
-}
-
 function getWaveAudioFileName(sdefPath, wavePath) {
-  const f = waveAudioFiles.get(`${sdefPath}:: ${wavePath}`);
-  return f ? f.name : null;
+  const file = getWaveAudioFile(sdefPath, wavePath);
+  return file ? file.name : null;
 }
 
 // ───────────────────────────────────────────────

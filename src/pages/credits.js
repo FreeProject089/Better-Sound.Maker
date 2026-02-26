@@ -111,15 +111,22 @@ export function renderCredits(container) {
       e.preventDefault();
       try {
         let text;
-        if (window.electronAPI) {
-          const appPath = await window.electronAPI.getAppPath();
-          // Load local LICENSE file
-          text = await window.electronAPI.readTextFile(`${appPath}/LICENSE`);
-        } else if (window.APP_CONFIG?.LocalLicense === 'true') {
-          // Load from local web server path
-          const resp = await fetch('./LICENSE');
-          text = await resp.text();
+        if (window.APP_CONFIG?.LocalLicense === 'true') {
+          if (window.electronAPI) {
+            const appPath = await window.electronAPI.getAppPath();
+            // Try public/LICENSE first, fallback to LICENSE if not found
+            try {
+              text = await window.electronAPI.readTextFile(`${appPath}/public/LICENSE`);
+            } catch (e) {
+              text = await window.electronAPI.readTextFile(`${appPath}/LICENSE`);
+            }
+          } else {
+            // Load from local web server path
+            const resp = await fetch('./LICENSE');
+            text = await resp.text();
+          }
         } else {
+          // Load from Github
           const resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
           text = await resp.text();
         }
