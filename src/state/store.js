@@ -52,7 +52,10 @@ const defaultState = {
     },
 
     // Unsaved SDEF changes (transient)
-    unsavedSdefs: {}
+    unsavedSdefs: {},
+
+    // SDEF Templates: array of { id, name, lucideIcon, params }
+    sdefTemplates: []
 };
 
 let state = { ...defaultState };
@@ -349,6 +352,20 @@ export function saveAllUnsavedSdefs() {
     notify('unsavedSdefs');
 }
 
+export function bulkSetSdefContent(updatesMap) {
+    for (const [sdefPath, content] of Object.entries(updatesMap)) {
+        if (!state.selectedAssets[sdefPath]) {
+            state.selectedAssets[sdefPath] = { sdefContent: '' };
+        }
+        state.selectedAssets[sdefPath].sdefContent = content;
+        // Also clear any unsaved transient changes for these paths to avoid confusion
+        delete state.unsavedSdefs[sdefPath];
+    }
+    notify('selectedAssets');
+    notify('unsavedSdefs');
+    saveState();
+}
+
 // --- Project Config ---
 export function updateProjectConfig(updates) {
     state.projectConfig = { ...state.projectConfig, ...updates };
@@ -480,6 +497,61 @@ export async function importModData({ assets, config, audioBlobs }) {
     notify('selectedAssets');
     notify('projectConfig');
     notify('unsavedSdefs');
+    notify('sdefTemplates');
+    saveState();
+}
+
+// --- SDEF Templates ---
+export function saveSdefTemplate(template) {
+    // Check if ID exists, update or push
+    const index = state.sdefTemplates.findIndex(p => p.id === template.id);
+    if (index >= 0) {
+        state.sdefTemplates[index] = template;
+    } else {
+        state.sdefTemplates.push(template);
+    }
+    notify('sdefTemplates');
+    saveState();
+}
+
+export function deleteSdefTemplate(id) {
+    state.sdefTemplates = state.sdefTemplates.filter(t => t.id !== id);
+    notify('sdefTemplates');
+    saveState();
+}
+
+export function exportSdefTemplates() {
+    const data = JSON.stringify(state.sdefTemplates, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sdef_templates_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+export function exportSingleSdefTemplate(id) {
+    const template = state.sdefTemplates.find(t => t.id === id);
+    if (!template) return;
+    const data = JSON.stringify(template, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sdef_template_${template.name.toLowerCase().replace(/\s+/g, '_')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+export async function importSdefTemplates(templates) {
+    if (!Array.isArray(templates)) return;
+    for (const t of templates) {
+        const idx = state.sdefTemplates.findIndex(x => x.id === t.id);
+        if (idx >= 0) state.sdefTemplates[idx] = t;
+        else state.sdefTemplates.push(t);
+    }
+    notify('sdefTemplates');
     saveState();
 }
 

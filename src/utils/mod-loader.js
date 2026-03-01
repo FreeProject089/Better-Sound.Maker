@@ -105,7 +105,7 @@ export async function loadModFromFolder(folderPath) {
             const fullPath = `${dir}/${entry.name}`;
             if (entry.isDirectory) {
                 await collectFiles(fullPath, ext, collected);
-            } else if (entry.name.toLowerCase().endsWith(ext)) {
+            } else if (entry.name && entry.name.toLowerCase().endsWith(ext)) {
                 collected.push(fullPath);
             }
         }
@@ -131,7 +131,13 @@ export async function loadModFromFolder(folderPath) {
     ];
 
     for (const sFilePath of sdefPaths) {
-        const sdefPathKey = sFilePath.replace(/^.*Sounds[/\\]sdef[/\\]/i, '').replace(/\\/g, '/');
+        let sdefPathKey = sFilePath.replace(/\\/g, '/');
+        if (sdefPathKey.toLowerCase().includes('/sounds/sdef/')) {
+            sdefPathKey = sdefPathKey.split(/\/sounds\/sdef\//i)[1];
+        } else {
+            // Fallback: just use the filename if structure is weird
+            sdefPathKey = sdefPathKey.split('/').pop();
+        }
         const content = await window.electronAPI.readTextFile(sFilePath);
         if (!content) continue;
         const params = parseSdef(content);
@@ -145,16 +151,27 @@ export async function loadModFromFolder(folderPath) {
         };
 
         if (params.wave && params.wave.length > 0) {
-            const firstWave = params.wave[0].toLowerCase();
-            const audioEntry = audioPaths.find(p => p.replace(/\\/g, '/').toLowerCase().endsWith(firstWave + '.wav') || p.replace(/\\/g, '/').toLowerCase().endsWith(firstWave + '.ogg'));
+            const firstWave = params.wave.find(w => w != null);
+            if (!firstWave) continue;
+            const firstWaveLower = firstWave.toLowerCase();
+            const audioEntry = audioPaths.find(p => {
+                if (!p) return false;
+                const pl = p.replace(/\\/g, '/').toLowerCase();
+                return pl.endsWith(firstWaveLower + '.wav') || pl.endsWith(firstWaveLower + '.ogg') ||
+                    pl.endsWith(firstWaveLower);
+            });
             if (audioEntry) {
-                const buffer = await window.electronAPI.readFile(audioEntry);
-                if (buffer) {
-                    const fileName = audioEntry.split(/[/\\]/).pop();
-                    const blob = new Blob([buffer], { type: fileName.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav' });
-                    const file = new File([blob], fileName, { type: blob.type });
-                    result.audioBlobs.set(sdefPathKey, file);
-                    result.assets[sdefPathKey].audioFileName = fileName;
+                try {
+                    const buffer = await window.electronAPI.readFile(audioEntry);
+                    if (buffer) {
+                        const fileName = audioEntry.split(/[/\\]/).pop();
+                        const blob = new Blob([buffer], { type: fileName.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav' });
+                        const file = new File([blob], fileName, { type: blob.type });
+                        result.audioBlobs.set(sdefPathKey, file);
+                        result.assets[sdefPathKey].audioFileName = fileName;
+                    }
+                } catch (e) {
+                    console.warn(`Failed to read audio ${audioEntry}:`, e);
                 }
             }
         }

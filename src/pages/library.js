@@ -24,6 +24,12 @@ let searchQuery = '';
 // categoryTree usage removed
 let folderTree = {};        // Deep folder tree built from full sdef paths
 let filteredAssetsCache = [];
+let showFilters = false;
+let activeFilters = {
+  hasNotes: false,
+  hasAudio: false,
+  soundTypes: new Set() // Set of sound type IDs
+};
 
 // Virtual scroll
 const ROW_HEIGHT = 48;
@@ -41,17 +47,67 @@ export async function renderLibrary(container) {
       <p class="page-description" data-i18n="library.description">Browse DCS sound assets. Navigate folders, upload audio replacements, and annotate SDEF/WAV files.</p>
     </div>
     <div id="library-stats" class="stats-bar"></div>
-    <div class="flex-between" style="margin-bottom: 10px; gap: 12px;">
-      <div class="search-container" style="flex: 1;">
+    <div class="flex-between" style="margin-bottom: 10px; gap: 12px; align-items: stretch;">
+      <div class="search-container" style="max-width: 600px; flex: 1; position: relative; margin-bottom: 0;">
         <span class="search-icon">${getIcon('search', '')}</span>
-        <input type="text" class="search-input" id="library-search" data-i18n="library.searchPlaceholder" placeholder="Search SDEF path, wave path..." />
+        <input type="text" class="search-input" id="library-search" data-i18n="library.searchPlaceholder" placeholder="${t('library.searchPlaceholder')}" />
       </div>
-      <div class="flex-gap">
-        <button class="btn btn-secondary btn-sm" id="select-filtered-btn" data-i18n="library.selectAll">Select All Visible</button>
-        <button class="btn btn-danger btn-sm" id="deselect-all-btn" data-i18n="library.clearSelection">Clear Selection</button>
-        <button class="btn btn-secondary btn-sm" id="import-btn" title="Import Data">${getIcon('download', 'icon-sm')} Import</button>
-        <button class="btn btn-secondary btn-sm" id="export-library-btn" title="Export Library Data">${getIcon('upload-cloud', 'icon-sm')} Export</button>
-        <button class="btn btn-secondary btn-sm" id="reload-library-btn">${getIcon('refresh-cw', 'icon-sm')} <span data-i18n="library.reload">Reload</span></button>
+      
+      <div style="position: relative; display: flex;">
+        <button class="btn btn-secondary btn-sm" id="toggle-filters-btn" style="height: 42px; border-radius: 8px; gap: 8px; padding: 0 16px;">
+          ${getIcon('filter', 'w-4 h-4')}
+          <span data-i18n="library.filters">${t('library.filters')}</span>
+          ${activeFilters.soundTypes.size + (activeFilters.hasNotes ? 1 : 0) + (activeFilters.hasAudio ? 1 : 0) > 0 ? `<span class="badge" style="background: var(--accent-blue); color: white; border-radius: 99px; padding: 1px 6px; font-size: 10px;">${activeFilters.soundTypes.size + (activeFilters.hasNotes ? 1 : 0) + (activeFilters.hasAudio ? 1 : 0)}</span>` : ''}
+          ${getIcon(showFilters ? 'chevron-up' : 'chevron-down', 'w-3 h-3')}
+        </button>
+
+        ${showFilters ? `
+        <div class="filter-dropdown" style="position: absolute; top: calc(100% + 8px); right: 0; width: 320px; background: var(--bg-secondary); border: 1px solid var(--accent-blue); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 1000; padding: 0; animation: fadeIn 0.2s ease; overflow: hidden;">
+          <div style="padding: 16px; background: rgba(59, 130, 246, 0.05); border-bottom: 1px solid var(--border-subtle);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 1px;" data-i18n="library.advancedFilters">${t('library.advancedFilters')}</div>
+            <p style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">Filtrez par statut ou par type de son pour trouver rapidement vos assets.</p>
+          </div>
+          
+          <div style="padding: 16px; max-height: 400px; overflow-y: auto;">
+            <div style="font-size: 12px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary);" data-i18n="library.assetStatus">${t('library.assetStatus')}</div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+              <label class="filter-checkbox-row" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 0;">
+                <input type="checkbox" id="filter-has-notes" ${activeFilters.hasNotes ? 'checked' : ''} />
+                <span style="font-size: 13px;" data-i18n="library.hasNotes">${t('library.hasNotes')}</span>
+              </label>
+              <label class="filter-checkbox-row" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 0;">
+                <input type="checkbox" id="filter-has-audio" ${activeFilters.hasAudio ? 'checked' : ''} />
+                <span style="font-size: 13px;" data-i18n="library.hasAudio">${t('library.hasAudio')}</span>
+              </label>
+            </div>
+            
+            <div style="font-size: 12px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary); border-top: 1px solid var(--border-subtle); padding-top: 16px;" data-i18n="library.filterByType">${t('library.filterByType')}</div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${Object.entries(SOUND_TYPES).map(([id, meta]) => `
+              <label class="filter-checkbox-row" style="display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 6px 8px; border-radius: 6px; transition: background 0.2s;">
+                <input type="checkbox" class="filter-sound-type-check" data-type-id="${id}" ${activeFilters.soundTypes.has(id) ? 'checked' : ''} />
+                <span style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                  <span style="color: ${meta.color || 'var(--text-muted)'}; display: flex;">${getTypeIconHtml(meta, 'w-4 h-4')}</span>
+                  ${meta.label}
+                </span>
+              </label>
+              `).join('')}
+            </div>
+          </div>
+          
+          <div style="padding: 12px 16px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+             <button class="btn btn-secondary btn-xs" id="reset-filters-btn" data-i18n="library.clear">${t('library.clear')}</button>
+             <span style="font-size: 11px; color: var(--text-muted);">${filteredAssetsCache.length} trouvé(s)</span>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+
+      <div class="flex-gap" style="margin-left: auto;">
+        <button class="btn btn-secondary btn-sm" id="select-filtered-btn" data-i18n="library.selectAll" style="height: 42px;">Select All Visible</button>
+        <button class="btn btn-danger btn-sm" id="deselect-all-btn" data-i18n="library.clearSelection" style="height: 42px;">Clear Selection</button>
+        <button class="btn btn-secondary btn-sm" id="import-btn" title="Import Data" style="height: 42px;">${getIcon('download', 'icon-sm')} Import</button>
+        <button class="btn btn-secondary btn-sm" id="reload-library-btn" style="height: 42px;">${getIcon('refresh-cw', 'icon-sm')} <span data-i18n="library.reload">Reload</span></button>
       </div>
     </div>
     <div id="library-breadcrumb" class="library-breadcrumb"></div>
@@ -93,20 +149,24 @@ export async function renderLibrary(container) {
   renderStats();
   renderFolderTree();
 
+  listContainer = document.getElementById('asset-list');
+  if (listContainer) {
+    listContainer.addEventListener('scroll', () => renderVirtualList());
+  }
+
   // Restore search query if one was persisted
   const searchInput = document.getElementById('library-search');
-  if (searchQuery) {
-    searchInput.value = searchQuery;
-  } else {
-    searchQuery = '';
-  }
-  applyFilter();
+  if (searchInput) {
+    searchInput.value = searchQuery || '';
 
-  // Search
-  searchInput.addEventListener('input', debounce(e => {
-    searchQuery = e.target.value;
-    applyFilter();
-  }, 200));
+    // Search listener
+    searchInput.addEventListener('input', debounce(e => {
+      searchQuery = e.target.value;
+      applyFilter();
+    }, 200));
+  }
+
+  applyFilter();
 
   document.getElementById('select-filtered-btn').addEventListener('click', selectAllVisible);
   document.getElementById('deselect-all-btn').addEventListener('click', deselectAll);
@@ -114,11 +174,52 @@ export async function renderLibrary(container) {
   document.getElementById('export-library-btn')?.addEventListener('click', exportLibrary);
   document.getElementById('reload-library-btn').addEventListener('click', () => openScannerModal(false));
 
-  listContainer = document.getElementById('asset-list');
-  listContainer.addEventListener('scroll', () => renderVirtualList());
-
   renderIcons(container);
   updateTranslations();
+
+  // Filter handlers
+  container.querySelector('#toggle-filters-btn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    showFilters = !showFilters;
+    renderLibrary(container);
+  });
+
+  if (showFilters) {
+    const handleOutsideClick = (e) => {
+      const dropdown = container.querySelector('.filter-dropdown');
+      const toggleBtn = container.querySelector('#toggle-filters-btn');
+      if (dropdown && !dropdown.contains(e.target) && !toggleBtn.contains(e.target)) {
+        showFilters = false;
+        renderLibrary(container);
+        document.removeEventListener('click', handleOutsideClick);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+  }
+
+  container.querySelector('#filter-has-notes')?.addEventListener('change', (e) => {
+    activeFilters.hasNotes = e.target.checked;
+    applyFilter();
+  });
+
+  container.querySelector('#filter-has-audio')?.addEventListener('change', (e) => {
+    activeFilters.hasAudio = e.target.checked;
+    applyFilter();
+  });
+
+  container.querySelectorAll('.filter-sound-type-check').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const typeId = chk.dataset.typeId;
+      if (chk.checked) activeFilters.soundTypes.add(typeId);
+      else activeFilters.soundTypes.delete(typeId);
+      applyFilter();
+    });
+  });
+
+  container.querySelector('#reset-filters-btn')?.addEventListener('click', () => {
+    activeFilters = { hasNotes: false, hasAudio: false, soundTypes: new Set() };
+    renderLibrary(container);
+  });
 }
 
 // ───────────────────────────────────────────────
@@ -603,25 +704,45 @@ function renderStats() {
 // ───────────────────────────────────────────────
 
 function applyFilter() {
+  let base = [];
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
-    filteredAssetsCache = allAssets.filter(a =>
+    base = allAssets.filter(a =>
       a.sdefPath.toLowerCase().includes(q) ||
-      a.treePath.toLowerCase().includes(q) ||
-      a.name.toLowerCase().includes(q) ||
-      a.waves.some(w => w.toLowerCase().includes(q))
+      (a.treePath && a.treePath.toLowerCase().includes(q)) ||
+      (a.name && a.name.toLowerCase().includes(q)) ||
+      (a.waves && a.waves.some(w => w && w.toLowerCase().includes(q)))
     );
   } else {
     // Collect assets from current folder
-    let base;
     if (currentPath.length === 0) {
       base = allAssets;
     } else {
       const node = getNodeAtPath(currentPath);
       base = node ? collectAssets(node) : [];
     }
-    filteredAssetsCache = base;
   }
+
+  // Apply Advanced Filters
+  if (activeFilters.hasNotes) {
+    base = base.filter(a => getAssetNote(a.sdefPath) || (a.waves && a.waves.some(w => getAssetNote(`wave::${w}`))));
+  }
+  if (activeFilters.hasAudio) {
+    const state = getState();
+    base = base.filter(a => {
+      const projAsset = state.selectedAssets[a.sdefPath];
+      if (!projAsset) return false;
+      // Must have a primary audio file OR at least one wave replacement
+      const hasPrimary = !!projAsset.audioFileName;
+      const hasWaves = projAsset.waveAudioFiles && Object.keys(projAsset.waveAudioFiles).length > 0;
+      return hasPrimary || hasWaves;
+    });
+  }
+  if (activeFilters.soundTypes.size > 0) {
+    base = base.filter(a => activeFilters.soundTypes.has(detectSoundType(a.sdefPath)));
+  }
+
+  filteredAssetsCache = base;
 
   const filteredEl = document.getElementById('filtered-count');
   if (filteredEl) filteredEl.textContent = filteredAssetsCache.length.toLocaleString();
@@ -684,12 +805,12 @@ function renderVirtualList(reset = false) {
     const typeIconHtml = getTypeIconHtml(typeInfo, 'w-3 h-3');
     // Strip all type labels from note display (they're shown in the Type column)
     const note = rawNote ? stripTypeLabels(rawNote) : '';
-    const NOTE_MAX = 28;
+    const NOTE_MAX = 10;
     const noteSnippet = note
       ? (note.length > NOTE_MAX
-        ? `<span class="asset-note-snippet"><span title="${note.replace(/"/g, '&quot;')}">${note.slice(0, NOTE_MAX)}…</span><button class="btn-expand-note" data-note="${note.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" title="View full note" style="background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--accent-blue);font-size:11px;cursor:pointer;padding:2px 5px;border-radius:4px;margin-left:4px;vertical-align:middle;line-height:1;display:inline-flex;align-items:center;">${getIcon('expand', 'w-3 h-3')}</button></span>`
-        : `<span class="asset-note-snippet" title="${note.replace(/"/g, '&quot;')}">${note}</span>`)
-      : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
+        ? `<div style="display:flex; justify-content:center; width:100%;"><button class="btn-expand-note" data-note="${note.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" title="View full note" style="background:var(--bg-tertiary); border:1px solid var(--accent-blue); color:var(--accent-blue); cursor:pointer; padding:4px; border-radius:6px; transition:all 0.2s; display:flex; align-items:center;">${getIcon('maximize', 'w-4 h-4')}</button></div>`
+        : `<span class="asset-note-snippet" style="font-style:italic; opacity:0.8;" title="${note.replace(/"/g, '&quot;')}">${note}</span>`)
+      : '<span style="color:var(--text-muted);font-size:11px; opacity:0.3;">—</span>';
 
     html += `
       <div class="asset-row ${selected ? 'selected' : ''} ${isActive ? 'detail-active' : ''}"

@@ -19,6 +19,7 @@ import { renderCredits } from './pages/credits.js';
 import { renderCollaboration } from './pages/collaboration.js';
 import { renderCustomTypes } from './pages/customTypes.js';
 import { getState, subscribe, navigate } from './state/store.js';
+import { getIcon, renderIcons } from './utils/icons.js';
 
 // Page renderers map
 const pages = {
@@ -77,8 +78,9 @@ async function checkReleaseNotes() {
                 if (content) {
                     const { showModal } = await import('./utils/modal.js');
                     showModal({
-                        title: `✨ What's New in v${CURRENT_VERSION}`,
+                        title: `What's New in v${CURRENT_VERSION}`,
                         content: `<div class="release-notes">${parseMarkdown(content)}</div>`,
+                        className: 'modal-lg',
                         buttons: [
                             { text: 'Awesome!', primary: true },
                             {
@@ -87,6 +89,7 @@ async function checkReleaseNotes() {
                             }
                         ]
                     });
+                    setTimeout(() => renderIcons(), 100);
                 }
             } catch (e) {
                 console.warn('Could not load release notes:', e);
@@ -127,18 +130,19 @@ async function showAllReleaseNotes() {
 
         const renderFileList = () => {
             return `
-                <div class="release-notes-list" style="max-height: 400px; overflow-y: auto; padding: 10px;">
-                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">Select a file to view its content:</p>
+                <div class="release-notes-list" style="max-height: 500px; overflow-y: auto; padding: 10px;">
+                    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Consultez les notes des versions précédentes :</p>
                     ${['Patch Notes', 'What\'s New / Other'].map(group => {
                 const groupFiles = allFiles.filter(f => f.group === group);
                 if (groupFiles.length === 0) return '';
                 return `
-                            <div style="margin-bottom: 16px;">
-                                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--accent-blue); margin-bottom: 8px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;">${group}</div>
-                                <div style="display: grid; gap: 4px;">
+                            <div style="margin-bottom: 24px;">
+                                <div class="release-notes-group-title">${group}</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                                     ${groupFiles.map(f => `
-                                        <button class="btn btn-secondary btn-sm" style="text-align: left; justify-content: flex-start; padding: 8px 12px;" data-note-path="${f.path}">
-                                            ${f.name}
+                                        <button class="btn release-notes-item" data-note-path="${f.path}">
+                                            <div class="item-icon">${getIcon(f.group === 'Patch Notes' ? 'folder' : 'file-text', 'w-4 h-4')}</div>
+                                            <div class="item-text">${f.name.replace('.md', '').replace(/_/g, ' ')}</div>
                                         </button>
                                     `).join('')}
                                 </div>
@@ -150,13 +154,15 @@ async function showAllReleaseNotes() {
         };
 
         const modal = showModal({
-            title: '📜 Release Notes Archive',
+            title: 'Release Notes Archive',
             content: renderFileList(),
+            className: 'modal-lg',
             buttons: [{ text: 'Close', primary: false }]
         });
 
         // Attach listeners after a short delay for modal to render
         setTimeout(() => {
+            renderIcons();
             document.querySelectorAll('[data-note-path]').forEach(btn => {
                 btn.onclick = async () => {
                     const path = btn.dataset.notePath;
@@ -170,13 +176,15 @@ async function showAllReleaseNotes() {
                         }
 
                         showModal({
-                            title: `📄 ${path.split('/').pop()}`,
+                            title: path.split('/').pop().replace('.md', ''),
                             content: `<div class="release-notes">${parseMarkdown(content)}</div>`,
+                            className: 'modal-lg',
                             buttons: [
                                 { text: 'Back to List', onClick: () => showAllReleaseNotes() },
                                 { text: 'Close', primary: true }
                             ]
                         });
+                        setTimeout(() => renderIcons(), 50);
                     } catch (e) {
                         const { showToast } = await import('./components/toast.js');
                         showToast('Failed to read file', 'error');

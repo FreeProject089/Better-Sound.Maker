@@ -498,62 +498,83 @@ textarea.input-field {
   line-height: 1.6;
 }
 
-/* Release Notes Markdown Styling */
+/* Release Notes Premium Styling */
 .release-notes {
   color: var(--text-secondary);
-  line-height: 1.6;
-  font-size: 14px;
+  line-height: 1.7;
+  font-size: 14.5px;
+  padding: 0 10px;
 }
 
 .release-notes h1 {
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-size: 2rem;
+  font-weight: 900;
   color: var(--text-primary);
-  margin: 1.5rem 0 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border-subtle);
+  margin: 0 0 2rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--accent-blue);
+  letter-spacing: -0.5px;
 }
 
 .release-notes h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--accent-blue);
-  margin: 1.5rem 0 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 2.5rem 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: rgba(59, 130, 246, 0.08);
+  border-left: 4px solid var(--accent-blue);
+  border-radius: 0 8px 8px 0;
 }
 
 .release-notes h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 1.2rem 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  margin: 1.8rem 0 0.8rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .release-notes ul {
-  margin: 0.8rem 0;
-  padding-left: 1.5rem;
+  margin: 1rem 0;
+  padding-left: 1.2rem;
   list-style-type: none;
 }
 
 .release-notes li {
   position: relative;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
+  padding-left: 5px;
 }
 
 .release-notes li::before {
-  content: "•";
+  content: "";
   position: absolute;
   left: -1.2rem;
-  color: var(--accent-blue);
-  font-weight: bold;
+  top: 0.6rem;
+  width: 6px;
+  height: 6px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+  box-shadow: 0 0 8px var(--accent-blue);
+}
+
+.release-notes p {
+  margin-bottom: 1.2rem;
 }
 
 .release-notes code {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 2px 6px;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 6px;
   font-family: var(--font-mono);
-  font-size: 0.9em;
+  font-size: 0.85em;
   color: var(--accent-amber);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .release-notes strong {
@@ -563,17 +584,24 @@ textarea.input-field {
 
 .release-notes hr {
   border: none;
-  border-top: 1px solid var(--border-subtle);
-  margin: 2rem 0;
+  border-top: 1px dashed var(--border-subtle);
+  margin: 3rem 0;
+  opacity: 0.5;
 }
 
 .release-notes blockquote {
-  margin: 1rem 0;
-  padding: 0.8rem 1.2rem;
-  border-left: 4px solid var(--accent-blue);
-  background: rgba(59, 130, 246, 0.05);
-  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 4px solid var(--border-default);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0 12px 12px 0;
   font-style: italic;
+  color: var(--text-muted);
+}
+
+/* Archive List Enhancements */
+.release-notes-list {
+  scrollbar-gutter: stable;
 }
 
 .release-notes-list::-webkit-scrollbar {
@@ -778,6 +806,76 @@ select.input-field {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.data-table tr.row-selected td {
+  background: rgba(59, 130, 246, 0.07);
+  border-bottom-color: rgba(59, 130, 246, 0.15);
+}
+
+.data-table tr.row-selected td:first-child {
+  border-left: 2px solid var(--accent-blue);
+}
+
+
+/* --- Custom Checkbox Styling --- */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+input[type="checkbox"]:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --- Filter UI --- */
+.filter-checkbox-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  line-height: 1;
+}
+
 /* --- Tabs --- */
 .tabs {
   display: flex;
@@ -936,6 +1034,97 @@ select.input-field {
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
   animation: modalIn 0.3s ease;
+}
+
+.modal-lg {
+  max-width: 880px;
+}
+
+.release-notes-item {
+  display: flex !important;
+  align-items: center;
+  text-align: left;
+  justify-content: flex-start;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.release-notes-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent-blue), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 0;
+}
+
+.release-notes-item:hover {
+  background: rgba(59, 130, 246, 0.05);
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.release-notes-item:hover::before {
+  opacity: 0.05;
+}
+
+.release-notes-item .item-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 14px;
+  color: var(--text-muted);
+  transition: all 0.2s;
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.release-notes-item:hover .item-icon {
+  background: var(--accent-blue);
+  color: white;
+  transform: scale(1.1);
+}
+
+.release-notes-item .item-text {
+  flex: 1;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-secondary);
+  z-index: 1;
+}
+
+.release-notes-item:hover .item-text {
+  color: var(--text-primary);
+}
+
+.release-notes-group-title {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 1.5px;
+}
+
+.release-notes-group-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border-subtle), transparent);
 }
 
 @keyframes modalIn {

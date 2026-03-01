@@ -16,6 +16,7 @@ let currentAudioSource = null;
 
 // Tree state for Project page
 let projectOpenFolders = new Set();
+let projectSelectedIds = new Set(); // For multi-select bulk actions
 
 export function renderProject(container) {
   const state = getState();
@@ -92,9 +93,12 @@ export function renderProject(container) {
       </div>
     </div>
     <div class="card" style="overflow-x: auto; padding: 0;">
-      <table class="data-table" style="table-layout: fixed; width: 100%; min-width: 800px;">
+      <table class="data-table" style="table-layout: fixed; width: 100%; min-width: 820px;">
         <thead>
           <tr>
+            <th style="width: 36px; text-align: center; padding: 0 8px;">
+              <input type="checkbox" id="project-select-all" title="Select all">
+            </th>
             <th style="width: 300px;">Asset / Path</th>
             <th>${t('project.audioFile')}</th>
             <th style="width: 100px; text-align: center;">${t('common.actions')}</th>
@@ -105,6 +109,16 @@ export function renderProject(container) {
         <tbody>${projectTreeHtml}</tbody>
       </table>
     </div>
+    ${projectSelectedIds.size > 0 ? `
+      <div id="project-bulk-bar-container" style="position: fixed; bottom: 24px; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; pointer-events: none;">
+        <div id="project-bulk-bar" style="display: flex; align-items: center; gap: 16px; background: var(--bg-card); border: 1px solid var(--accent-blue); border-radius: 99px; padding: 10px 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(59,130,246,0.2); pointer-events: auto; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); border-bottom: 2px solid var(--accent-blue);">
+          <span style="font-weight: 700; font-size: 14px; color: var(--accent-blue); letter-spacing: 0.5px;">${projectSelectedIds.size} SÉLECTIONNÉ${projectSelectedIds.size > 1 ? 'S' : ''}</span>
+          <div style="width: 1px; height: 20px; background: var(--border-subtle);"></div>
+          <button class="btn btn-secondary btn-sm" id="project-clear-selection" style="border-radius: 99px; height: 32px; padding: 0 16px;">${getIcon('x', 'w-3 h-3')} Effacer</button>
+          <button class="btn btn-danger btn-sm" id="project-bulk-remove" style="border-radius: 99px; height: 32px; padding: 0 16px; font-weight: 600;">${getIcon('trash-2', 'w-4 h-4')} Retirer du Projet</button>
+        </div>
+      </div>
+    ` : ''}
   `;
   renderIcons(container);
   updateTranslations();
@@ -141,6 +155,9 @@ function renderProjectTreeNode(node, parentPath = [], depth = 0) {
 
     html += `
             <tr class="folder-row" data-folder-path="${pathStr}">
+                <td style="text-align:center; vertical-align:middle; padding: 0 8px; background: var(--bg-card);">
+                  <input type="checkbox" class="project-folder-check" data-folder-path="${pathStr}">
+                </td>
                 <td colspan="5" style="padding-left: ${16 + indent}px; background: var(--bg-card); cursor: pointer;" class="project-folder-toggle">
                     <div style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); font-weight: 600;">
                         <span class="folder-arrow ${isOpen ? 'open' : ''}" style="transition: transform 0.2s;">
@@ -250,7 +267,10 @@ function renderAssetRow(asset, depth) {
   }
 
   return `
-        <tr>
+        <tr class="${projectSelectedIds.has(asset.sdefPath) ? 'row-selected' : ''}" data-sdef-path="${asset.sdefPath}">
+          <td style="text-align:center; vertical-align:middle; padding: 0 8px;">
+            <input type="checkbox" class="project-row-check" data-sdef-path="${asset.sdefPath}" ${projectSelectedIds.has(asset.sdefPath) ? 'checked' : ''}>
+          </td>
           <td style="padding-left: ${16 + indent}px;">
             <div class="project-asset-name" style="font-weight: 600; font-size: 13px; color: var(--text-color);">${name}</div>
             <div class="project-asset-path truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${asset.sdefPath}">${asset.sdefPath}</div>
@@ -284,6 +304,79 @@ function attachFolderHandlers(container) {
       }
       renderProject(container);
     });
+  });
+
+  // Folder Checkbox Handler
+  container.querySelectorAll('.project-folder-check').forEach(chk => {
+    const folderPath = chk.dataset.folderPath;
+    const state = getState();
+    const assetsUnder = Object.entries(state.selectedAssets)
+      .filter(([path]) => path.startsWith(folderPath + '/'))
+      .map(([path, data]) => ({ ...data, sdefPath: path }));
+    if (assetsUnder.length > 0) {
+      const checkedCount = assetsUnder.filter(a => projectSelectedIds.has(a.sdefPath)).length;
+      chk.checked = (checkedCount === assetsUnder.length);
+      chk.indeterminate = (checkedCount > 0 && checkedCount < assetsUnder.length);
+    }
+    chk.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      assetsUnder.forEach(a => {
+        if (isChecked) projectSelectedIds.add(a.sdefPath);
+        else projectSelectedIds.delete(a.sdefPath);
+      });
+      renderProject(container);
+    });
+  });
+
+  // Checkbox: select-all
+  const chkAll = container.querySelector('#project-select-all');
+  if (chkAll) {
+    // Sync initial state
+    const allPaths = [...container.querySelectorAll('.project-row-check')].map(c => c.dataset.sdefPath);
+    chkAll.checked = allPaths.length > 0 && allPaths.every(p => projectSelectedIds.has(p));
+    chkAll.addEventListener('change', () => {
+      allPaths.forEach(p => {
+        if (chkAll.checked) projectSelectedIds.add(p);
+        else projectSelectedIds.delete(p);
+      });
+      renderProject(container);
+    });
+  }
+
+  // Checkbox: individual rows
+  container.querySelectorAll('.project-row-check').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const path = chk.dataset.sdefPath;
+      if (chk.checked) projectSelectedIds.add(path);
+      else projectSelectedIds.delete(path);
+      renderProject(container);
+    });
+  });
+
+  // Bulk bar: clear selection
+  container.querySelector('#project-clear-selection')?.addEventListener('click', () => {
+    projectSelectedIds.clear();
+    renderProject(container);
+  });
+
+  // Bulk bar: remove selected from project
+  container.querySelector('#project-bulk-remove')?.addEventListener('click', async () => {
+    const { showModal } = await import('../components/modal.js');
+    const confirm = await showModal({
+      title: 'Confirmation',
+      content: `<p>Voulez-vous vraiment retirer les <b>${projectSelectedIds.size}</b> fichiers sélectionnés du projet ?</p>`,
+      actions: [
+        { id: 'cancel', label: 'Annuler', class: 'btn-secondary' },
+        { id: 'confirm', label: 'Retirer', class: 'btn-danger' }
+      ]
+    });
+
+    if (confirm === 'confirm') {
+      projectSelectedIds.forEach(path => deselectAsset(path));
+      projectSelectedIds.clear();
+      renderProject(container);
+      showToast(`Asset(s) retiré(s) du projet`, 'info');
+    }
   });
 }
 
@@ -382,45 +475,18 @@ function attachProjectHandlers(container) {
       }
     }
 
-    // Ask user: .zip or folder?
-    const { showModal } = await import('../components/modal.js');
-    const fmt = await showModal({
-      title: 'Load Format',
-      content: `<p>How is your mod packaged?</p>`,
-      actions: [
-        { id: 'cancel', label: 'Cancel', class: 'btn-secondary' },
-        { id: 'zip', label: '&#x1F4E6; ZIP Archive (.zip)', class: 'btn-primary' },
-        { id: 'folder', label: '&#x1F4C1; Unzipped Folder', class: 'btn-secondary' }
-      ]
-    });
-    if (!fmt || fmt === 'cancel') return;
-
     try {
-      if (fmt === 'zip') {
-        const { pickFiles } = await import('../utils/file-picker.js');
-        const files = await pickFiles({ accept: '.zip' });
-        if (!files.length) return;
-        showToast('Loading mod from ZIP…', 'info');
-        const { loadModFromZip } = await import('../utils/mod-loader.js');
-        const modData = await loadModFromZip(files[0]);
-        const { importModData } = await import('../state/store.js');
-        await importModData(modData);
-        showToast('Mod loaded successfully', 'success');
-      } else {
-        // Folder — use Electron API to pick a directory
-        if (!window.electronAPI?.pickFolder) {
-          showToast('Folder pick not available in browser mode', 'warning');
-          return;
-        }
-        const folderPath = await window.electronAPI.pickFolder();
-        if (!folderPath) return;
-        showToast('Loading mod from folder…', 'info');
-        const { loadModFromFolder } = await import('../utils/mod-loader.js');
-        const modData = await loadModFromFolder(folderPath);
-        const { importModData } = await import('../state/store.js');
-        await importModData(modData);
-        showToast('Mod loaded from folder successfully', 'success');
-      }
+      const { pickFiles } = await import('../utils/file-picker.js');
+      const files = await pickFiles({ accept: '.zip' });
+      if (!files.length) return;
+
+      showToast('Loading mod from ZIP…', 'info');
+      const { loadModFromZip } = await import('../utils/mod-loader.js');
+      const modData = await loadModFromZip(files[0]);
+      const { importModData } = await import('../state/store.js');
+      await importModData(modData);
+
+      showToast('Mod loaded successfully', 'success');
       renderProject(document.getElementById('page-container'));
     } catch (e) {
       if (e.name !== 'AbortError') {
@@ -554,7 +620,7 @@ function playAudio(sdefPath, wavePath, btn) {
     }
     let finalVolume = params.gain !== undefined ? Math.max(params.gain, 0) : 1;
     if (params.pitch !== undefined) audio.playbackRate = Math.max(0.1, params.pitch);
-    if (params.detached === false || params.listmode === 'LOOP') audio.loop = true;
+    audio.loop = false; // User requested no-loop playback
 
     // Apply stereo panning & distance attenuation based on SDEF position
     if (params.position && Array.isArray(params.position) && params.position.length >= 3) {

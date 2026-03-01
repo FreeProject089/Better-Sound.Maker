@@ -1,35 +1,41 @@
-# What's New in v1.0.6 - Better Sound.maker
+# What's New in v1.0.6
 
-Welcome to **v1.0.6**! This version is a major step forward for customization, bringing the long-awaited **Custom Sound Type Manager**.
+Version 1.0.6 introduces significant updates to asset categorization and batch management tools.
 
-## 🏷️ Custom Sound Type Manager
-You can now fully control how your sounds are categorized!
-- **Create Custom Types**: Add your own types with custom labels, descriptions, and a selection of over 100+ high-quality icons.
-- **Regex Logic Rules**: Define powerful Regular Expression rules to automatically assign sounds to your custom types based on their file paths.
-- **Rule Priority**: Your custom rules are evaluated first, allowing you to override default DCS categorizations for your specific mods.
-- **Sharing & Presets**: Export your custom types as `.json` files or embed them directly into your Presets to share your entire setup with teammates.
+## Custom Sound Type Manager
+This update provides full control over asset categorization:
+- **Custom Definitions**: Create types with custom labels and descriptions.
+- **Rule Engine**: Define Regular Expression (Regex) rules for automated type assignment based on file paths.
+- **Priority Logic**: User-defined rules take precedence over default DCS mappings.
+- **Data Portability**: Export/import type definitions via JSON to maintain consistency across workstations.
 
+## SDEF Template Manager
+A new module designed to streamline SDEF parameter editing across the physical library:
+- **Bulk Application**: Apply parameter sets to all selected assets or individual files with one click.
+- **Dashboard UI**: A redesigned two-column interface for efficient library management.
+- **French Localization**: The entire interface is now available in French.
+- **Flexible Sources**: Use any open SDEF file as a template donor.
 
-## 📂 Advanced Project Loading
-- **Load from Unzipped Folders**: In addition to `.zip` archives, you can now load existing mods directly from a folder on your disk (Electron only).
-- **Format Picker**: A new modal helps you choose between Zip or Folder formats when importing an existing mod.
+## Advanced Search & Filters
+Enhanced discovery tools for large audio libraries:
+- **New Filter Panel**: Toggleable advanced search interface.
+- **Multi-Category Querying**: Filter by multiple sound types simultaneously.
+- **Modification Tracking**: Quickly isolate assets with custom notes or audio replacements.
 
-## 🔍 Enhanced Assets Library & Scanner
-- **DCS Assets Scanner**: The scanner is now more robust and supports scanning both your DCS root and your Saved Games mods folder simultaneously.
-- **Manual SDEF Loading**: If the auto-scanner doesn't find what you need, you can manually load a legacy `sdef_and_wave_list.txt` file.
+## Mass Management Improvements
+- **Directory-Level Selection**: Select or deselect large groups of assets via the folder checkbox.
+- **Indeterminate States**: Visual feedback when sub-assets have mixed selection states.
+- **Safety Overlays**: Added confirmation dialogs for all destructive bulk actions.
 
+## SDEF Editor Updates
+- **Play/Stop Toggle**: Replaced the static play button with a dynamic toggle for better audio control.
+- **Single-Shot Preview**: Audio playback is no longer looped to prevent noise overlap.
+- **Expansible Notes**: Large text notes are now handled via a dedicated modal viewer to maintain interface clarity.
 
-## 📂 Project View Improvements
-- **Smart Folder Highlighting**: In the Project page, the folder that *directly* contains your SDEF files is now highlighted in **Electric Blue** with a subtle outer glow. This "Leaf Folder" indicator acts as a compass, showing you exactly where you are in deep file structures like `AH-61D/Cockpit`.
-- **Enhanced Table Layout**: Fixed alignment issues in the Project table headers (ACTIONS/EDIT). The table now uses a fixed layout and a minimum width to ensure buttons stay perfectly aligned regardless of content.
-- **Button Micro-Animations**: Interactive buttons in the project and custom type tables now feature subtle hover scaling for a more responsive feel.
-
-## 🛠️ Bug Fixes & UI Polish
-- **Fixed Preset 404 Error**: Resolved a persistent error when fetching community presets by improving `Load.cfg` precedence and respecting the `DisableCommunityPresets` setting.
-- **Improved FAQ**: Added 7 new questions to the F.A.Q covering audio formats, installation troubleshooting, and custom types.
-- **Installation Guide**: A new step-by-step guide is available in the Documentation page to help you install your mods correctly.
-- **Modal Icons**: Added icons to the "Assign to Type" dropdown in the rule editor for better visual identification.
+## Documentation & Archive Improvements
+- **Overhauled Version Archive**: Redesigned the centralized dashboard for browsing previous version updates with a modern grid and better navigation.
+- **Technical UI Redesign**: Significant improvements to documentation formatting, utilizing wider layouts and professional styling for better readability.
+- **Upgraded Iconography**: Replaced existing interface emojis with professional SVG icons for a cleaner, workstation-focused user experience.
 
 ---
-*Thank you for using Better Sound.maker. Happy modding! 🎧*
-
+*Better Sound.Maker v1.0.6*

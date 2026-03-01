@@ -109,7 +109,7 @@ export function parseSdef(text) {
             continue;
         }
 
-        if (line.startsWith('wave') && line.includes('{')) {
+        if (line.toLowerCase().startsWith('wave') && line.includes('{')) {
             inWaveList = true;
             waveList.length = 0;
             // Check if it's a single-line list
@@ -132,7 +132,7 @@ export function parseSdef(text) {
             // String
             if (val.startsWith('"') && val.endsWith('"')) {
                 val = val.slice(1, -1);
-                if (key === 'wave') {
+                if (key.toLowerCase() === 'wave') {
                     params.wave = [val];
                 } else {
                     params[key] = val;
@@ -148,8 +148,8 @@ export function parseSdef(text) {
             }
 
             // Boolean
-            if (val === 'true' || val === 'false') {
-                params[key] = val === 'true';
+            if (val.toLowerCase() === 'true' || val.toLowerCase() === 'false') {
+                params[key] = val.toLowerCase() === 'true';
                 continue;
             }
 

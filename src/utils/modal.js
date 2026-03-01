@@ -2,13 +2,13 @@
  * src/utils/modal.js — Generic modal utility
  */
 
-export function showModal({ title, content, buttons = [] }) {
-    const overlay = document.getElementById('modal-overlay');
-    if (!overlay) return;
+export function showModal({ title, content, buttons = [], className = '' }) {
+  const overlay = document.getElementById('modal-overlay');
+  if (!overlay) return;
 
-    overlay.classList.remove('hidden');
-    overlay.innerHTML = `
-    <div class="modal-content">
+  overlay.classList.remove('hidden');
+  overlay.innerHTML = `
+    <div class="modal ${className}">
       <div class="modal-header">
         <h2 class="modal-title">${title}</h2>
         <button class="modal-close" id="modal-close">&times;</button>
@@ -24,21 +24,21 @@ export function showModal({ title, content, buttons = [] }) {
     </div>
   `;
 
-    // Bind close
-    const closeBtn = document.getElementById('modal-close');
-    closeBtn?.addEventListener('click', closeModal);
+  // Bind close
+  const closeBtn = document.getElementById('modal-close');
+  closeBtn?.addEventListener('click', closeModal);
 
-    // Bind buttons
-    buttons.forEach((btn, i) => {
-        const el = document.getElementById(`modal-btn-${i}`);
-        el?.addEventListener('click', () => {
-            if (btn.onClick) btn.onClick();
-            if (!btn.preventClose) closeModal();
-        });
+  // Bind buttons
+  buttons.forEach((btn, i) => {
+    const el = document.getElementById(`modal-btn-${i}`);
+    el?.addEventListener('click', () => {
+      if (btn.onClick) btn.onClick();
+      if (!btn.preventClose) closeModal();
     });
+  });
 }
 
 export function closeModal() {
-    const overlay = document.getElementById('modal-overlay');
-    if (overlay) overlay.classList.add('hidden');
+  const overlay = document.getElementById('modal-overlay');
+  if (overlay) overlay.classList.add('hidden');
 }
