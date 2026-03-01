@@ -53,6 +53,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getAppPath: () => ipcRenderer.invoke('app:getPath'),
 
     /**
+     * Get user home directory path
+     */
+    getUserHome: () => ipcRenderer.invoke('app:getUserHome'),
+
+    /**
      * Trigger the native autoUpdater to check for updates.
      */
     checkForUpdates: () => ipcRenderer.invoke('app:checkForUpdates'),
@@ -63,7 +68,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
     readDir: (dirPath) => ipcRenderer.invoke('fs:readDir', dirPath),
 
     /**
+     * Check if path exists.
+     */
+    exists: (checkPath) => ipcRenderer.invoke('fs:exists', checkPath),
+
+    /**
+     * Scan directory recursively for .sdef files.
+     */
+    scanSdefs: (rootPath) => ipcRenderer.invoke('fs:scanSdefs', rootPath),
+
+    /**
      * Open a file or folder in OS default handler.
      */
     openExternal: (targetPath) => ipcRenderer.invoke('app:openExternal', targetPath),
+
+    /**
+     * Pick a folder and return its path (alias of selectDirectory).
+     * @returns {Promise<string|null>}
+     */
+    pickFolder: () => ipcRenderer.invoke('dialog:selectDirectory'),
 });

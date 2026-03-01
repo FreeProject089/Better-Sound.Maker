@@ -47,6 +47,7 @@ const defaultState = {
     // Global settings
     globalSettings: {
         dcsPath: '',
+        savedGamesPath: '',
         autoScan: false
     },
 

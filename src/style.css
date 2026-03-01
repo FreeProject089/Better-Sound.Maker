@@ -3292,3 +3292,145 @@ body.onboarding-active #sidebar {
   margin-left: 4px;
   flex-shrink: 0;
 }
+
+/* ================================================
+   Sound Type Manager — Custom Types Page
+   ================================================ */
+
+.types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.type-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.type-card:hover {
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-md);
+  background: var(--bg-card-hover);
+}
+
+.type-card-custom {
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.type-card-custom:hover {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.type-card-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.type-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.type-card-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.type-card-id {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.type-card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.type-card-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.type-card-actions .btn-icon {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.type-card-actions .btn-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  border-color: var(--border-default);
+}
+
+.type-card-actions .btn-icon.danger:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--accent-red);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Icon Picker */
+.icon-picker-item {
+  transition: all 0.12s ease !important;
+}
+
+.icon-picker-item:hover {
+  background: rgba(59, 130, 246, 0.15) !important;
+  border-color: var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
+  transform: scale(1.1);
+}
+
+.icon-picker-item.selected {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: var(--accent-blue) !important;
+  color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Tip Box */
+.tip-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-left: 3px solid var(--accent-amber);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}

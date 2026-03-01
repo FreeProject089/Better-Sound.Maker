@@ -355,6 +355,13 @@ async function checkUpdatesForLocalPresets(container) {
   const list = state.presets || [];
   if (list.length === 0) return;
 
+  // Disable if configured in cfg
+  if (window.APP_CONFIG?.DisableCommunityPresets === 'true') {
+    gCommunityPresetsCache = [];
+    gCommunityPresetsTime = Date.now();
+    return;
+  }
+
   // Use cache if checked within 5 mins
   if (!gCommunityPresetsCache || Date.now() - gCommunityPresetsTime > 5 * 60 * 1000) {
     try {
@@ -363,12 +370,19 @@ async function checkUpdatesForLocalPresets(container) {
         gCommunityPresetsCache = await gResp.json();
         gCommunityPresetsTime = Date.now();
       } else {
+        // Repository or path not found, mock as empty array to stop further attempts in this session
+        gCommunityPresetsCache = [];
+        gCommunityPresetsTime = Date.now();
         return;
       }
-    } catch {
+    } catch (e) {
+      gCommunityPresetsCache = [];
+      gCommunityPresetsTime = Date.now();
       return;
     }
   }
+
+  if (!Array.isArray(gCommunityPresetsCache)) return;
 
   for (let i = 0; i < list.length; i++) {
     const preset = list[i];
@@ -492,14 +506,41 @@ async function exportPreset(idx) {
   let versionVal = preset.version || '1.0.0';
   let updateNumVal = preset.UpdateNumber || 1;
 
+  let customTypesHTML = '';
+  const customStr = localStorage.getItem('bsm-custom-types');
+  let hasCustomTypes = false;
+  if (customStr) {
+    try {
+      const parsed = JSON.parse(customStr);
+      hasCustomTypes = Object.keys(parsed.types || {}).length > 0 || (parsed.rules || []).length > 0;
+    } catch (e) { }
+  }
+
+  if (hasCustomTypes) {
+    customTypesHTML = `
+      <div class="input-group" style="margin-top: 16px; padding: 12px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: var(--radius-sm);">
+        <label class="checkbox-wrapper">
+          <input type="checkbox" id="export-custom-types" checked />
+          <span style="font-size: 13px; color: var(--text-primary); font-weight: 500;">Include Custom Sound Types</span>
+        </label>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; padding-left: 26px;">
+          Attach your custom sound types rules to this preset so others can use them.
+        </div>
+      </div>
+    `;
+  }
+
+  let includeTypes = hasCustomTypes;
   setTimeout(() => {
     const vInput = document.getElementById('export-version');
     const uInput = document.getElementById('export-updatenum');
+    const typesInput = document.getElementById('export-custom-types');
     if (vInput) vInput.addEventListener('input', e => versionVal = e.target.value);
     if (uInput) uInput.addEventListener('input', e => {
       const val = parseInt(e.target.value, 10);
       if (!isNaN(val)) updateNumVal = val;
     });
+    if (typesInput) typesInput.addEventListener('change', e => includeTypes = e.target.checked);
   }, 50);
 
   const action = await showModal({
@@ -516,6 +557,7 @@ async function exportPreset(idx) {
         <label class="input-label">${t('presetsPage.updateNumberLabel') || 'Update Number'} (increment for updates)</label>
         <input type="number" id="export-updatenum" class="input-field" value="${updateNumVal}" min="1" />
       </div>
+      ${customTypesHTML}
     `,
     actions: [
       { id: 'cancel', label: t('common.cancel') || 'Cancel', class: 'btn-secondary' },
@@ -532,7 +574,12 @@ async function exportPreset(idx) {
     updatePreset(idx, { version: versionVal, UpdateNumber: updateNumVal });
   });
 
-  const json = JSON.stringify(preset, null, 2);
+  const presetCopy = { ...preset, version: versionVal, UpdateNumber: updateNumVal };
+  if (includeTypes && hasCustomTypes) {
+    presetCopy.customTypes = JSON.parse(customStr);
+  }
+
+  const json = JSON.stringify(presetCopy, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -552,6 +599,48 @@ async function importPresetFromFile(container) {
     if (!preset.name || !Array.isArray(preset.assetPaths)) {
       showToast('Invalid preset file format', 'error');
       return;
+    }
+
+    if (preset.customTypes) {
+      const numTypes = Object.keys(preset.customTypes.types || {}).length;
+      const numRules = (preset.customTypes.rules || []).length;
+      if (numTypes > 0 || numRules > 0) {
+        const result = await showModal({
+          title: 'Import Custom Types?',
+          content: `
+            <p>This preset includes <strong>${numTypes} custom sound types</strong> and <strong>${numRules} matching rules</strong>.</p>
+            <p style="margin-top: 8px;">Do you want to import them into your local sound type database?</p>
+          `,
+          actions: [
+            { id: 'no', label: 'No (Assets Only)', class: 'btn-secondary' },
+            { id: 'yes', label: 'Yes, Import Types', class: 'btn-primary' }
+          ]
+        });
+
+        if (result === 'yes') {
+          try {
+            const existingRaw = localStorage.getItem('bsm-custom-types');
+            const data = existingRaw ? JSON.parse(existingRaw) : { types: {}, rules: [] };
+
+            if (preset.customTypes.types) {
+              Object.assign(data.types, preset.customTypes.types);
+            }
+            if (Array.isArray(preset.customTypes.rules)) {
+              for (const rule of preset.customTypes.rules) {
+                if (!data.rules.find(r => r.match === rule.match && r.type === rule.type)) {
+                  data.rules.push(rule);
+                }
+              }
+            }
+            localStorage.setItem('bsm-custom-types', JSON.stringify(data));
+            const { reloadRules } = await import('../utils/audio-analyzer.js');
+            await reloadRules();
+            showToast(`Imported ${numTypes} custom types`, 'success');
+          } catch (e) {
+            console.error('Failed to import bundled custom types:', e);
+          }
+        }
+      }
     }
 
     importPreset(preset);
@@ -736,6 +825,32 @@ async function showCommunityPresets(container) {
           saveLibraryToStorage(getState().libraryData).catch(() => { });
         } else {
           importPreset(presetData);
+        }
+
+        if (presetData.customTypes) {
+          try {
+            const existingRaw = localStorage.getItem('bsm-custom-types');
+            const data = existingRaw ? JSON.parse(existingRaw) : { types: {}, rules: [] };
+            let addedCount = 0;
+            if (presetData.customTypes.types) {
+              const newTypes = Object.keys(presetData.customTypes.types).length;
+              Object.assign(data.types, presetData.customTypes.types);
+              addedCount += newTypes;
+            }
+            if (Array.isArray(presetData.customTypes.rules)) {
+              for (const rule of presetData.customTypes.rules) {
+                if (!data.rules.find(r => r.match === rule.match && r.type === rule.type)) {
+                  data.rules.push(rule);
+                  addedCount++;
+                }
+              }
+            }
+            if (addedCount > 0) {
+              localStorage.setItem('bsm-custom-types', JSON.stringify(data));
+              import('../utils/audio-analyzer.js').then(({ reloadRules }) => reloadRules());
+              showToast(`Imported custom types from community preset`, 'success');
+            }
+          } catch (e) { }
         }
 
         btnEl.parentElement.innerHTML = `

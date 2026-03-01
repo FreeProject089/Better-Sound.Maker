@@ -92,13 +92,13 @@ export function renderProject(container) {
       </div>
     </div>
     <div class="card" style="overflow-x: auto; padding: 0;">
-      <table class="data-table">
+      <table class="data-table" style="table-layout: fixed; width: 100%; min-width: 800px;">
         <thead>
           <tr>
-            <th data-i18n="library.assets" style="width: 300px;">Asset / Path</th>
+            <th style="width: 300px;">Asset / Path</th>
             <th>${t('project.audioFile')}</th>
-            <th style="width: 100px;">${t('common.actions')}</th>
-            <th style="width: 60px;">${t('common.edit')}</th>
+            <th style="width: 100px; text-align: center;">${t('common.actions')}</th>
+            <th style="width: 60px; text-align: center;">${t('common.edit')}</th>
             <th style="width: 60px;"></th>
           </tr>
         </thead>
@@ -119,8 +119,21 @@ function renderProjectTreeNode(node, parentPath = [], depth = 0) {
   const keys = Object.keys(node).filter(k => k !== '_files').sort();
 
   for (const key of keys) {
-    const child = node[key];
-    const currentPathArr = [...parentPath, key];
+    let child = node[key];
+    let compressedPath = [key];
+
+    while (true) {
+      const childKeys = Object.keys(child).filter(k => k !== '_files');
+      const hasFiles = child._files && child._files.length > 0;
+      if (childKeys.length === 1 && !hasFiles) {
+        compressedPath.push(childKeys[0]);
+        child = child[childKeys[0]];
+      } else {
+        break;
+      }
+    }
+
+    const currentPathArr = [...parentPath, ...compressedPath];
     const pathStr = currentPathArr.join('/');
     const isOpen = projectOpenFolders.has(pathStr);
     const count = countProjectFiles(child);
@@ -134,8 +147,8 @@ function renderProjectTreeNode(node, parentPath = [], depth = 0) {
                             ${getIcon('chevron-right', 'w-3 h-3')}
                         </span>
                         ${getIcon('folder', 'fill text-blue-500')} 
-                        <span>${key}</span>
-                        <span style="font-size: 11px; font-weight: 400; color: var(--text-muted); background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 99px;">${count}</span>
+                        <span style="${(child._files && child._files.length > 0) ? 'color: var(--accent-blue); text-shadow: 0 0 8px rgba(59,130,246,0.3);' : ''}">${compressedPath.join('/')}</span>
+                        <span style="font-size: 11px; font-weight: 500; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 1px 8px; border-radius: 99px; border: 1px solid rgba(59, 130, 246, 0.2);">${count}</span>
                     </div>
                 </td>
             </tr>
@@ -239,21 +252,21 @@ function renderAssetRow(asset, depth) {
   return `
         <tr>
           <td style="padding-left: ${16 + indent}px;">
-            <div class="project-asset-name">${name}</div>
-            <div class="project-asset-path">${asset.sdefPath}</div>
+            <div class="project-asset-name" style="font-weight: 600; font-size: 13px; color: var(--text-color);">${name}</div>
+            <div class="project-asset-path truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${asset.sdefPath}">${asset.sdefPath}</div>
           </td>
           <td>${audioInfo}</td>
-          <td>
-            <div class="flex-gap">
-                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn-icon" data-change="${asset.sdefPath}" title="${t('project.replace')}">${getIcon('refresh-cw')}</button>` : ''}
-                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn-icon danger" data-remove-audio="${asset.sdefPath}" title="${t('project.removeAudio')}">${getIcon('trash-2')}</button>` : ''}
+          <td style="text-align:center; vertical-align:middle;">
+            <div class="flex-gap" style="justify-content:center;">
+                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn btn-secondary btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-change="${asset.sdefPath}" title="${t('project.replace')}">${getIcon('refresh-cw', 'w-4 h-4')}</button>` : ''}
+                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn btn-danger btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-remove-audio="${asset.sdefPath}" title="${t('project.removeAudio')}">${getIcon('trash-2', 'w-4 h-4')}</button>` : ''}
             </div>
           </td>
-          <td>
-            <button class="btn-icon" data-edit-sdef="${asset.sdefPath}" title="${t('project.editSdef')}">${getIcon('sliders')}</button>
+          <td style="text-align:center; vertical-align:middle;">
+            <button class="btn btn-secondary btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-edit-sdef="${asset.sdefPath}" title="${t('project.editSdef')}">${getIcon('sliders', 'w-4 h-4')}</button>
           </td>
-          <td>
-            <button class="btn-icon danger" data-deselect="${asset.sdefPath}" title="${t('project.remove')}">${getIcon('x')}</button>
+          <td style="text-align:center; vertical-align:middle;">
+            <button class="btn btn-danger btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-deselect="${asset.sdefPath}" title="${t('project.remove')}">${getIcon('x', 'w-4 h-4')}</button>
           </td>
         </tr>
       `;
@@ -364,23 +377,50 @@ function attachProjectHandlers(container) {
 
       if (choice === 'cancel' || !choice) return;
       if (choice === 'save-load') {
+        const { saveAllUnsavedSdefs } = await import('../state/store.js');
         saveAllUnsavedSdefs();
       }
     }
 
+    // Ask user: .zip or folder?
+    const { showModal } = await import('../components/modal.js');
+    const fmt = await showModal({
+      title: 'Load Format',
+      content: `<p>How is your mod packaged?</p>`,
+      actions: [
+        { id: 'cancel', label: 'Cancel', class: 'btn-secondary' },
+        { id: 'zip', label: '&#x1F4E6; ZIP Archive (.zip)', class: 'btn-primary' },
+        { id: 'folder', label: '&#x1F4C1; Unzipped Folder', class: 'btn-secondary' }
+      ]
+    });
+    if (!fmt || fmt === 'cancel') return;
+
     try {
-      const { pickFiles } = await import('../utils/file-picker.js');
-      const files = await pickFiles({ accept: '.zip' });
-      if (files.length === 0) return;
-
-      showToast('Loading mod...', 'info');
-      const { loadModFromZip } = await import('../utils/mod-loader.js');
-      const modData = await loadModFromZip(files[0]);
-
-      const { importModData } = await import('../state/store.js');
-      await importModData(modData);
-
-      showToast('Mod loaded successfully', 'success');
+      if (fmt === 'zip') {
+        const { pickFiles } = await import('../utils/file-picker.js');
+        const files = await pickFiles({ accept: '.zip' });
+        if (!files.length) return;
+        showToast('Loading mod from ZIP…', 'info');
+        const { loadModFromZip } = await import('../utils/mod-loader.js');
+        const modData = await loadModFromZip(files[0]);
+        const { importModData } = await import('../state/store.js');
+        await importModData(modData);
+        showToast('Mod loaded successfully', 'success');
+      } else {
+        // Folder — use Electron API to pick a directory
+        if (!window.electronAPI?.pickFolder) {
+          showToast('Folder pick not available in browser mode', 'warning');
+          return;
+        }
+        const folderPath = await window.electronAPI.pickFolder();
+        if (!folderPath) return;
+        showToast('Loading mod from folder…', 'info');
+        const { loadModFromFolder } = await import('../utils/mod-loader.js');
+        const modData = await loadModFromFolder(folderPath);
+        const { importModData } = await import('../state/store.js');
+        await importModData(modData);
+        showToast('Mod loaded from folder successfully', 'success');
+      }
       renderProject(document.getElementById('page-container'));
     } catch (e) {
       if (e.name !== 'AbortError') {

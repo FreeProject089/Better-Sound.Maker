@@ -7,13 +7,13 @@ import {
   getState, isAssetSelected, toggleAsset, selectAsset, deselectAsset,
   setLibraryData, setAudioFile, getAudioFile, removeAudioFile,
   setAssetNote, getAssetNote, loadLibraryFromStorage, saveLibraryToStorage,
-  setWaveAudioFile, getWaveAudioFile
+  setWaveAudioFile, getWaveAudioFile, setGlobalSettings
 } from '../state/store.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { t, updateTranslations } from '../utils/i18n.js';
 import { parseSdefList } from '../data/sdef-parser.js';
 import { showToast } from '../components/toast.js';
-import { guessLoopType, detectSoundType, SOUND_TYPES, analyzeAudioFile } from '../utils/audio-analyzer.js';
+import { guessLoopType, detectSoundType, SOUND_TYPES, analyzeAudioFile, ensureRulesLoaded, getTypeIconHtml } from '../utils/audio-analyzer.js';
 import { pickTextFile, pickJsonFile } from '../utils/file-picker.js';
 import { showModal } from '../components/modal.js';
 
@@ -34,6 +34,7 @@ let listContainer = null;
 let selectedDetailAsset = null;
 
 export async function renderLibrary(container) {
+  await ensureRulesLoaded();
   container.innerHTML = `
     <div class="page-header" style="margin-bottom:16px;">
       <h1 class="page-title" data-i18n="library.title">Assets Library</h1>
@@ -65,7 +66,7 @@ export async function renderLibrary(container) {
           <div data-i18n="library.waves">Wave(s)</div>
           <div data-i18n="library.type">Type</div>
           <div data-i18n="library.loop">Loop</div>
-          <div data-i18n="library.note">Note</div>
+          <div>Note</div>
         </div>
         <div id="asset-list" class="asset-list-container" style="flex:1; position:relative;"></div>
       </div>
@@ -111,7 +112,7 @@ export async function renderLibrary(container) {
   document.getElementById('deselect-all-btn').addEventListener('click', deselectAll);
   document.getElementById('import-btn')?.addEventListener('click', handleImportClick);
   document.getElementById('export-library-btn')?.addEventListener('click', exportLibrary);
-  document.getElementById('reload-library-btn').addEventListener('click', reloadLibrary);
+  document.getElementById('reload-library-btn').addEventListener('click', () => openScannerModal(false));
 
   listContainer = document.getElementById('asset-list');
   listContainer.addEventListener('scroll', () => renderVirtualList());
@@ -140,25 +141,14 @@ async function loadLibraryData() {
       return;
     }
 
-    if (loaderSub) loaderSub.textContent = t('library.downloadingData') || "Downloading DCS Data...";
-    // Fallback to fetch default (now from public folder) with cache busting
-    const resp = await fetch(`./sdef_and_wave_list.txt?v=${Date.now()}`);
-    const text = await resp.text();
+    const state = getState();
+    // First launch detection
+    if (!state.globalSettings.dcsPath) {
+      await openScannerModal(true);
+      return;
+    }
 
-    if (loaderSub) loaderSub.textContent = t('library.parsingData') || "Parsing database models... This may take a moment.";
-    // Allow DOM to yield the heavy parsing to display text
-    await new Promise(r => setTimeout(r, 20));
-
-    const data = parseSdefList(text);
-
-    setLibraryData(data);
-    await saveLibraryToStorage(data);
-
-    if (loaderSub) loaderSub.textContent = t('library.buildingFolders') || "Building folder structures...";
-    await new Promise(r => setTimeout(r, 10));
-    allAssets = data.sections.flatMap(s => s.assets);
-    folderTree = buildFolderTree(allAssets);
-    showToast(`Loaded ${allAssets.length} assets`, 'success');
+    await loadLibraryFallback();
   } catch (e) {
     showToast('Failed to load asset library: ' + e.message, 'error');
   } finally {
@@ -167,7 +157,37 @@ async function loadLibraryData() {
   }
 }
 
+async function loadLibraryFallback() {
+  const loaderSub = document.getElementById('loader-subtext');
+  if (loaderSub) loaderSub.textContent = t('library.downloadingData') || "Downloading DCS Data...";
+  // Fallback to fetch default (now from public folder) with cache busting
+  const resp = await fetch(`./sdef_and_wave_list.txt?v=${Date.now()}`);
+  const text = await resp.text();
+
+  if (loaderSub) loaderSub.textContent = t('library.parsingData') || "Parsing database models... This may take a moment.";
+  // Allow DOM to yield the heavy parsing to display text
+  await new Promise(r => setTimeout(r, 20));
+
+  const data = parseSdefList(text);
+
+  setLibraryData(data);
+  await saveLibraryToStorage(data);
+
+  if (loaderSub) loaderSub.textContent = t('library.buildingFolders') || "Building folder structures...";
+  await new Promise(r => setTimeout(r, 10));
+  allAssets = data.sections.flatMap(s => s.assets);
+  folderTree = buildFolderTree(allAssets);
+  showToast(`Loaded ${allAssets.length} assets`, 'success');
+
+  currentPath = [];
+  renderFolderTree();
+  applyFilter();
+  renderStats();
+}
+
 async function reloadLibrary() {
+  // Keep original manual reload logic if user wants to use manual file picker
+  // But now this is secondary, the main reload button calls openScannerModal directly
   try {
     const file = await pickTextFile();
     const text = await file.text();
@@ -610,6 +630,25 @@ function applyFilter() {
   renderVirtualList(true);
 }
 
+/**
+ * Strip all known type labels from a note string.
+ * Removes occurrences like "(Radio / Comm)", "(Engine)", etc. that already appear in the Type column.
+ */
+function stripTypeLabels(note) {
+  if (!note || !SOUND_TYPES) return note;
+  // Build list of labels to strip from note (case-insensitive)
+  const labels = Object.values(SOUND_TYPES).map(t => t.label).filter(Boolean);
+  if (labels.length === 0) return note;
+  // Escape special characters for regex
+  const escaped = labels.map(l => l.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  // Remove labels in parens: "(Radio / Comm)" → ""
+  const parenRegex = new RegExp(`\\s*\\(?\\s*(${escaped.join('|')})\\s*\\)?\\s*`, 'gi');
+  let cleaned = note.replace(parenRegex, ' ').trim();
+  // Remove leading/trailing dashes, colons, semicolons left behind
+  cleaned = cleaned.replace(/^[\s\-:;,]+|[\s\-:;,]+$/g, '').trim();
+  return cleaned;
+}
+
 function renderVirtualList(reset = false) {
   if (!listContainer) return;
   if (reset) listContainer.scrollTop = 0;
@@ -635,15 +674,21 @@ function renderVirtualList(reset = false) {
         ? '<span class="tag tag-amber">one-shot</span>'
         : '';
 
-    const note = getAssetNote(asset.sdefPath);
+    const rawNote = getAssetNote(asset.sdefPath);
     const hasAudio = !!getAudioFile(asset.sdefPath);
     const isActive = selectedDetailAsset?.sdefPath === asset.sdefPath;
 
     const audioIndicator = hasAudio
       ? `<span class="asset-audio-dot" title="Audio uploaded">${getIcon('music', 'w-3 h-3')}</span>`
       : '';
+    const typeIconHtml = getTypeIconHtml(typeInfo, 'w-3 h-3');
+    // Strip all type labels from note display (they're shown in the Type column)
+    const note = rawNote ? stripTypeLabels(rawNote) : '';
+    const NOTE_MAX = 28;
     const noteSnippet = note
-      ? `<span class="asset-note-snippet" title="${note.replace(/"/g, '&quot;')}">${note.slice(0, 30)}${note.length > 30 ? '…' : ''}</span>`
+      ? (note.length > NOTE_MAX
+        ? `<span class="asset-note-snippet"><span title="${note.replace(/"/g, '&quot;')}">${note.slice(0, NOTE_MAX)}…</span><button class="btn-expand-note" data-note="${note.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" title="View full note" style="background:var(--bg-surface);border:1px solid var(--border-subtle);color:var(--accent-blue);font-size:11px;cursor:pointer;padding:2px 5px;border-radius:4px;margin-left:4px;vertical-align:middle;line-height:1;display:inline-flex;align-items:center;">${getIcon('expand', 'w-3 h-3')}</button></span>`
+        : `<span class="asset-note-snippet" title="${note.replace(/"/g, '&quot;')}">${note}</span>`)
       : '<span style="color:var(--text-muted);font-size:11px;">—</span>';
 
     html += `
@@ -655,14 +700,15 @@ function renderVirtualList(reset = false) {
             <input type="checkbox" ${selected ? 'checked' : ''} data-sdef="${asset.sdefPath}" />
           </label>
         </div>
-        <div class="asset-sdef-path truncate" title="${asset.sdefPath}">
-          ${audioIndicator}${asset.sdefPath}
+        <div class="asset-sdef-path truncate" style="line-height: 1.2; display: flex; flex-direction: column; justify-content: center;" title="${asset.sdefPath}">
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-color);">${audioIndicator}${asset.name}</div>
+          <div class="truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${asset.sdefPath}">${asset.sdefPath}</div>
         </div>
         <div class="asset-wave-paths truncate" title="${asset.waves.join(', ')}">
           ${asset.waves.join(', ') || '—'}
         </div>
         <div>
-          <span class="tag" title="${typeInfo.description}" style="font-size:10px;">${typeInfo.icon} ${typeInfo.label}</span>
+          <span class="tag" title="${typeInfo.description}" style="font-size:10px; display:inline-flex; align-items:center; gap:4px;">${typeIconHtml} ${typeInfo.label}</span>
         </div>
         <div>${loopTag}</div>
         <div>${noteSnippet}</div>
@@ -673,6 +719,19 @@ function renderVirtualList(reset = false) {
   html += '</div>';
   listContainer.innerHTML = html;
   renderIcons(listContainer);
+
+  // Expand-note modal
+  listContainer.querySelectorAll('.btn-expand-note').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const { showModal } = await import('../components/modal.js');
+      await showModal({
+        title: 'Note',
+        content: `<div style="white-space:pre-wrap; font-size:13px; color:var(--text-secondary); max-height:400px; overflow-y:auto; padding:4px 0;">${btn.dataset.note}</div>`,
+        actions: [{ id: 'close', label: 'Close', class: 'btn-secondary' }]
+      });
+    });
+  });
 
   // Checkbox handlers
   listContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
@@ -931,4 +990,268 @@ function debounce(fn, delay) {
     clearTimeout(timer);
     timer = setTimeout(() => fn(...args), delay);
   };
+}
+
+// ───────────────────────────────────────────────
+// DCS SCANNER INTEGRATION
+// ───────────────────────────────────────────────
+
+async function openScannerModal(isFirstLaunch = false) {
+  const { globalSettings } = getState();
+  let dcsPath = globalSettings.dcsPath || '';
+  let savedGamesPath = globalSettings.savedGamesPath || '';
+
+  // Auto detect if empty
+  if (!dcsPath && window.electronAPI) {
+    const dcsDefault = 'C:/Program Files/Eagle Dynamics/DCS World';
+    if (await window.electronAPI.exists(dcsDefault)) dcsPath = dcsDefault;
+  }
+
+  if (!savedGamesPath && window.electronAPI) {
+    const home = await window.electronAPI.getUserHome();
+    const sgDefault = home ? `${home}/Saved Games/DCS` : '';
+    // Let's also check DCS.openbeta as a fallback if plain DCS isn't there, 
+    // even though user said no more openbeta, it doesn't hurt to check if 'DCS' doesn't exist.
+    if (sgDefault && await window.electronAPI.exists(sgDefault)) {
+      savedGamesPath = sgDefault;
+    }
+  }
+
+  const modalHtml = `
+    <div style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">
+      ${isFirstLaunch ? t('library.scanner.welcome') : t('library.scanner.rescan')}
+      <br/><br/>
+      <div style="color: var(--accent-amber); padding: 8px; background: rgba(255, 193, 7, 0.1); border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+        ${getIcon('alert-triangle', 'w-5 h-5')} <div><b>${t('library.scanner.recommendation')}:</b> ${t('library.scanner.recommendationText')}</div>
+      </div>
+    </div>
+    <div style="margin-bottom: 15px;">
+      <label style="display:block; margin-bottom:5px; font-weight: 500;">${t('library.scanner.dcsLabel')}</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="scan-dcs-path" class="input-field" style="flex:1" value="${dcsPath}" placeholder="${t('library.scanner.dcsPlaceholder')}" />
+        <button class="btn btn-secondary" id="browse-dcs-btn">${getIcon('folder')}</button>
+      </div>
+    </div>
+    <div style="margin-bottom: 15px;">
+      <label style="display:block; margin-bottom:5px; font-weight: 500;">${t('library.scanner.sgLabel')}</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="scan-sg-path" class="input-field" style="flex:1" value="${savedGamesPath}" placeholder="${t('library.scanner.sgPlaceholder')}" />
+        <button class="btn btn-secondary" id="browse-sg-btn">${getIcon('folder')}</button>
+      </div>
+    </div>
+    <div style="margin-bottom: 15px; font-size: 12px; color: var(--text-muted);">
+      <p>${t('library.scanner.desc')}</p>
+    </div>
+  `;
+
+  let finalDcsPath = '';
+  let finalSgPath = '';
+
+  const action = await showModal({
+    title: t('library.scanner.title'),
+    content: modalHtml,
+    actions: [
+      { id: 'start-scan', label: t('library.scanner.start'), class: 'btn-primary' },
+      { id: 'manual-load', label: t('library.scanner.manual'), class: 'btn-secondary', title: t('library.scanner.manualTip') },
+      { id: 'cancel', label: t('library.scanner.cancel'), class: 'btn-secondary' }
+    ],
+    onRender: (modalEl) => {
+      if (window.electronAPI) {
+        modalEl.querySelector('#browse-dcs-btn').addEventListener('click', async () => {
+          const res = await window.electronAPI.selectDirectory();
+          if (res) modalEl.querySelector('#scan-dcs-path').value = res;
+        });
+        modalEl.querySelector('#browse-sg-btn').addEventListener('click', async () => {
+          const res = await window.electronAPI.selectDirectory();
+          if (res) modalEl.querySelector('#scan-sg-path').value = res;
+        });
+      }
+    },
+    onClose: (modalEl, act) => {
+      if (act === 'start-scan') {
+        const dcsInput = modalEl.querySelector('#scan-dcs-path');
+        const sgInput = modalEl.querySelector('#scan-sg-path');
+        if (dcsInput) finalDcsPath = dcsInput.value.trim();
+        if (sgInput) finalSgPath = sgInput.value.trim();
+      }
+    }
+  });
+
+  if (action === 'start-scan') {
+    setGlobalSettings({ dcsPath: finalDcsPath, savedGamesPath: finalSgPath });
+    await runDcsScanner(finalDcsPath, finalSgPath);
+  } else if (action === 'manual-load') {
+    await reloadLibrary(); // the old manual file picker logic
+  } else if (isFirstLaunch) {
+    // If they cancel first launch, load fallback
+    await loadLibraryFallback();
+  }
+}
+
+async function runDcsScanner(dcsPath, sgPath) {
+  const loaderSub = document.getElementById('loader-subtext');
+  showToast(t('library.scanner.toast'), 'info');
+
+  try {
+    let combinedData = { sections: [] };
+    let totalAssetsCount = 0;
+
+    // 1. Read base list
+    if (dcsPath && window.electronAPI) {
+      if (loaderSub) loaderSub.textContent = "Parsing base sdef list...";
+      const basePath = dcsPath + '/Doc/Sounds/sdef_and_wave_list.txt';
+      if (await window.electronAPI.exists(basePath)) {
+        const text = await window.electronAPI.readTextFile(basePath);
+        if (text) {
+          const baseData = parseSdefList(text);
+          combinedData.sections.push(...baseData.sections);
+          totalAssetsCount += baseData.sections.reduce((acc, sec) => acc + sec.assets.length, 0);
+        }
+      } else {
+        showToast('Could not find base list in Doc/Sounds/sdef_and_wave_list.txt', 'warning');
+        // We can still continue to scan CoreMods though
+      }
+    }
+
+    // 2. Scan CoreMods
+    if (dcsPath && window.electronAPI) {
+      if (loaderSub) loaderSub.textContent = "Scanning CoreMods for sdefs...";
+      showToast('Scanning CoreMods. This may take a while...', 'info');
+      const coreModsPath = dcsPath + '/CoreMods';
+      if (await window.electronAPI.exists(coreModsPath)) {
+        const sdefs = await window.electronAPI.scanSdefs(coreModsPath);
+
+        const coreSectionMap = {};
+
+        for (const sdef of sdefs) {
+          const sPath = sdef.relPath.replace(/\\/g, '/');
+          let localPath = sPath;
+          let modRoot = sPath.substring(0, sPath.lastIndexOf('/'));
+
+          const lowerSPath = sPath.toLowerCase();
+
+          if (lowerSPath.includes('/sounds/sdef/')) {
+            const idx = lowerSPath.indexOf('/sounds/sdef/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 13);
+          } else if (lowerSPath.includes('sounds/sdef/')) {
+            const idx = lowerSPath.indexOf('sounds/sdef/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 12);
+          } else if (lowerSPath.includes('/sounds/')) {
+            const idx = lowerSPath.indexOf('/sounds/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 8);
+          } else if (lowerSPath.includes('sounds/')) {
+            const idx = lowerSPath.indexOf('sounds/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 7);
+          }
+
+          if (modRoot.endsWith('/')) modRoot = modRoot.substring(0, modRoot.length - 1);
+
+          const modName = sPath.split('/')[1] || 'UnknownMod'; // e.g. aircraft/<ModName> => <ModName>
+          const sectionName = `CoreMods: ${modName}`;
+          const treePath = modRoot ? `[CoreMods]/${modRoot}/${localPath.replace(/\.sdef$/i, '')}` : `[CoreMods]/${localPath.replace(/\.sdef$/i, '')}`;
+
+          const asset = {
+            sdefPath: localPath,
+            name: localPath.split('/').pop(),
+            waves: sdef.waves,
+            treePath: treePath,
+            customSdefContent: sdef.content,
+            sectionName: sectionName
+          };
+
+          if (!coreSectionMap[sectionName]) {
+            coreSectionMap[sectionName] = { name: sectionName, modPrefix: `CoreMods/${modName}`, assets: [] };
+          }
+          coreSectionMap[sectionName].assets.push(asset);
+          totalAssetsCount++;
+        }
+
+        for (const key in coreSectionMap) {
+          if (coreSectionMap[key].assets.length > 0) {
+            combinedData.sections.push(coreSectionMap[key]);
+          }
+        }
+      }
+    }
+
+    // 3. Scan Saved Games Mods
+    if (sgPath && window.electronAPI) {
+      if (loaderSub) loaderSub.textContent = "Scanning Saved Games Mods...";
+      const sgModsPath = sgPath + '/Mods';
+      if (await window.electronAPI.exists(sgModsPath)) {
+        const sdefs = await window.electronAPI.scanSdefs(sgModsPath);
+        const sgSection = { name: "SavedGames Mods", modPrefix: "SavedGames Mods", assets: [] };
+
+        for (const sdef of sdefs) {
+          const sPath = sdef.relPath.replace(/\\/g, '/');
+          let localPath = sPath;
+          let modRoot = sPath.substring(0, sPath.lastIndexOf('/'));
+
+          const lowerSPath = sPath.toLowerCase();
+
+          if (lowerSPath.includes('/sounds/sdef/')) {
+            const idx = lowerSPath.indexOf('/sounds/sdef/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 13);
+          } else if (lowerSPath.includes('sounds/sdef/')) {
+            const idx = lowerSPath.indexOf('sounds/sdef/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 12);
+          } else if (lowerSPath.includes('/sounds/')) {
+            const idx = lowerSPath.indexOf('/sounds/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 8);
+          } else if (lowerSPath.includes('sounds/')) {
+            const idx = lowerSPath.indexOf('sounds/');
+            modRoot = sPath.substring(0, idx);
+            localPath = sPath.substring(idx + 7);
+          }
+
+          if (modRoot.endsWith('/')) modRoot = modRoot.substring(0, modRoot.length - 1);
+
+          const treePath = modRoot ? `[SavedGames]/${modRoot}/${localPath.replace(/\.sdef$/i, '')}` : `[SavedGames]/${localPath.replace(/\.sdef$/i, '')}`;
+
+          const asset = {
+            sdefPath: localPath,
+            name: localPath.split('/').pop(),
+            waves: sdef.waves,
+            treePath: treePath,
+            customSdefContent: sdef.content,
+            sectionName: "SavedGames Mods"
+          };
+          sgSection.assets.push(asset);
+          totalAssetsCount++;
+        }
+        if (sgSection.assets.length > 0) {
+          combinedData.sections.push(sgSection);
+        }
+      }
+    }
+
+    if (totalAssetsCount === 0) {
+      showToast('No assets found during scan. Check paths.', 'warning');
+      return;
+    }
+
+    setLibraryData(combinedData);
+    await saveLibraryToStorage(combinedData);
+
+    allAssets = combinedData.sections.flatMap(s => s.assets);
+    folderTree = buildFolderTree(allAssets);
+    currentPath = [];
+    renderFolderTree();
+    applyFilter();
+    renderStats();
+    showToast(`Scan complete. Loaded ${totalAssetsCount} assets`, 'success');
+  } catch (e) {
+    console.error(e);
+    showToast('Scanner failed: ' + e.message, 'error');
+  } finally {
+    renderIcons(document.getElementById('page-container'));
+    updateTranslations();
+  }
 }

@@ -2,9 +2,11 @@
  * modal.js — Modal dialog system
  */
 
+import { renderIcons } from '../utils/icons.js';
+
 let overlay = null;
 
-export function showModal({ title, content, actions = [] }) {
+export function showModal({ title, content, actions = [], onRender = null, onClose = null }) {
     overlay = document.getElementById('modal-overlay');
     if (!overlay) return;
 
@@ -25,23 +27,27 @@ export function showModal({ title, content, actions = [] }) {
 
     overlay.classList.remove('hidden');
 
-    // Close button
-    overlay.querySelector('#modal-close-btn').addEventListener('click', hideModal);
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) hideModal();
-    });
+    if (onRender) onRender(overlay);
+    renderIcons(overlay);
 
     // Action buttons
     return new Promise(resolve => {
-        overlay.querySelectorAll('[data-action]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                resolve(btn.dataset.action);
-                hideModal();
-            });
+        const cleanup = (val) => {
+            if (onClose) onClose(overlay, val);
+            hideModal();
+            resolve(val);
+        };
+
+        // Close button
+        overlay.querySelector('#modal-close-btn').addEventListener('click', () => cleanup(null));
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) cleanup(null);
         });
 
-        overlay.querySelector('#modal-close-btn').addEventListener('click', () => {
-            resolve(null);
+        overlay.querySelectorAll('[data-action]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                cleanup(btn.dataset.action);
+            });
         });
     });
 }

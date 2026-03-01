@@ -17,6 +17,7 @@ import { renderDocs } from './pages/docs.js';
 import { renderFaq } from './pages/faq.js';
 import { renderCredits } from './pages/credits.js';
 import { renderCollaboration } from './pages/collaboration.js';
+import { renderCustomTypes } from './pages/customTypes.js';
 import { getState, subscribe, navigate } from './state/store.js';
 
 // Page renderers map
@@ -27,6 +28,7 @@ const pages = {
     'theme': renderTheme,
     'presets': renderPresets,
     'collaboration': renderCollaboration,
+    'custom-types': renderCustomTypes,
     'build': renderBuild,
     'settings': renderSettings,
     'docs': renderDocs,
@@ -34,7 +36,7 @@ const pages = {
     'credits': renderCredits
 };
 
-const CURRENT_VERSION = '1.0.5';
+const CURRENT_VERSION = '1.0.6';
 const LAST_VERSION_KEY = 'bsm-last-run-version';
 
 // Simple Markdown parser
@@ -190,6 +192,16 @@ async function showAllReleaseNotes() {
 
 // Initialize app
 async function init() {
+    // Parse Load.cfg immediately
+    const cfg = {};
+    rawCfg.split('\n').forEach(line => {
+        if (line.includes('=')) {
+            const [k, v] = line.split('=');
+            cfg[k.trim()] = v.trim();
+        }
+    });
+    window.APP_CONFIG = cfg;
+
     // Start Loader Image swapping
     let spinImg = document.getElementById('loader-img-spin');
     let useYeux = false;
@@ -306,16 +318,7 @@ async function init() {
 }
 
 function initDebugPanel() {
-    // Parse Load.cfg
-    const cfg = {};
-    rawCfg.split('\n').forEach(line => {
-        if (line.includes('=')) {
-            const [k, v] = line.split('=');
-            cfg[k.trim()] = v.trim();
-        }
-    });
-
-    window.APP_CONFIG = cfg;
+    const cfg = window.APP_CONFIG || {};
 
     if (cfg['ProdMode'] === 'false') {
         const panel = document.createElement('div');

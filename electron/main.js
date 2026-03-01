@@ -206,8 +206,64 @@ ipcMain.handle('fs:readDir', async (_event, dirPath) => {
     }
 });
 
+// Check if path exists
+ipcMain.handle('fs:exists', async (_event, checkPath) => {
+    return fs.existsSync(checkPath);
+});
+
+// Scan directory recursively for .sdef files and quick parse
+ipcMain.handle('fs:scanSdefs', async (_event, rootPath) => {
+    const results = [];
+    try {
+        const walk = (dir) => {
+            if (!fs.existsSync(dir)) return;
+            const items = fs.readdirSync(dir, { withFileTypes: true });
+            for (const item of items) {
+                const fullPath = path.join(dir, item.name);
+                if (item.isDirectory()) {
+                    walk(fullPath);
+                } else if (item.name.toLowerCase().endsWith('.sdef')) {
+                    try {
+                        const content = fs.readFileSync(fullPath, 'utf8');
+                        const waves = [];
+                        const lines = content.split(/\r?\n/);
+                        for (const line of lines) {
+                            const trimmed = line.trim();
+                            if (trimmed.startsWith('wave') && trimmed.includes('"')) {
+                                const match = trimmed.match(/"([^"]+)"/);
+                                if (match) {
+                                    let wPath = match[1].replace(/\\\\/g, '/');
+                                    // Strip leading slash if any
+                                    if (wPath.startsWith('/')) wPath = wPath.slice(1);
+                                    waves.push(wPath);
+                                }
+                            }
+                        }
+                        // Make paths relative to the rootPath provided, uniformly using forward slashes
+                        const relPath = path.relative(rootPath, fullPath).replace(/\\\\/g, '/');
+                        results.push({
+                            relPath,
+                            content: content,
+                            waves
+                        });
+                    } catch (e) {
+                        // ignore unreadable files
+                    }
+                }
+            }
+        };
+        walk(rootPath);
+    } catch (e) {
+        console.error('fs:scanSdefs error:', e);
+    }
+    return results;
+});
+
 // Get app root path
 ipcMain.handle('app:getPath', () => app.getAppPath());
+
+// Get user home path
+ipcMain.handle('app:getUserHome', () => app.getPath('home'));
 
 // Check for updates manually
 ipcMain.handle('app:checkForUpdates', async () => {

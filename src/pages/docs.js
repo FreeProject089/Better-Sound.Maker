@@ -17,6 +17,7 @@ export function renderDocs(container) {
       <div class="tab active" data-tab="audio">${getIcon('music', 'w-4 h-4')} ${t('docs.tabs.audio')}</div>
       <div class="tab" data-tab="sdef">${getIcon('file-text', 'w-4 h-4')} ${t('docs.tabs.sdef')}</div>
       <div class="tab" data-tab="sdeflist">${getIcon('list', 'w-4 h-4')} ${t('docs.tabs.sdeflist') || 'Sdef List'}</div>
+      <div class="tab" data-tab="types">${getIcon('tag', 'w-4 h-4')} ${t('docs.tabs.types') || 'Sound Types'}</div>
       <div class="tab" data-tab="theme">${getIcon('image', 'w-4 h-4')} ${t('docs.tabs.theme')}</div>
       <div class="tab" data-tab="install">${getIcon('download', 'w-4 h-4')} ${t('docs.tabs.install')}</div>
     </div>
@@ -44,6 +45,7 @@ function showTab(tab) {
     case 'audio': el.innerHTML = audioGuide(); break;
     case 'sdef': el.innerHTML = sdefGuide(); break;
     case 'sdeflist': el.innerHTML = sdeflistGuide(); break;
+    case 'types': el.innerHTML = typesGuide(); break;
     case 'theme': el.innerHTML = themeGuide(); break;
     case 'install': el.innerHTML = installGuide(); break;
   }
@@ -275,7 +277,91 @@ function sdeflistGuide() {
     <pre>\\DCS World\\Doc\\Sounds\\sdef_and_wave_list.txt</pre>
     <div class="tip-box">
       ${t('docs.sdeflist.tip') || 'You can find it in the installation directory of DCS World. Usually located in your Program Files or Saved Games depending on your setup.'}
+      <br><br>💡 <b>Note:</b> Better ModMaker now includes a native Scanner that automatically finds this file and scans your CoreMods/Saved Games!
     </div>
+  `;
+}
+
+function typesGuide() {
+  return `
+    <h2>${t('docs_content.types.title') || 'Custom Sound Types & Regex Rules'}</h2>
+    <p>${t('docs_content.types.intro') || 'The Asset Library uses <strong>Regex (Regular Expressions)</strong> to automatically categorize your sounds based on their SDEF file paths. By default, the app can spot Radios, Weapons, Engines, etc. But if you work on a specific mod, you might want to create your own types!'}</p>
+    
+    <h3>${t('docs_content.types.whatIsRegex') || 'What is a Regex Pattern?'}</h3>
+    <p>${t('docs_content.types.regexDesc') || 'A Regex pattern is a sequence of characters that specifies a search pattern in text. When ModMaker scans a file like <code>Effects/Aircrafts/F16/Engine/Burner.sdef</code>, it tests your rules to see which Custom Type to assign.'}</p>
+
+    <div class="doc-reference-grid" style="margin-top: 16px;">
+        <div class="ref-section-card">
+            <div class="ref-card-header"><strong>${t('docs_content.types.basic.title') || 'Basic Word Matching'}</strong></div>
+            <div class="ref-card-details">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${t('docs_content.types.basic.desc') || 'Just type the folder or word you want to find. It is case-insensitive.'}</p>
+                <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 8px;">
+                    Pattern: <code>afterburner</code><br>
+                    Matches: <code>.../Engine/<b>afterburner</b>.sdef</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-section-card">
+            <div class="ref-card-header"><strong>${t('docs_content.types.or.title') || 'The OR Operator (|)'}</strong></div>
+            <div class="ref-card-details">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${t('docs_content.types.or.desc') || 'Use the vertical pipe symbol <code>|</code> to say "Match this OR that". Perfect for grouping multiple folders.'}</p>
+                <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 8px;">
+                    Pattern: <code>gun|cannon|vulcan</code><br>
+                    Matches: <code>.../<b>gun</b>_fire.sdef</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-section-card">
+            <div class="ref-card-header"><strong>${t('docs_content.types.strict.title') || 'Strict Matching (^ and $)'}</strong></div>
+            <div class="ref-card-details">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${t('docs_content.types.strict.desc') || 'Use <code>^</code> for the start of the path, and <code>$</code> for the end.'}</p>
+                <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-bottom: 8px;">
+                    Pattern: <code>alerts/.*\\.sdef$</code><br>
+                    Matches only items ending in .sdef inside an exact 'alerts' structure.
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-section-card">
+            <div class="ref-card-header"><strong>${t('docs_content.types.examples.title') || 'Practical Examples'}</strong></div>
+            <div class="ref-card-details">
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${t('docs_content.types.examples.desc') || 'Common use-cases when creating custom types for DCS.'}</p>
+                
+                <div style="margin-bottom: 12px;">
+                    <strong style="font-size: 12px; color: var(--text-primary);">${t('docs_content.types.examples.ex1Title') || 'Ex 1: All F-16 Engines'}</strong>
+                    <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-top: 4px;">
+                        Pattern: <code>f16.*/engine</code><br>
+                        Matches: <code>Aircrafts/<b>F16/Engine</b>/Burner.sdef</code>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 12px;">
+                    <strong style="font-size: 12px; color: var(--text-primary);">${t('docs_content.types.examples.ex2Title') || 'Ex 2: Specific Weapons'}</strong>
+                    <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-top: 4px;">
+                        Pattern: <code>aim9|aim120|sparrow</code><br>
+                        Matches: <code>Weapons/Missiles/<b>aim120</b>_launch.sdef</code>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 4px;">
+                    <strong style="font-size: 12px; color: var(--text-primary);">${t('docs_content.types.examples.ex3Title') || 'Ex 3: Exact file match'}</strong>
+                    <div style="background: var(--bg-surface); padding: 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-top: 4px;">
+                        Pattern: <code>cockpit/warning_beep\\.sdef$</code><br>
+                        Matches exactly that file, not <code>warning_beep_2.sdef</code>.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tip-box" style="margin-top: 24px;">
+      ${getIcon('alert-triangle', 'w-4 h-4')} <strong>${t('docs_content.types.priorityTitle') || 'Rule Priority:'}</strong> ${t('docs_content.types.priorityDesc') || 'Custom Rules are evaluated FIRST, top to bottom. If no custom rule matches the SDEF path, the built-in default rules are then used.'}
+    </div>
+
+    <h3>${t('docs_content.types.share.title') || 'Sharing Types'}</h3>
+    <p>${t('docs_content.types.share.desc') || 'Once you have created types for your mod (e.g., F-14 RIO chatter, F-16 MFD buttons), you can export them. Even better, when you share a Presets file, you can embed your Custom Types into it! When someone imports your preset, ModMaker will automatically install the missing Types and Icons into their library.'}</p>
   `;
 }
 
@@ -401,7 +487,7 @@ function installGuide() {
     <ol>
       <li>${t('docs_content.install.step1')}
         <pre>C:\\Users\\&lt;your username&gt;\\Saved Games\\DCS\\Mods\\resource\\</pre>
-        <p style="font-size: 12px; color: var(--text-muted);">If the <code>resource</code> folder doesn't exist, create it.</p>
+        <p style="font-size: 12px; color: var(--text-muted);">${t('docs_content.install.tip1')}</p>
       </li>
       <li>${t('docs_content.install.step2')}</li>
       <li>${t('docs_content.install.step3')}</li>
@@ -409,7 +495,7 @@ function installGuide() {
     </ol>
 
     <div class="warning-box">
-      <strong>DCS Variant Suffixes:</strong> If you use DCS Open Beta, your saved games folder may be <code>DCS.openbeta</code> instead of <code>DCS</code>. Check which version you're running.
+      ${t('docs_content.install.variantWarning')}
     </div>
 
     <h3>${t('docs_content.install.folderStructure')}</h3>
@@ -428,10 +514,10 @@ function installGuide() {
 
     <h3>${t('docs_content.install.trouble')}</h3>
     <ul>
-      <li><strong>Sounds not playing:</strong> Check that your SDEF <code>wave</code> paths match the actual file locations in <code>Sounds/Effects/</code>.</li>
-      <li><strong>Default sounds still play:</strong> Make sure <code>mount_vfs_sound_path</code> is present in entry.lua and the SDEF path matches the original DCS path exactly.</li>
-      <li><strong>Theme not showing:</strong> Verify the <code>Skins</code> section exists in entry.lua and <code>mount_vfs_texture_path</code> is called.</li>
-      <li><strong>Mod not detected:</strong> Make sure the mod is in the correct <code>Mods/resource/</code> directory for your DCS version.</li>
+      <li>${t('docs_content.install.trouble1')}</li>
+      <li>${t('docs_content.install.trouble2')}</li>
+      <li>${t('docs_content.install.trouble3')}</li>
+      <li>${t('docs_content.install.trouble4')}</li>
     </ul>
 
     <h3>${t('docs_content.install.links')}</h3>

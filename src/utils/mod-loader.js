@@ -85,7 +85,8 @@ function parseEntryLua(content) {
 }
 
 /**
- * Load a mod from a folder (Electron Only)
+ * Load a mod from an unzipped folder on disk (Electron Only).
+ * @param {string} folderPath — absolute path to the mod root
  */
 export async function loadModFromFolder(folderPath) {
     if (!window.electronAPI) throw new Error('Folder loading requires Electron');
@@ -96,8 +97,68 @@ export async function loadModFromFolder(folderPath) {
         audioBlobs: new Map()
     };
 
-    // Implementation would use electronAPI.readDir / readFile recursively
-    // For now, let's assume it follows a similar structure to ZIP
-    // This is a placeholder for actual Electron recursive scanning
+    // Helper: recursively collect files with a given extension
+    async function collectFiles(dir, ext, collected = []) {
+        let entries;
+        try { entries = await window.electronAPI.readDir(dir); } catch { return collected; }
+        for (const entry of entries) {
+            const fullPath = `${dir}/${entry.name}`;
+            if (entry.isDirectory) {
+                await collectFiles(fullPath, ext, collected);
+            } else if (entry.name.toLowerCase().endsWith(ext)) {
+                collected.push(fullPath);
+            }
+        }
+        return collected;
+    }
+
+    // 1. Parse entry.lua
+    const entryPath = `${folderPath}/entry.lua`;
+    if (await window.electronAPI.exists(entryPath)) {
+        const content = await window.electronAPI.readTextFile(entryPath);
+        if (content) result.config = parseEntryLua(content);
+    }
+
+    // 2. Scan SDEFs
+    const sdefRoot = `${folderPath}/Sounds/sdef`;
+    const sdefPaths = await collectFiles(sdefRoot, '.sdef');
+
+    // 3. Build audio index from Effects folder
+    const effectsRoot = `${folderPath}/Sounds/Effects`;
+    const audioPaths = [
+        ...await collectFiles(effectsRoot, '.wav'),
+        ...await collectFiles(effectsRoot, '.ogg')
+    ];
+
+    for (const sFilePath of sdefPaths) {
+        const sdefPathKey = sFilePath.replace(/^.*Sounds[/\\]sdef[/\\]/i, '').replace(/\\/g, '/');
+        const content = await window.electronAPI.readTextFile(sFilePath);
+        if (!content) continue;
+        const params = parseSdef(content);
+
+        result.assets[sdefPathKey] = {
+            sdefContent: content,
+            customWaves: params.wave || [],
+            audioFileName: null,
+            audioMeta: null,
+            note: 'Imported from folder'
+        };
+
+        if (params.wave && params.wave.length > 0) {
+            const firstWave = params.wave[0].toLowerCase();
+            const audioEntry = audioPaths.find(p => p.replace(/\\/g, '/').toLowerCase().endsWith(firstWave + '.wav') || p.replace(/\\/g, '/').toLowerCase().endsWith(firstWave + '.ogg'));
+            if (audioEntry) {
+                const buffer = await window.electronAPI.readFile(audioEntry);
+                if (buffer) {
+                    const fileName = audioEntry.split(/[/\\]/).pop();
+                    const blob = new Blob([buffer], { type: fileName.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav' });
+                    const file = new File([blob], fileName, { type: blob.type });
+                    result.audioBlobs.set(sdefPathKey, file);
+                    result.assets[sdefPathKey].audioFileName = fileName;
+                }
+            }
+        }
+    }
+
     return result;
 }

@@ -1,0 +1,256 @@
+{
+    "_info": {
+        "name": "Default Sound Type Rules",
+        "version": "1.1.0",
+        "description": "Maps SDEF path patterns to sound types. Rules are evaluated top-to-bottom; first match wins. You can add your own .json files in sound-types/ and they will be merged.",
+        "format": "Each rule has a 'match' regex pattern tested against the lowercase sdef path, and a 'type' key matching a type in the types list."
+    },
+    "types": {
+        "engine": {
+            "label": "Engine",
+            "lucideIcon": "flame",
+            "description": "External engine loops"
+        },
+        "engine_start": {
+            "label": "Engine Start",
+            "lucideIcon": "key",
+            "description": "Engine startup/shutdown"
+        },
+        "engine_internal": {
+            "label": "Cockpit Engine",
+            "lucideIcon": "headphones",
+            "description": "Engine heard from cockpit"
+        },
+        "cockpit_switch": {
+            "label": "Cockpit Switch",
+            "lucideIcon": "toggle-left",
+            "description": "Button/switch one-shots"
+        },
+        "betty": {
+            "label": "Betty / Voice",
+            "lucideIcon": "megaphone",
+            "description": "Voice alerts"
+        },
+        "tones": {
+            "label": "Tones / RWR",
+            "lucideIcon": "radio",
+            "description": "Warning tones and RWR"
+        },
+        "weapon": {
+            "label": "Weapon",
+            "lucideIcon": "crosshair",
+            "description": "Cannon, missiles, bombs"
+        },
+        "apu": {
+            "label": "APU",
+            "lucideIcon": "cog",
+            "description": "Auxiliary power unit"
+        },
+        "ecs": {
+            "label": "ECS / Avionics",
+            "lucideIcon": "snowflake",
+            "description": "Climate & avionics hum"
+        },
+        "gear": {
+            "label": "Landing Gear",
+            "lucideIcon": "circle-dot",
+            "description": "Gear extension/retraction"
+        },
+        "canopy": {
+            "label": "Canopy",
+            "lucideIcon": "shield",
+            "description": "Canopy open/close"
+        },
+        "wind": {
+            "label": "Wind / Ambient",
+            "lucideIcon": "wind",
+            "description": "Wind and atmosphere"
+        },
+        "flyby": {
+            "label": "Flyby",
+            "lucideIcon": "plane",
+            "description": "External flyby sounds"
+        },
+        "radio": {
+            "label": "Radio / Comm",
+            "lucideIcon": "radio-tower",
+            "description": "Radio and intercom"
+        },
+        "explosion": {
+            "label": "Explosion",
+            "lucideIcon": "bomb",
+            "description": "Explosions and impacts"
+        },
+        "damage": {
+            "label": "Damage",
+            "lucideIcon": "hammer",
+            "description": "Damage and hit effects"
+        },
+        "personnel": {
+            "label": "Personnel",
+            "lucideIcon": "user",
+            "description": "Pilot breathing, pain"
+        },
+        "environment": {
+            "label": "Environment",
+            "lucideIcon": "globe",
+            "description": "Terrain, weather, sea"
+        },
+        "ui": {
+            "label": "UI / Interface",
+            "lucideIcon": "mouse-pointer",
+            "description": "Menu and UI sounds"
+        },
+        "generic": {
+            "label": "Generic",
+            "lucideIcon": "volume-2",
+            "description": "Unclassified sound"
+        }
+    },
+    "rules": [
+        {
+            "match": "betty\\/",
+            "type": "betty"
+        },
+        {
+            "match": "tones?\\/",
+            "type": "tones"
+        },
+        {
+            "match": "\\bsw\\d+",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "cockpit\\/.*(sw_|switch|knob|btn|button|lever|handle|contactor)",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "throttle.?(click|from|to|idle|off|lim)",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "cockpit.*click",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "battery\\.sdef",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "seat.?adjust",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "\\becs",
+            "type": "ecs"
+        },
+        {
+            "match": "avionics",
+            "type": "ecs"
+        },
+        {
+            "match": "gyro",
+            "type": "ecs"
+        },
+        {
+            "match": "canopy|hood|hatch",
+            "type": "canopy"
+        },
+        {
+            "match": "\\bapu",
+            "type": "apu"
+        },
+        {
+            "match": "cockpit.*(f404|engine|afterburner|rpm|thrust|amb_in)",
+            "type": "engine_internal"
+        },
+        {
+            "match": "f404.*_in\\b",
+            "type": "engine_internal"
+        },
+        {
+            "match": "afterburner_in",
+            "type": "engine_internal"
+        },
+        {
+            "match": "(start|shutdown|spool.*up|spool.*down|ignit).*(engine|f404|turbine)",
+            "type": "engine_start"
+        },
+        {
+            "match": "f404ge_(start|shutdown)",
+            "type": "engine_start"
+        },
+        {
+            "match": "f404|afterburner|rpm\\d|thrust|nozzle|jet.?blast|back[12]",
+            "type": "engine"
+        },
+        {
+            "match": "engine|turbine|idle",
+            "type": "engine"
+        },
+        {
+            "match": "distant|flyby|fly_by|whistle",
+            "type": "flyby"
+        },
+        {
+            "match": "personnel\\/",
+            "type": "personnel"
+        },
+        {
+            "match": "\\b(pilot|heart|breath|dying|wounded|g-?loc|gasp)\\b",
+            "type": "personnel"
+        },
+        {
+            "match": "damage\\/",
+            "type": "damage"
+        },
+        {
+            "match": "\\b(break|bullet.?hit|ricochet|burning|hit.?in|crash|wings.?damage)\\b",
+            "type": "damage"
+        },
+        {
+            "match": "explosion",
+            "type": "explosion"
+        },
+        {
+            "match": "\\b(explode|debris|napalm)\\b",
+            "type": "explosion"
+        },
+        {
+            "match": "weapons?\\/",
+            "type": "weapon"
+        },
+        {
+            "match": "\\b(cannon|vulcan|m61|missile|bomb|rocket|flare|chaff|catapult)\\b",
+            "type": "weapon"
+        },
+        {
+            "match": "gear|landing|wheel|tire|brake",
+            "type": "gear"
+        },
+        {
+            "match": "wind|turbulence|highspeed|plane.?wing",
+            "type": "wind"
+        },
+        {
+            "match": "environment|terrain|sea|water|rain|thunder",
+            "type": "environment"
+        },
+        {
+            "match": "radio|comm|intercom|voice|static",
+            "type": "radio"
+        },
+        {
+            "match": "ui[\\/]|menu|cursor",
+            "type": "ui"
+        },
+        {
+            "match": "cockpit",
+            "type": "cockpit_switch"
+        },
+        {
+            "match": "aircraft",
+            "type": "generic"
+        }
+    ]
+}

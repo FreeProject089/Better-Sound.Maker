@@ -27,7 +27,7 @@ const STEPS = [
         page: 'library',
         title: '📁 Assets Library',
         titleKey: 'nav.library',
-        text: 'This is where you browse and select DCS sound assets. Navigate the folder tree and check the files you want to replace with your custom audio.',
+        text: 'Browse DCS sound assets using the folder tree. Check assets you want to replace. Use the <strong>Reload</strong> button (top-right) to rescan your DCS installation and pick up new modules or mods. The first time, you will be asked to enter your DCS install path.',
         textKey: 'tutorial.library',
         image: IMG_TASKY_EYES
     },
@@ -59,9 +59,17 @@ const STEPS = [
         page: 'presets',
         title: '💾 Presets',
         titleKey: 'nav.presets',
-        text: 'Save and load your SDEF parameter presets. Great for reusing settings across different mods.',
+        text: 'Save and load your asset selections as presets. Great for reusing selections of sounds across different mods.',
         textKey: 'tutorial.presets',
         image: IMG_TASKY
+    },
+    {
+        page: 'custom-types',
+        title: '🏷️ Sound Type Manager',
+        titleKey: 'nav.soundTypes',
+        text: 'Manage how sounds are categorized with Custom Sound Types. You can set Regex rules to auto-assign custom icons based on the sound\'s file path!',
+        textKey: 'tutorial.soundTypes',
+        image: IMG_TASKY_EYES
     },
     {
         page: 'collaboration',
@@ -78,6 +86,14 @@ const STEPS = [
         text: 'When you\'re ready, hit Build to generate the complete mod folder — entry.lua, .sdef files, and your audio — ready to drop into DCS Mods.',
         textKey: 'tutorial.build',
         image: IMG_TASKY_EYES
+    },
+    {
+        page: 'settings',
+        title: '⚙️ Settings',
+        titleKey: 'nav.settings',
+        text: 'Set your DCS install path and Saved Games folder here. The app uses these to auto-scan your modules. You can also enable or disable features via the <code>Load.cfg</code> file — for example, <code>TypeDetection</code> toggles smart sound-type labels in the library.',
+        textKey: 'tutorial.settings',
+        image: IMG_TASKY
     },
     {
         page: 'docs',

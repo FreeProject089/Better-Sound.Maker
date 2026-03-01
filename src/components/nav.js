@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { id: 'sdef-editor', icon: 'sliders', label: 'nav.sdef', section: 'nav.section.workspace' },
   { id: 'theme', icon: 'palette', label: 'nav.theme', section: 'nav.section.customization' },
   { id: 'presets', icon: 'save', label: 'nav.presets', section: 'nav.section.customization' },
+  { id: 'custom-types', icon: 'tag', label: 'nav.soundTypes', section: 'nav.section.customization' },
   { id: 'collaboration', icon: 'users', label: 'nav.collab', section: 'nav.section.team' },
   { id: 'build', icon: 'rocket', label: 'nav.builder', section: 'nav.section.export' },
   { id: 'settings', icon: 'settings', label: 'nav.settings', section: 'nav.section.help' },

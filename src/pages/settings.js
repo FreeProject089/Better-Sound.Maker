@@ -1,6 +1,6 @@
 import { getState, setGlobalSettings } from '../state/store.js';
 import { t } from '../utils/i18n.js';
-import { getIcon } from '../utils/icons.js';
+import { getIcon, renderIcons } from '../utils/icons.js';
 import { showToast } from '../components/toast.js';
 
 export function renderSettings(container) {

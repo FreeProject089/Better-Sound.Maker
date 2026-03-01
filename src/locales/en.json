@@ -34,6 +34,7 @@
         "builder": "Mod Generator",
         "docs": "Documentation",
         "presets": "Presets",
+        "soundTypes": "Sound Types",
         "credits": "Credits",
         "tutorial": "Tutorial",
         "section": {
@@ -92,6 +93,81 @@
         "communityBtn": "Community Presets",
         "communityModalTitle": "Community Presets"
     },
+    "customTypesPage": {
+        "title": "Sound Type Manager",
+        "desc": "View and manage sound types used to categorize your SDEF assets. Create custom types, assign icons, and define matching rules.",
+        "stats": {
+            "default": "Default Types",
+            "custom": "Custom Types",
+            "rules": "Custom Rules",
+            "sdefs": "Library SDEFs"
+        },
+        "allTypesTitle": "All Sound Types",
+        "createBtn": "Create Custom Type",
+        "importBtn": "Import Types",
+        "exportBtn": "Export Custom Types",
+        "defaultGridTitle": "Default Types (built-in)",
+        "customGridTitle": "Custom Types",
+        "emptyTitle": "No Custom Types Yet",
+        "emptyDesc": "Create custom types to better categorize sounds specific to your modules.",
+        "rulesTitle": "SDEF ↔ Type Mapping Rules",
+        "addRuleBtn": "Add Rule",
+        "table": {
+            "regex": "Regex Pattern",
+            "assigned": "Assigned Type",
+            "source": "Source",
+            "actions": "Actions",
+            "noRules": "No custom rules. Add rules to override default type detection.",
+            "builtIn": "Built-in"
+        },
+        "modals": {
+            "createTitle": "Create Custom Type",
+            "typeId": "Type ID (unique, lowercase, no spaces)",
+            "typeIdPh": "e.g. helicopter_rotor",
+            "label": "Display Label",
+            "labelPh": "e.g. Helicopter Rotor",
+            "description": "Description",
+            "descPh": "e.g. Rotor blade sounds",
+            "icon": "Icon",
+            "rule": "Matching Rule (optional regex)",
+            "rulePh": "e.g. rotor|blade|prop",
+            "ruleTip": "Regex pattern to auto-detect this type from SDEF paths. Leave empty to only assign manually via rules.",
+            "create": "Create",
+            "editTitle": "Edit Type",
+            "addRuleTitle": "Add Matching Rule",
+            "regexField": "Regex Pattern",
+            "regexTip": "This is tested against the lowercase SDEF path. First match wins.",
+            "assignTo": "Assign to Type",
+            "ruleWarning": "Custom rules are evaluated <strong>before</strong> default rules, so they take priority.",
+            "editRuleTitle": "Edit Rule",
+            "deleteTypeTitle": "Delete Custom Type",
+            "deleteTypeDesc": "Are you sure you want to delete the custom type <strong>\"{id}\"</strong>? Any rules using this type will also be removed.",
+            "importTitle": "Import Custom Types?",
+            "importDesc1": "This preset includes <strong>{types} custom sound types</strong> and <strong>{rules} matching rules</strong>.",
+            "importDesc2": "Do you want to import them into your local sound type database?",
+            "noImport": "No (Assets Only)",
+            "yesImport": "Yes, Import Types"
+        },
+        "toasts": {
+            "req": "Type ID and Label are required",
+            "exists": "Type \"{id}\" already exists",
+            "created": "Custom type \"{label}\" created!",
+            "updated": "Type \"{label}\" updated",
+            "deleted": "Custom type \"{id}\" deleted",
+            "reqLabel": "Label is required",
+            "reqPattern": "Pattern is required",
+            "invalidRegex": "Invalid regular expression: ",
+            "ruleAdded": "Rule added",
+            "ruleUpdated": "Rule updated",
+            "ruleDeleted": "Rule deleted",
+            "noExport": "No custom types to export",
+            "exported": "Custom types exported",
+            "invalidFile": "Invalid types file format",
+            "imported": "Imported {types} types and {rules} rules",
+            "importFailed": "Failed to import",
+            "shared": "Type \"{label}\" exported for sharing"
+        }
+    },
     "project": {
         "title": "Projects",
         "description": "Manage your selected sound assets and upload custom audio files.",
@@ -132,6 +208,23 @@
         "note": "Note",
         "emptyDetail": "Click on an asset row to see details, add notes, and upload audio.",
         "totalAssets": "Total Assets",
+        "scanner": {
+            "title": "DCS Assets Scanner",
+            "welcome": "Welcome! To populate your library, please specify your DCS installation and Saved Games folders.",
+            "rescan": "Rescan your DCS installation, CoreMods, and Saved Games to build a complete asset library.",
+            "recommendation": "Recommendation",
+            "recommendationText": "The game root folder should be completely clean with 0 mods installed before scanning.",
+            "desc": "This will scan <b>Doc/Sounds/sdef_and_wave_list.txt</b>, your <b>CoreMods</b> folder, and optionally your Saved Games mods folder.",
+            "dcsLabel": "DCS Installation Path",
+            "dcsPlaceholder": "e.g. C:\\Program Files\\Eagle Dynamics\\DCS World",
+            "sgLabel": "Saved Games Path (Optional)",
+            "sgPlaceholder": "e.g. C:\\Users\\Name\\Saved Games\\DCS",
+            "start": "Start Scan",
+            "manual": "Manual File",
+            "manualTip": "Load legacy SDEF text file directly",
+            "toast": "Starting DCS Assets Scan...",
+            "cancel": "Cancel"
+        },
         "modules": "Modules",
         "showing": "Showing",
         "selected": "Selected",
@@ -238,11 +331,13 @@
         "sdeflistTitle": "📋 sdef_and_wave_list.txt",
         "sdeflist": "The full index of sound events is located in your DCS folder at \\\\DCS World\\\\Doc\\\\Sounds\\\\sdef_and_wave_list.txt. Open the SDEF List tab to learn more.",
         "welcome": "Welcome to Better ModMaker!",
-        "library": "This is where you browse and select DCS sound assets. Navigate the folder tree and check the files you want to replace with your custom audio.",
-        "project": "Here you configure your mod details — name, aircraft, version. All selected assets appear here so you can review them.",
+        "settings": "Configure your DCS paths, enable Auto-Scanner to stay up to date, and tweak your application preferences.",
+        "library": "This is where you browse and select DCS sound assets. The new Scanner will auto-detect your DCS and CoreMods to build a complete list of sounds!",
+        "project": "Here you review your selected assets. Tip: the folder highlighted in blue with a glow is the 'Leaf Folder' — the direct parent of the files you are currently seeing. It helps you stay oriented in deep structures!",
         "sdef": "Each sound asset needs an .sdef file. The visual editor lets you tweak volume, looping, distance, pitch and more — no code needed!",
         "theme": "Customise the look of the app. Change the background image and accent colors to make it feel like yours.",
-        "presets": "Save and load your SDEF parameter presets. Great for reusing settings across different mods.",
+        "presets": "Save and load your asset selections as presets. Great for reusing selections of sounds across different mods.",
+        "soundTypes": "Manage how sounds are categorized with Custom Sound Types. You can set Regex rules to auto-assign custom icons based on the sound's file path!",
         "collab": "Connect to a GitHub repo to sync your project with teammates. Push your mod build, leave notes, and restore earlier versions.",
         "build": "When you're ready, hit Build to generate the complete mod folder — entry.lua, .sdef files, and your audio — ready to drop into DCS Mods.",
         "docs": "Everything you need to know about DCS sound modding: file formats, parameters, tips and examples.",
@@ -254,6 +349,23 @@
             "title": "Recommended Defaults per Sound Type",
             "desc": "The mod creator auto-fills these values based on sound type:",
             "note": "Note: A \"—\" means the default of the engine is used."
+        },
+        "install": {
+            "title": "Installation & Troubleshooting",
+            "steps": "Standard Installation Steps",
+            "step1": "Navigate to your DCS Saved Games folder.",
+            "step2": "Build your mod in Better ModMaker choosing the destination folder above.",
+            "step3": "Ensure your mod structure follows the standard (Sounds/Effects and Sounds/sdef).",
+            "step4": "Launch DCS and verify the mod appears in the 'Mods' section of the settings.",
+            "tip1": "If the <code>resource</code> folder doesn't exist, create it.",
+            "variantWarning": "<strong>DCS Variant Suffixes:</strong> If you use DCS Open Beta, your saved games folder may be <code>DCS.openbeta</code> instead of <code>DCS</code>.",
+            "folderStructure": "Standard Folder Structure",
+            "trouble": "Common Issues",
+            "trouble1": "<strong>Sounds not playing:</strong> Check that your SDEF <code>wave</code> paths match the actual file locations in <code>Sounds/Effects/</code>.",
+            "trouble2": "<strong>Default sounds still play:</strong> Make sure <code>mount_vfs_sound_path</code> is present in entry.lua and the SDEF path matches original exactly.",
+            "trouble3": "<strong>Theme not showing:</strong> Verify the <code>Skins</code> section exists in entry.lua.",
+            "trouble4": "<strong>Mod not detected:</strong> Make sure the mod is in the correct <code>Mods/resource/</code> directory.",
+            "links": "Useful Links"
         },
         "audio": {
             "title": "🎵 Audio Guide for DCS Sound Modding",
@@ -340,17 +452,6 @@
             },
             "tip": "Theme support must be enabled in the entry.lua with a <code>Skins</code> section and <code>mount_vfs_texture_path</code>. The Build page handles this automatically when you enable Theme."
         },
-        "install": {
-            "title": "📦 How to Install a DCS Sound Mod",
-            "steps": "Installation Steps",
-            "step1": "Navigate to your DCS saved games folder:",
-            "step2": "Copy your entire mod folder (e.g., <code>SoundModBetterHornet/</code>) into the <code>resource</code> folder.",
-            "step3": "Start DCS World.",
-            "step4": "Your mod should be automatically detected!",
-            "trouble": "Troubleshooting",
-            "folderStructure": "Final Folder Structure",
-            "links": "Useful Links"
-        },
         "gain": {
             "title": "Gain-Distance Model",
             "desc": "DCS uses a multi-stage gain curve based on distance. This visual model shows how volume (gain) changes as you move away.",
@@ -395,18 +496,50 @@
                 "explosionsDist": "Explosions need large <code>outer_radius</code> (15000+) to be heard from distance.",
                 "randomListDesc": "Use a list of files for <code>wave</code> to avoid repetitive sound patterns."
             }
+        },
+        "types": {
+            "title": "Custom Sound Types & Regex Rules",
+            "intro": "The Asset Library uses <strong>Regex (Regular Expressions)</strong> to automatically categorize your sounds based on their SDEF file paths. By default, the app can spot Radios, Weapons, Engines, etc. But if you work on a specific mod, you might want to create your own types!",
+            "whatIsRegex": "What is a Regex Pattern?",
+            "regexDesc": "A Regex pattern is a sequence of characters that specifies a search pattern in text. When ModMaker scans a file like <code>Effects/Aircrafts/F16/Engine/Burner.sdef</code>, it tests your rules to see which Custom Type to assign.",
+            "basic": {
+                "title": "Basic Word Matching",
+                "desc": "Just type the folder or word you want to find. It is case-insensitive."
+            },
+            "or": {
+                "title": "The OR Operator (|)",
+                "desc": "Use the vertical pipe symbol <code>|</code> to say \"Match this OR that\". Perfect for grouping multiple folders."
+            },
+            "strict": {
+                "title": "Strict Matching (^ and $)",
+                "desc": "Use <code>^</code> for the start of the path, and <code>$</code> for the end."
+            },
+            "examples": {
+                "title": "Practical Examples",
+                "desc": "Common use-cases when creating custom types for DCS.",
+                "ex1Title": "Ex 1: All F-16 Engines",
+                "ex2Title": "Ex 2: Specific Weapons",
+                "ex3Title": "Ex 3: Exact file match"
+            },
+            "priorityTitle": "Rule Priority:",
+            "priorityDesc": "Custom Rules are evaluated FIRST, top to bottom. If no custom rule matches the SDEF path, the built-in default rules are then used.",
+            "share": {
+                "title": "Sharing Types",
+                "desc": "Once you have created types for your mod (e.g., F-14 RIO chatter, F-16 MFD buttons), you can export them. Even better, when you share a Presets file, you can embed your Custom Types into it! When someone imports your preset, ModMaker will automatically install the missing Types and Icons into their library."
+            }
         }
     },
     "docs": {
         "title": "Documentation",
-        "desc": "Learn how to use Better ModMaker and create DCS sound mods.",
+        "desc": "Access built-in guides and references about DCS audio modding.",
         "tabs": {
-            "audio": "Audio Guide",
+            "audio": "Audio Fundamentals",
             "sdef": "SDEF Guide",
             "f18": "F/A-18C Reference",
-            "sdeflist": "SDEF List",
+            "sdeflist": "Sdef List",
+            "types": "Sound Types",
             "theme": "Theme Guide",
-            "install": "Installation"
+            "install": "Installation Guide"
         },
         "loadSoundsTitle": "How DCS Loads Sounds",
         "loadSoundsDesc": "When DCS needs a sound, it looks for the SDEF file at the specified path. The SDEF tells DCS:",
@@ -579,7 +712,7 @@
         "description": "Find answers to common questions about using Better ModMaker.",
         "q1": {
             "title": "How to update Assets Library?",
-            "desc": "Go to the Docs tab, click 'Reload Library', and make sure your DCS directory is correctly mapped. The application will scan and update your internal reference."
+            "desc": "Go to the Library tab and click 'Reload Library'. The new Scanner modal will appear, allowing you to automatically scan the base game, your CoreMods, and your Saved Games folder."
         },
         "q2": {
             "title": "Where is sdef_and_wave_list.txt located?",
@@ -603,7 +736,35 @@
         },
         "q7": {
             "title": "How to import modded aircraft SDEFs into the Assets Library?",
-            "desc": "To import modded aircraft sounds, locate the mod's folder and find the 'Sounds' directory. For mods in 'Saved Games', it's usually at the root (e.g., <code>A4E/Sounds</code>). For 'CoreMods' (DCS root), search in <code>CoreMods\\aircraft\\{AIRCRAFTNAME}\\Sounds</code>. You can either zip the <code>Sounds</code> folder as a .zip file or simply zip the entire mod and use the <strong>Import Mod (.zip)</strong> option in the Library tab."
+            "desc": "You no longer need to manually zip and import mods! The built-in Scanner will automatically scan your CoreMods and optionally your Saved Games folder, adding all officially supported and community mods (F-4E, F-14, A-4E-C, etc.) to your Library natively. You can still use the Legacy manual import button via the Scanner Modal if preferred."
+        },
+        "q8": {
+            "title": "What does the 'Reload / Rescan' button do?",
+            "desc": "The <strong>Reload</strong> button in the Assets Library opens the DCS Scanner modal. It rescans your DCS installation and (optionally) your Saved Games mods folder to rebuild the full asset library from scratch. Use it after installing a new DCS module or mod."
+        },
+        "q9": {
+            "title": "What is a Preset?",
+            "desc": "A Preset saves a <em>snapshot of which assets you have selected</em> in the library — not the SDEF parameter values. It is a shortcut to restore a group of sounds quickly."
+        },
+        "q10": {
+            "title": "Can I load an existing mod I already built?",
+            "desc": "Yes! On the Project page, click <strong>Load Existing Mod</strong>. You can load from a <code>.zip</code> archive or directly from an unzipped folder on disk (Electron only). The app will import the SDEF files and attempt to match the corresponding audio files automatically."
+        },
+        "q11": {
+            "title": "Can I customize how sound types are detected?",
+            "desc": "Yes. Sound type detection is driven by JSON files in <code>public/sound-types/</code>. The bundled <code>default.json</code> contains all base rules. Add your own <code>.json</code> file with <code>rules</code> (regex → type) and <code>types</code> (label, icon)."
+        },
+        "q12": {
+            "title": "What are the audio format requirements for DCS?",
+            "desc": "DCS recommends <strong>Mono WAV or OGG</strong> files at 44100 Hz or 48000 Hz. Stereo files can be used for non-spatialized cockpit or ambient sounds. The app will warn you if a file is outside recommended specs."
+        },
+        "q13": {
+            "title": "My sounds are not playing in-game after installing the mod. Why?",
+            "desc": "Check: (1) The SDEF <code>wave</code> paths match the actual audio files in <code>Sounds/Effects/</code>. (2) Your <code>entry.lua</code> calls <code>mount_vfs_sound_path</code>. (3) The SDEF path in your mod exactly mirrors the original DCS path."
+        },
+        "q14": {
+            "title": "DCS says the Saved Games folder must be clean. Why?",
+            "desc": "Eagle Dynamics recommends keeping the DCS root installation folder free of third-party mods. All mods should be placed in <code>Saved Games\\DCS\\Mods\\resource\\</code> to avoid conflicts, especially after DCS updates."
         }
     }
 }

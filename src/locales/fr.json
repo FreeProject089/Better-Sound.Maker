@@ -34,6 +34,7 @@
         "theme": "Thème & Paramètres",
         "collab": "Collaboration",
         "presets": "Préréglages",
+        "soundTypes": "Types de Sons",
         "credits": "Crédits",
         "section": {
             "workspace": "ESPACE DE TRAVAIL",
@@ -92,6 +93,81 @@
         "communityBtn": "Presets Communautaires",
         "communityModalTitle": "Presets Communautaires"
     },
+    "customTypesPage": {
+        "title": "Gestionnaire des Types de Sons",
+        "desc": "Consultez et gérez les types de sons utilisés pour catégoriser vos SDEFs. Créez des types persos, assignez des icônes et définissez des règles de correspondance.",
+        "stats": {
+            "default": "Types par Défaut",
+            "custom": "Types Personnalisés",
+            "rules": "Règles Personnalisées",
+            "sdefs": "SDEFs de Bibliothèque"
+        },
+        "allTypesTitle": "Tous les Types de Sons",
+        "createBtn": "Créer un Type Personnalisé",
+        "importBtn": "Importer des Types",
+        "exportBtn": "Exporter les Types",
+        "defaultGridTitle": "Types par Défaut (intégrés)",
+        "customGridTitle": "Types Personnalisés",
+        "emptyTitle": "Aucun Type Personnalisé",
+        "emptyDesc": "Créez des types personnalisés pour mieux catégoriser les sons spécifiques à vos modules.",
+        "rulesTitle": "Règles SDEF ↔ Types",
+        "addRuleBtn": "Ajouter une Règle",
+        "table": {
+            "regex": "Motif Regex",
+            "assigned": "Type Assigné",
+            "source": "Source",
+            "actions": "Actions",
+            "noRules": "Aucune règle personnalisée. Ajoutez des règles pour écraser les détections par défaut.",
+            "builtIn": "Intégré"
+        },
+        "modals": {
+            "createTitle": "Créer un Type",
+            "typeId": "ID du Type (unique, minuscules, sans espace)",
+            "typeIdPh": "ex: helico_rotor",
+            "label": "Libellé Affiché",
+            "labelPh": "ex: Rotor Hélico",
+            "description": "Description",
+            "descPh": "ex: Sons pales de rotor",
+            "icon": "Icône",
+            "rule": "Règle Correspondance (regex optionnelle)",
+            "rulePh": "ex: rotor|blade|prop",
+            "ruleTip": "Motif Regex pour auto-détecter ce type dans les chemins SDEF. Laissez vide pour assigner que manuellement.",
+            "create": "Créer",
+            "editTitle": "Modifier le Type",
+            "addRuleTitle": "Ajouter une Règle",
+            "regexField": "Motif Regex",
+            "regexTip": "Ceci est testé par rapport au chemin SDEF mis en minuscules. Le premier qui match gagne.",
+            "assignTo": "Assigner au Type",
+            "ruleWarning": "Les règles customs sont évaluées <strong>avant</strong> les règles par défaut, elles ont la priorité.",
+            "editRuleTitle": "Modifier la Règle",
+            "deleteTypeTitle": "Supprimer le Type Personnalisé",
+            "deleteTypeDesc": "Êtes-vous sûr de supprimer <strong>\"{id}\"</strong> ? Toutes les règles utilisant ce type seront aussi effacées.",
+            "importTitle": "Importer les Types Customs ?",
+            "importDesc1": "Ce preset inclut <strong>{types} types de sons</strong> et <strong>{rules} règles</strong>.",
+            "importDesc2": "Voulez-vous les importer dans votre base ?",
+            "noImport": "Non (Seulement les assets)",
+            "yesImport": "Oui, Importer les Types"
+        },
+        "toasts": {
+            "req": "L'ID et le Libellé sont requis",
+            "exists": "Le Type \"{id}\" existe déjà",
+            "created": "Type custom \"{label}\" créé !",
+            "updated": "Type \"{label}\" mis à jour",
+            "deleted": "Type custom \"{id}\" supprimé",
+            "reqLabel": "Le libellé est requis",
+            "reqPattern": "Le motif est requis",
+            "invalidRegex": "Regex Invalide : ",
+            "ruleAdded": "Règle ajoutée",
+            "ruleUpdated": "Règle mise à jour",
+            "ruleDeleted": "Règle supprimée",
+            "noExport": "Aucun type à exporter",
+            "exported": "Types customs exportés",
+            "invalidFile": "Format de fichier invalide",
+            "imported": "Importé {types} types et {rules} règles",
+            "importFailed": "Échec de l'importation",
+            "shared": "Type \"{label}\" préparé à partager"
+        }
+    },
     "project": {
         "title": "Projets",
         "description": "Gérez vos assets sonores sélectionnés et uploadez des fichiers audio personnalisés.",
@@ -132,6 +208,23 @@
         "note": "Note",
         "emptyDetail": "Cliquez sur une ligne pour voir les détails, ajouter des notes et upload l'audio.",
         "totalAssets": "Total Assets",
+        "scanner": {
+            "title": "Scanner d'Assets DCS",
+            "welcome": "Bienvenue ! Pour remplir votre bibliothèque, veuillez spécifier vos dossiers d'installation DCS et de Parties Enregistrées.",
+            "rescan": "Analysez votre installation DCS, CoreMods et Parties Enregistrées pour construire une bibliothèque d'assets complète.",
+            "recommendation": "Recommandation",
+            "recommendationText": "Le dossier racine du jeu doit être complètement propre (0 mod installé) avant de lancer l'analyse.",
+            "desc": "Ceci va analyser <b>Doc/Sounds/sdef_and_wave_list.txt</b>, votre dossier <b>CoreMods</b>, et optionnellement votre dossier de mods Saved Games.",
+            "dcsLabel": "Chemin d'installation DCS",
+            "dcsPlaceholder": "ex: C:\\Program Files\\Eagle Dynamics\\DCS World",
+            "sgLabel": "Chemin Saved Games (Optionnel)",
+            "sgPlaceholder": "ex: C:\\Users\\Nom\\Saved Games\\DCS",
+            "start": "Lancer le Scan",
+            "manual": "Fichier Manuel",
+            "manualTip": "Charger un fichier texte SDEF legacy directement",
+            "toast": "Lancement du scan d'assets DCS...",
+            "cancel": "Annuler"
+        },
         "modules": "Modules",
         "showing": "Affichage",
         "selected": "Sélectionné",
@@ -238,12 +331,14 @@
         "sdeflistTitle": "📋 sdef_and_wave_list.txt",
         "sdeflist": "L'index complet des événements sonores se trouve dans votre dossier DCS sous <code>\\\\DCS World\\\\Doc\\\\Sounds\\\\sdef_and_wave_list.txt</code>. Ouvrez l'onglet 'Liste SDEF' pour en savoir plus.",
         "welcome": "Bienvenue sur Better ModMaker !",
+        "settings": "Configurez vos chemins DCS, activez l'Auto-Scanner pour rester à jour, et ajustez les paramètres globaux de l'application.",
         "language": "Veuillez choisir votre langue pour commencer.",
-        "library": "C'est ici que vous parcourez et sélectionnez les assets sonores DCS. Naviguez dans l'arborescence et cochez les fichiers à remplacer.",
-        "project": "Configurez ici les détails de votre mod : nom, avion, version. Tous les assets sélectionnés apparaissent ici pour révision.",
+        "library": "C'est ici que vous parcourez et sélectionnez les assets DCS. Le nouveau Scanner détectera automatiquement votre jeu et vos CoreMods pour construire une liste complète !",
+        "project": "Ici vous révisez vos assets sélectionnés. Astuce : le dossier en bleu brillant est le 'Dossier Feuille' — le parent direct des SDEFs que vous voyez. Cela vous aide à vous repérer dans les structures complexes !",
         "sdef": "Chaque asset a besoin d'un fichier .sdef. L'éditeur visuel vous permet d'ajuster le volume, la boucle, la distance, etc. — sans code !",
         "theme": "Personnalisez l'apparence de l'application. Changez l'image de fond et les couleurs d'accentuation.",
-        "presets": "Enregistrez et chargez vos préréglages de paramètres SDEF. Idéal pour réutiliser des réglages sur différents mods.",
+        "presets": "Enregistrez et chargez vos sélections d'assets comme préréglages. Idéal pour réutiliser des listes de sons sur différents mods.",
+        "soundTypes": "Gérez la catégorisation des sons avec les Types personnalisés. Vous pouvez définir des règles Regex pour auto-assigner des icônes selon le chemin de fichier du son !",
         "collab": "Connectez-vous à un dépôt GitHub pour synchroniser avec vos coéquipiers. Pushez votre build, laissez des notes, et restaurez des versions.",
         "build": "Quand vous êtes prêt, cliquez sur Build pour générer le dossier de mod complet — entry.lua, fichiers sdef et audio — prêt pour DCS Mods.",
         "docs": "Tout ce que vous devez savoir sur le modding sonore DCS : formats de fichiers, paramètres, astuces et exemples.",
@@ -252,14 +347,15 @@
     },
     "docs": {
         "title": "Documentation",
-        "desc": "Apprenez à utiliser Better ModMaker et à créer des mods sonores DCS.",
+        "desc": "Accès aux guides et références intégrés concernant le modding audio DCS.",
         "tabs": {
-            "audio": "Guide Audio",
+            "audio": "Fondamentaux Audio",
             "sdef": "Guide SDEF",
             "f18": "Référence F/A-18C",
             "sdeflist": "Liste SDEF",
-            "theme": "Guide Thème",
-            "install": "Installation"
+            "types": "Types de Sons",
+            "theme": "Guide des Thèmes",
+            "install": "Guide d'Installation"
         },
         "loadSoundsTitle": "Comment DCS Charge les Sons",
         "loadSoundsDesc": "Quand DCS a besoin d'un son, il cherche le fichier SDEF au chemin spécifié. Le SDEF dit à DCS :",
@@ -289,9 +385,26 @@
     },
     "docs_content": {
         "defaults": {
-            "title": "Valeurs par Défaut",
-            "desc": "Si un paramètre est absent du SDEF, DCS utilise ces valeurs par défaut internes.",
-            "note": "Note : Certains modules d'avion peuvent outrepasser ces valeurs par défaut globales."
+            "title": "Valeurs par Défaut Recommandées",
+            "desc": "Le créateur de mod auto-remplit ces valeurs selon le type de son :",
+            "note": "Note : Un \"—\" signifie que le moteur utilise sa valeur interne par défaut."
+        },
+        "install": {
+            "title": "Installation & Dépannage",
+            "steps": "Étapes d'Installation Standard",
+            "step1": "Allez dans votre dossier DCS Saved Games (Parties Enregistrées).",
+            "step2": "Générez votre mod dans Better ModMaker en choisissant la destination ci-dessus.",
+            "step3": "Vérifiez que la structure suit le standard (Sounds/Effects et Sounds/sdef).",
+            "step4": "Lancez DCS et vérifiez que le mod apparaît dans la section 'Mods' des réglages.",
+            "tip1": "Si le dossier <code>resource</code> n'existe pas, créez-le.",
+            "variantWarning": "<strong>Variantes DCS :</strong> Si vous utilisez DCS Open Beta, votre dossier peut être <code>DCS.openbeta</code> au lieu de <code>DCS</code>.",
+            "folderStructure": "Structure de Dossiers Standard",
+            "trouble": "Problèmes Courants",
+            "trouble1": "<strong>Sons inaudibles :</strong> Vérifiez que les chemins <code>wave</code> correspondent aux fichiers dans <code>Sounds/Effects/</code>.",
+            "trouble2": "<strong>Sons d'origine persistants :</strong> Vérifiez <code>mount_vfs_sound_path</code> dans entry.lua et que le chemin SDEF est exact.",
+            "trouble3": "<strong>Thème absent :</strong> Vérifiez la section <code>Skins</code> dans entry.lua.",
+            "trouble4": "<strong>Mod non détecté :</strong> Assurez-vous d'être dans le bon dossier <code>Mods/resource/</code>.",
+            "links": "Liens Utiles"
         },
         "audio": {
             "title": "🎵 Guide Audio pour le Modding DCS",
@@ -378,10 +491,6 @@
             },
             "tip": "Le support de thème doit être activé dans le entry.lua avec une section <code>Skins</code>. La page Build le gère automatiquement si vous activez le Thème."
         },
-        "install": {
-            "title": "Comment Installer un Mod Sonore DCS",
-            "steps": "Étapes d'Installation"
-        },
         "gain": {
             "title": "Modèle Gain-Distance",
             "desc": "DCS utilise une courbe de gain multi-étapes basée sur la distance. Ce modèle visuel montre comment le volume (gain) change lorsque vous vous éloignez.",
@@ -403,28 +512,59 @@
             }
         },
         "f18": {
-            "title": "Référence Sonore F/A-18C",
-            "desc": "Guide détaillé pour le modding sonore du Hornet. Référencez ces chemins et paramètres pour vos sons personnalisés.",
-            "tipMono": "<strong>Moteurs & Cockpit :</strong> La plupart des sons extérieurs et des switchs intérieurs sont en Mono pour le positionnement 3D.",
-            "warningLoop": "<strong>Boucles Moteur :</strong> Assurez-vous que vos boucles de démarrage/arrêt/ralenti ont des crossfades précis pour éviter les clics.",
+            "title": "Référence F/A-18C",
+            "desc": "Chemins communs des effets sonores du module F/A-18C Hornet.",
+            "tipMono": "La majorité des sons Moteurs et Armes doivent être Mono pour le positionnement 3D correct.",
+            "warningLoop": "Les sons en boucle doivent être Seamless pour éviter les clics.",
             "sections": {
-                "engines": "Sons Moteur (Ext)",
-                "flyby": "Effets de Flyby",
+                "engines": "Moteurs (Extérieur)",
+                "flyby": "Passages Rapides",
                 "cockpit": "Ambiance Cockpit",
-                "switches": "Boutons & Interrupteurs",
-                "betty": "Alertes Vocales (Betty)",
-                "tones": "Tonalités d'Alerte",
-                "weapons": "Canon & Missiles",
+                "switches": "Interrupteurs & Boutons",
+                "betty": "Alarme Betty",
+                "tones": "Tonalités Radar/RWR",
+                "weapons": "Armements",
                 "explosions": "Explosions",
-                "damage": "Effets de Dégâts",
-                "customTips": "Astuces Pro pour le Hornet",
-                "randomLists": "Sons Aléatoires"
+                "damage": "Dégâts",
+                "customTips": "Astuces Custom",
+                "randomLists": "Sons Aléatoires (Listes)"
             },
             "tips": {
-                "enginePitch": "Les moteurs utilisent la modulation de <code>pitch</code> basée sur la plage de RPM.",
-                "cockpitQuiet": "Gardez le gain des switchs du cockpit autour de 0.6-0.8 pour plus de réalisme.",
-                "explosionsDist": "Les explosions ont besoin d'un large <code>outer_radius</code> (15000+) pour être entendues de loin.",
-                "randomListDesc": "Utilisez une liste de fichiers pour <code>wave</code> afin d'éviter les schémas sonores répétitifs."
+                "enginePitch": "Ajustez le paramètre <code>pitch</code> dans les SDEF moteur pour les sons graves.",
+                "cockpitQuiet": "Les sons de cockpit doivent avoir un <code>inner_radius</code> très bas (ex: 2).",
+                "explosionsDist": "Les grandes explosions nécessitent un <code>outer_radius</code> (15000+).",
+                "randomListDesc": "Utilisez une liste pour ne pas avoir de série de sons exactement identiques."
+            }
+        },
+        "types": {
+            "title": "Types de Sons & Règles Regex",
+            "intro": "La bibliothèque d'assets utilise des <strong>Regex (Expressions Régulières)</strong> pour catégoriser automatiquement vos sons selon leur chemin SDEF. L'application repère déjà les Radios, Armes, Moteurs, etc. Mais pour un mod spécifique, vous pourriez vouloir créer vos propres types !",
+            "whatIsRegex": "Qu'est-ce qu'un motif Regex ?",
+            "regexDesc": "Un motif Regex est une suite de caractères pour rechercher du texte. Lorsque ModMaker scanne <code>Effects/Aircrafts/F16/Engine/Burner.sdef</code>, il teste vos règles pour voir quel Type de Son lui assigner.",
+            "basic": {
+                "title": "Correspondance de Mots Simple",
+                "desc": "Tapez juste le dossier ou mot que vous cherchez. C'est insensible à la casse."
+            },
+            "or": {
+                "title": "L'Opérateur OU (|)",
+                "desc": "Utilisez la barre verticale <code>|</code> pour dire \"Ceci OU Cela\". Parfait pour grouper plusieurs dossiers."
+            },
+            "strict": {
+                "title": "Match Strict (^ et $)",
+                "desc": "Utilisez <code>^</code> pour le début du chemin, et <code>$</code> pour la fin."
+            },
+            "examples": {
+                "title": "Exemples Pratiques",
+                "desc": "Cas d'utilisation courants lors de la création de Types de sons pour DCS.",
+                "ex1Title": "Ex 1: Usine à Gaz F-16",
+                "ex2Title": "Ex 2: Armes Spécifiques",
+                "ex3Title": "Ex 3: Correspondance Exacte"
+            },
+            "priorityTitle": "Priorité des Règles :",
+            "priorityDesc": "Vos règles Custom sont évaluées EN PREMIER, de haut en bas. Si aucune règle custom ne correspond, les règles par défaut sont utilisées.",
+            "share": {
+                "title": "Partager vos Types",
+                "desc": "Une fois vos types créés (ex: F-14 RIO, Boutons MFD...), vous pouvez les exporter. Mieux encore : lors du partage d'un Préréglage, vous pouvez y intégrer vos Types ! Lors de l'import d'un preset, ModMaker proposera d'installer les Types manquants."
             }
         }
     },
@@ -557,7 +697,7 @@
         "description": "Retrouvez les réponses aux questions les plus fréquentes sur Better ModMaker.",
         "q1": {
             "title": "Comment mettre à jour l'Assets Library ?",
-            "desc": "Allez dans l'onglet Docs, cliquez sur \"Recharger la Bibliothèque\", et assurez-vous que votre dossier DCS est correctement lié. L'application va scanner et s'actualiser."
+            "desc": "Allez dans l'onglet Bibliothèque et cliquez sur \"Recharger la Bibliothèque\". Le nouveau Scanner apparaîtra pour analyser automatiquement le jeu de base, vos CoreMods, et vos Parties Enregistrées."
         },
         "q2": {
             "title": "Où se trouve le fichier sdef_and_wave_list.txt ?",
@@ -581,7 +721,35 @@
         },
         "q7": {
             "title": "Comment importer les SDEF d'un avion moddé dans la Bibliothèque ?",
-            "desc": "Pour importer les sons d'un avion moddé, allez dans le dossier du mod et cherchez le dossier nommé 'Sounds'. Pour les mods dans 'Saved Games', il se trouve souvent à la racine (ex: <code>A4E/Sounds</code>). Pour les mods 'Core' (racine DCS), cherchez dans <code>CoreMods\\aircraft\\{AIRCRAFTNAME}\\Sounds</code>. Il vous suffit de zipper le dossier <code>Sounds</code> en .zip, ou bien de zipper tout le mod d'un coup, et de l'importer via l'option <strong>Import Mod (.zip)</strong> dans l'onglet Bibliothèque."
+            "desc": "Vous n'avez plus besoin de zipper et importer manuellement ! Le Scanner natif analysera automatiquement vos dossiers CoreMods et Parties Enregistrées, ajoutant tous les mods (F-4E, F-14, A-4E-C) à la Bibliothèque. L'import manuel (Legacy) reste disponible via le bouton 'Fichier Manuel' du Scanner."
+        },
+        "q8": {
+            "title": "Que fait le bouton 'Recharger / Rescan' ?",
+            "desc": "Le bouton <strong>Reload</strong> dans la Bibliothèque ouvre le scanner DCS. Il analyse votre installation DCS et (optionnellement) votre dossier de mods dans Saved Games pour reconstruire la bibliothèque complète à partir de zéro. Utilisez-le après avoir installé un nouveau module ou mod."
+        },
+        "q9": {
+            "title": "Qu'est-ce qu'un Preset ?",
+            "desc": "Un Preset enregistre un <em>instantané de vos assets sélectionnés</em> dans la bibliothèque — pas les valeurs des paramètres SDEF. C'est un raccourci pour restaurer un groupe de sons rapidement."
+        },
+        "q10": {
+            "title": "Puis-je charger un mod existant déjà construit ?",
+            "desc": "Oui ! Sur la page Projet, cliquez sur <strong>Charger Mod Existant</strong>. Vous pouvez charger depuis une archive <code>.zip</code> ou directement depuis un dossier décompressé (version Electron). L'app importera les fichiers SDEF et tentera de faire correspondre l'audio automatiquement."
+        },
+        "q11": {
+            "title": "Puis-je personnaliser la détection des types de sons ?",
+            "desc": "Oui. La détection est pilotée par des fichiers JSON dans <code>public/sound-types/</code>. Le fichier <code>default.json</code> contient les règles de base. Vous pouvez ajouter votre propre fichier <code>.json</code> avec vos <code>rules</code> (regex → type) et <code>types</code> (label, icône)."
+        },
+        "q12": {
+            "title": "Quelles sont les exigences de format audio pour DCS ?",
+            "desc": "DCS recommande des fichiers <strong>WAV ou OGG Mono</strong> à 44100 Hz ou 48000 Hz. Les fichiers stéréo peuvent être utilisés pour les sons d'ambiance ou le cockpit non spatialisé. L'app vous avertira si un fichier sort des recommandations."
+        },
+        "q13": {
+            "title": "Mes sons ne jouent pas en jeu après installation. Pourquoi ?",
+            "desc": "Vérifiez : (1) Les chemins <code>wave</code> de l'SDEF correspondent aux fichiers audio dans <code>Sounds/Effects/</code>. (2) Votre <code>entry.lua</code> appelle <code>mount_vfs_sound_path</code>. (3) Le chemin SDEF dans votre mod miroir exactement celui d'origine."
+        },
+        "q14": {
+            "title": "DCS dit que le dossier Saved Games doit être propre. Pourquoi ?",
+            "desc": "Eagle Dynamics recommande de ne pas modifier le dossier racine de DCS. Les mods doivent être placés dans <code>Saved Games\\DCS\\Mods\\resource\\</code> pour éviter les conflits, surtout après les mises à jour."
         }
     }
 }
