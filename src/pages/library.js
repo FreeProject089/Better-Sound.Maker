@@ -245,6 +245,12 @@ async function loadLibraryData() {
     const state = getState();
     // First launch detection
     if (!state.globalSettings.dcsPath) {
+      // Hide global loader so user can see and interact with the modal
+      const loader = document.getElementById('global-loader');
+      if (loader && !loader.classList.contains('hidden')) {
+        loader.classList.add('hidden');
+        setTimeout(() => loader.remove(), 500);
+      }
       await openScannerModal(true);
       return;
     }

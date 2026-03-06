@@ -105,6 +105,7 @@ function createWindow() {
 
     // In dev: load Vite dev server; in prod: load built HTML
     if (isDev) {
+        let retries = 0;
         const tryLoad = async (port) => {
             try {
                 await win.loadURL(`http://localhost:${port}`);
@@ -113,6 +114,12 @@ function createWindow() {
                     console.log('Port 5173 failed, trying 5174...');
                     tryLoad(5174);
                 } else {
+                    retries++;
+                    if (retries > 5) {
+                        console.log('Could not connect to Vite dev server after multiple retries. Falling back to dist/index.html...');
+                        win.loadFile(path.join(__dirname, '../dist/index.html'));
+                        return;
+                    }
                     console.log(`Port ${port} failed, retrying in 1s...`);
                     setTimeout(() => tryLoad(5173), 1000);
                 }
