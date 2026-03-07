@@ -127,8 +127,15 @@ export function renderCredits(container) {
           }
         } else {
           // Load from Github
-          const resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
-          text = await resp.text();
+          let resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/main/LICENSE`);
+          if (!resp.ok) {
+            resp = await fetch(`https://raw.githubusercontent.com/${GITHUB_REPO}/master/LICENSE`);
+          }
+          if (resp.ok) {
+            text = await resp.text();
+          } else {
+            throw new Error('Could not load license from GitHub');
+          }
         }
 
         if (!text) throw new Error('No content');
@@ -158,7 +165,8 @@ export function renderCredits(container) {
           actions: [{ id: 'close', label: t('common.close') || 'Close', class: 'btn-secondary' }]
         });
       } catch (err) {
-        window.open(`https://github.com/${GITHUB_REPO}/blob/main/LICENSE`, '_blank');
+        console.warn('License fetch failed, falling back to GitHub page:', err);
+        window.open(`https://github.com/${GITHUB_REPO}`, '_blank');
       }
     });
   }

@@ -37,7 +37,9 @@ const pages = {
     'credits': renderCredits
 };
 
-const CURRENT_VERSION = '1.0.7';
+import { APP_VERSION } from './utils/version.js';
+
+const CURRENT_VERSION = APP_VERSION;
 const LAST_VERSION_KEY = 'bsm-last-run-version';
 
 // Simple Markdown parser
