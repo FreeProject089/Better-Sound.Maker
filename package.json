@@ -1,7 +1,7 @@
 {
   "name": "better-modmaker",
   "private": true,
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Better Sound.Maker — Create DCS World sound mods easily",
   "type": "module",
   "main": "electron/main.js",
@@ -38,8 +38,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "FreeProject089",
-        "repo": "Better-ModMaker",
+        "owner": "better-dcs",
+        "repo": "Better-Sound.Maker",
         "vPrefixedTagName": false
       }
     ],

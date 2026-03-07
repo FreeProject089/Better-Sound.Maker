@@ -39,8 +39,8 @@ Sound categorization is driven by JSON rule files.
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/FreeProject089/Better-ModMaker.git
-   cd Better-ModMaker
+   git clone https://github.com/better-dcs/Better-Sound.Maker.git
+   cd Better-Sound.Maker
    ```
 
 2. **Install dependencies**:
@@ -60,7 +60,7 @@ Sound categorization is driven by JSON rule files.
 ## 🛠️ How Can I Contribute?
 
 ### 🐛 Reporting Bugs
-- Check the [Issues tab](https://github.com/FreeProject089/Better-ModMaker/issues) to see if the bug has already been reported.
+- Check the [Issues tab](https://github.com/better-dcs/Better-Sound.Maker/issues) to see if the bug has already been reported.
 - If not, open a new issue using the **Bug report** template.
 - Provide as much detail as possible: steps to reproduce, screenshots, and logs from the DevTools console (F12).
 

@@ -2,7 +2,7 @@
 
 **Better Sound.Maker** is a powerful, modern desktop application designed to streamline the creation and management of sound mods for **DCS World**. It provides a comprehensive suite of tools to browse assets, edit SDEF parameters visually, manage custom audio, and package complete mods ready for installation.
 
-![App Version](https://img.shields.io/badge/version-1.0.3-blue)
+![App Version](https://img.shields.io/badge/version-1.0.8-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Electron-brightgreen)
 ![License](https://img.shields.io/badge/license-Apache--2.0-orange)
 
@@ -52,8 +52,8 @@ Generate a complete, DCS-ready mod folder structure. The app automatically creat
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/FreeProject089/Better-ModMaker.git
-   cd Better-ModMaker
+   git clone https://github.com/better-dcs/Better-Sound.Maker.git
+   cd Better-Sound.Maker
    ```
 
 2. Install dependencies:
@@ -101,7 +101,7 @@ To generate a production-ready Windows installer (`.exe`):
 Created & Developed by **FreeProject089**.
 
 - **Discord:** [Join the community](https://discord.gg/CTaaEF9R75)
-- **GitHub:** [@FreeProject089](https://github.com/FreeProject089)
+- **GitHub:** [@better-dcs](https://github.com/better-dcs)
 
 ---
 
