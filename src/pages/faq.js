@@ -23,7 +23,7 @@ export function renderFaq(container) {
     {
       q: t('faq.q5.title'),
       a: t('faq.q5.desc'),
-      extra: `<a href="https://github.com/better-dcs/Better-Sound.Maker" target="_blank" class="btn btn-secondary btn-sm" style="margin-top: 12px; display: inline-flex;">${getIcon('github', 'w-4 h-4')} ${t('creditsPage.github.title')}</a>`
+      extra: `<a href="https://github.com/FreeProject089/Better-Sound.Maker" target="_blank" class="btn btn-secondary btn-sm" style="margin-top: 12px; display: inline-flex;">${getIcon('github', 'w-4 h-4')} ${t('creditsPage.github.title')}</a>`
     },
     {
       q: t('faq.q6.title'),

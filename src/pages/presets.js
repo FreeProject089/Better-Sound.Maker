@@ -365,7 +365,7 @@ async function checkUpdatesForLocalPresets(container) {
   // Use cache if checked within 5 mins
   if (!gCommunityPresetsCache || Date.now() - gCommunityPresetsTime > 5 * 60 * 1000) {
     try {
-      const gResp = await fetch(`https://api.github.com/repos/better-dcs/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
+      const gResp = await fetch(`https://api.github.com/repos/BetterDCS/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
       if (gResp.ok) {
         gCommunityPresetsCache = await gResp.json();
         gCommunityPresetsTime = Date.now();
@@ -660,7 +660,7 @@ async function showCommunityPresets(container) {
 
   // 1. Try Github Fetch first
   try {
-    const gResp = await fetch(`https://api.github.com/repos/better-dcs/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
+    const gResp = await fetch(`https://api.github.com/repos/BetterDCS/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
     if (gResp.ok) {
       const ghFiles = await gResp.json();
       for (const meta of ghFiles) {

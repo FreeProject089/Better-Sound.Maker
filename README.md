@@ -52,7 +52,7 @@ Generate a complete, DCS-ready mod folder structure. The app automatically creat
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/better-dcs/Better-Sound.Maker.git
+   git clone https://github.com/FreeProject089/Better-Sound.Maker.git
    cd Better-Sound.Maker
    ```
 
@@ -101,7 +101,7 @@ To generate a production-ready Windows installer (`.exe`):
 Created & Developed by **FreeProject089**.
 
 - **Discord:** [Join the community](https://discord.gg/CTaaEF9R75)
-- **GitHub:** [@better-dcs](https://github.com/better-dcs)
+- **GitHub:** [@FreeProject089](https://github.com/FreeProject089)
 
 ---
 
