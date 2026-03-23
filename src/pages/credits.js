@@ -13,7 +13,11 @@ export function renderCredits(container) {
       <p class="page-description">${t('creditsPage.subtitle')}</p>
     </div>
 
-    <div class="credits-hero card" style="max-width:720px;margin-bottom:28px;text-align:center;padding:36px 28px;background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(6,182,212,0.06));border-color:rgba(59,130,246,0.25);">
+    <div class="credits-hero card" style="position:relative; overflow:hidden; max-width:720px; margin-bottom:28px; text-align:center; padding:36px 28px; border-color:rgba(59,130,246,0.25);">
+      <video autoplay muted loop playsinline class="credits-video-bg">
+        <source src="credits_bg.mp4" type="video/mp4">
+      </video>
+      <div style="position:relative; z-index:2;">
       <div style="display:flex;justify-content:center;margin-bottom:18px;">
         <div class="credits-logo-wrap">
           <img src="BSM.png" alt="Better Sound.Maker" class="credits-logo-img" />
@@ -25,6 +29,7 @@ export function renderCredits(container) {
       <p style="color:var(--text-secondary);max-width:480px;margin:0 auto;font-size:14px;line-height:1.7;">
         ${t('creditsPage.appDescription')}
       </p>
+      </div>
     </div>
 
     <div class="grid-2" style="max-width:720px;margin-bottom:24px;gap:16px;">
@@ -177,7 +182,9 @@ function injectCreditsStyles() {
   const style = document.createElement('style');
   style.id = 'credits-styles';
   style.textContent = `
-    .credits-logo-wrap { width: 88px; height: 88px; border-radius: 22px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
+    .credits-hero { background: var(--bg-card); }
+    .credits-video-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; z-index: 1; pointer-events: none; }
+    .credits-logo-wrap { position: relative; z-index: 2; width: 88px; height: 88px; border-radius: 22px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; padding: 10px; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); }
     .credits-logo-img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
     .credits-version-badge { display: inline-block; background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); border: 1px solid rgba(59, 130, 246, 0.3); font-size: 11px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 100px; margin-top: 6px; }
     .credits-info-card { display: flex; flex-direction: column; gap: 4px; padding: 20px; }
