@@ -16,7 +16,7 @@ export function renderCredits(container) {
     <div class="credits-hero card" style="max-width:720px;margin-bottom:28px;text-align:center;padding:36px 28px;background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(6,182,212,0.06));border-color:rgba(59,130,246,0.25);">
       <div style="display:flex;justify-content:center;margin-bottom:18px;">
         <div class="credits-logo-wrap">
-          <img src="Bm.png" alt="Better Sound.Maker" class="credits-logo-img" />
+          <img src="BSM.png" alt="Better Sound.Maker" class="credits-logo-img" />
         </div>
       </div>
       <h2 style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;">Better Sound.Maker</h2>

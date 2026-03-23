@@ -43,7 +43,7 @@ export function renderNav(container) {
   container.innerHTML = `
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <img src="./BetterSoundMod.webp" alt="Better Sound.Maker" class="sidebar-brand-img" />
+        <img src="./BetterSoundMod.webp " alt="Better Sound.Maker" class="sidebar-brand-img" />
       </div>
     </div>
     

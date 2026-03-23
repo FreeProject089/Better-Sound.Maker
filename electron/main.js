@@ -92,8 +92,8 @@ function createWindow() {
         minHeight: 700,
         title: 'Better Sound.Maker',
         icon: isDev
-            ? path.join(__dirname, '../public/Bm.png')
-            : path.join(__dirname, '../dist/Bm.png'),
+            ? path.join(__dirname, '../public/BSM.png')
+            : path.join(__dirname, '../dist/BSM.png'),
         backgroundColor: '#0d1117',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
