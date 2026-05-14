@@ -5,7 +5,7 @@
 ![App Version](https://img.shields.io/badge/version-1.0.8-blue)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Electron-brightgreen)
 ![License](https://img.shields.io/badge/license-Apache--2.0-orange)
-
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I31ZIPPG)
 ---
 
 ## ✨ Key Features
