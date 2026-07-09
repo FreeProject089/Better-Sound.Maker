@@ -10,6 +10,7 @@ import { showToast } from '../components/toast.js';
 import { pickAudioFile as pickAudioFileFn } from '../utils/file-picker.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { t, updateTranslations } from '../utils/i18n.js';
+import { escapeHtml } from '../utils/html.js';
 
 let audioContext = null;
 let currentAudioSource = null;
@@ -152,19 +153,20 @@ function renderProjectTreeNode(node, parentPath = [], depth = 0) {
     const isOpen = projectOpenFolders.has(pathStr);
     const count = countProjectFiles(child);
     const indent = depth * 20;
+    const safePathStr = escapeHtml(pathStr);
 
     html += `
-            <tr class="folder-row" data-folder-path="${pathStr}">
+            <tr class="folder-row" data-folder-path="${safePathStr}">
                 <td style="text-align:center; vertical-align:middle; padding: 0 8px; background: var(--bg-card);">
-                  <input type="checkbox" class="project-folder-check" data-folder-path="${pathStr}">
+                  <input type="checkbox" class="project-folder-check" data-folder-path="${safePathStr}">
                 </td>
                 <td colspan="5" style="padding-left: ${16 + indent}px; background: var(--bg-card); cursor: pointer;" class="project-folder-toggle">
                     <div style="display: flex; align-items: center; gap: 8px; color: var(--text-primary); font-weight: 600;">
                         <span class="folder-arrow ${isOpen ? 'open' : ''}" style="transition: transform 0.2s;">
                             ${getIcon('chevron-right', 'w-3 h-3')}
                         </span>
-                        ${getIcon('folder', 'fill text-blue-500')} 
-                        <span style="${(child._files && child._files.length > 0) ? 'color: var(--accent-blue); text-shadow: 0 0 8px rgba(59,130,246,0.3);' : ''}">${compressedPath.join('/')}</span>
+                        ${getIcon('folder', 'fill text-blue-500')}
+                        <span style="${(child._files && child._files.length > 0) ? 'color: var(--accent-blue); text-shadow: 0 0 8px rgba(59,130,246,0.3);' : ''}">${escapeHtml(compressedPath.join('/'))}</span>
                         <span style="font-size: 11px; font-weight: 500; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 1px 8px; border-radius: 99px; border: 1px solid rgba(59, 130, 246, 0.2);">${count}</span>
                     </div>
                 </td>
@@ -201,30 +203,39 @@ function renderAssetRow(asset, depth) {
   const name = parts.pop();
   const indent = depth * 20;
 
+  // asset.sdefPath, filenames, and wave paths can all come from an imported
+  // (potentially untrusted) mod ZIP/folder, so they must be escaped before
+  // going into innerHTML (CWE-79).
+  const safeSdefPath = escapeHtml(asset.sdefPath);
+  const safeName = escapeHtml(name);
+  const safeAudioFileName = escapeHtml(asset.audioFileName || '');
+
   let audioInfo = '';
   // Multiple Waves View
   if (asset.customWaves && asset.customWaves.length > 1) {
     const waveRows = asset.customWaves.map((wavePath, i) => {
       const waveFile = asset.waveAudioFiles ? asset.waveAudioFiles[wavePath] : null;
       const waveShort = wavePath.split('/').pop();
+      const safeWavePath = escapeHtml(wavePath);
+      const safeWaveShort = escapeHtml(waveShort);
       if (waveFile && waveFile.fileName) {
         return `
             <div class="audio-player" style="margin-bottom:4px; margin-top:4px; display:flex; align-items:center; gap:6px;">
-              <button class="audio-play-btn" data-play-wave="${asset.sdefPath}" data-wave-path="${wavePath}" title="${t('project.play')}">${getIcon('play')}</button>
+              <button class="audio-play-btn" data-play-wave="${safeSdefPath}" data-wave-path="${safeWavePath}" title="${t('project.play')}">${getIcon('play')}</button>
               <div class="audio-info" style="flex:1; min-width:0;">
-                <div class="audio-filename" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${waveFile.fileName}</div>
+                <div class="audio-filename" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escapeHtml(waveFile.fileName)}</div>
                 <div class="audio-meta" style="display:flex; gap:4px; flex-wrap:wrap;">
-                  <span class="tag tag-blue" style="font-size:10px;">${waveShort}</span>
-                  <span class="tag ${waveFile.audioMeta?.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${waveFile.audioMeta?.channelType || '?'}</span>
+                  <span class="tag tag-blue" style="font-size:10px;">${safeWaveShort}</span>
+                  <span class="tag ${waveFile.audioMeta?.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${escapeHtml(waveFile.audioMeta?.channelType || '?')}</span>
                 </div>
               </div>
-              <button class="btn-icon danger" style="flex-shrink:0; width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center;" data-remove-wave="${asset.sdefPath}" data-wave-path="${wavePath}" title="${t('project.removeAudio')}">${getIcon('trash-2', 'w-4 h-4')}</button>
+              <button class="btn-icon danger" style="flex-shrink:0; width:28px; height:28px; padding:0; display:flex; align-items:center; justify-content:center;" data-remove-wave="${safeSdefPath}" data-wave-path="${safeWavePath}" title="${t('project.removeAudio')}">${getIcon('trash-2', 'w-4 h-4')}</button>
             </div>
         `;
       } else {
         return `
-            <div class="drop-zone" data-drop-wave="${asset.sdefPath}" data-wave-path="${wavePath}" style="margin-bottom:4px; margin-top:4px; padding:6px 8px; display:flex; align-items:center; gap:6px;">
-              ${getIcon('upload', 'w-3 h-3')} ${t('project.clickDragUpload')} <span style="font-family:monospace; font-size:10px; opacity:0.7;">(${waveShort})</span>
+            <div class="drop-zone" data-drop-wave="${safeSdefPath}" data-wave-path="${safeWavePath}" style="margin-bottom:4px; margin-top:4px; padding:6px 8px; display:flex; align-items:center; gap:6px;">
+              ${getIcon('upload', 'w-3 h-3')} ${t('project.clickDragUpload')} <span style="font-family:monospace; font-size:10px; opacity:0.7;">(${safeWaveShort})</span>
             </div>
         `;
       }
@@ -237,13 +248,13 @@ function renderAssetRow(asset, depth) {
       // Normal player
       audioInfo = `
               <div class="audio-player">
-                <button class="audio-play-btn" data-play="${asset.sdefPath}" title="${t('project.play')}">${getIcon('play')}</button>
+                <button class="audio-play-btn" data-play="${safeSdefPath}" title="${t('project.play')}">${getIcon('play')}</button>
                 <div class="audio-info">
-                  <div class="audio-filename">${asset.audioFileName}</div>
+                  <div class="audio-filename">${safeAudioFileName}</div>
                   <div class="audio-meta">
-                    <span class="tag ${meta.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${meta.channelType}</span>
-                    <span>${meta.sampleRate}Hz</span>
-                    <span>${meta.durationFormatted}</span>
+                    <span class="tag ${meta.channelType === 'Mono' ? 'tag-green' : 'tag-amber'}">${escapeHtml(meta.channelType)}</span>
+                    <span>${escapeHtml(String(meta.sampleRate))}Hz</span>
+                    <span>${escapeHtml(meta.durationFormatted)}</span>
                   </div>
                 </div>
               </div>
@@ -253,13 +264,13 @@ function renderAssetRow(asset, depth) {
       }
     } else if (hasAudio && !hasFile) {
       audioInfo = `
-              <div class="drop-zone warning" data-drop="${asset.sdefPath}">
-                ${getIcon('refresh-cw', 'w-3 h-3')} ${t('project.reupload')} ${asset.audioFileName}
+              <div class="drop-zone warning" data-drop="${safeSdefPath}">
+                ${getIcon('refresh-cw', 'w-3 h-3')} ${t('project.reupload')} ${safeAudioFileName}
               </div>
             `;
     } else {
       audioInfo = `
-              <div class="drop-zone" data-drop="${asset.sdefPath}">
+              <div class="drop-zone" data-drop="${safeSdefPath}">
                 ${getIcon('upload', 'w-3 h-3')} ${t('project.clickDragUpload')}
               </div>
             `;
@@ -267,26 +278,26 @@ function renderAssetRow(asset, depth) {
   }
 
   return `
-        <tr class="${projectSelectedIds.has(asset.sdefPath) ? 'row-selected' : ''}" data-sdef-path="${asset.sdefPath}">
+        <tr class="${projectSelectedIds.has(asset.sdefPath) ? 'row-selected' : ''}" data-sdef-path="${safeSdefPath}">
           <td style="text-align:center; vertical-align:middle; padding: 0 8px;">
-            <input type="checkbox" class="project-row-check" data-sdef-path="${asset.sdefPath}" ${projectSelectedIds.has(asset.sdefPath) ? 'checked' : ''}>
+            <input type="checkbox" class="project-row-check" data-sdef-path="${safeSdefPath}" ${projectSelectedIds.has(asset.sdefPath) ? 'checked' : ''}>
           </td>
           <td style="padding-left: ${16 + indent}px;">
-            <div class="project-asset-name" style="font-weight: 600; font-size: 13px; color: var(--text-color);">${name}</div>
-            <div class="project-asset-path truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${asset.sdefPath}">${asset.sdefPath}</div>
+            <div class="project-asset-name" style="font-weight: 600; font-size: 13px; color: var(--text-color);">${safeName}</div>
+            <div class="project-asset-path truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${safeSdefPath}">${safeSdefPath}</div>
           </td>
           <td>${audioInfo}</td>
           <td style="text-align:center; vertical-align:middle;">
             <div class="flex-gap" style="justify-content:center;">
-                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn btn-secondary btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-change="${asset.sdefPath}" title="${t('project.replace')}">${getIcon('refresh-cw', 'w-4 h-4')}</button>` : ''}
-                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn btn-danger btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-remove-audio="${asset.sdefPath}" title="${t('project.removeAudio')}">${getIcon('trash-2', 'w-4 h-4')}</button>` : ''}
+                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn btn-secondary btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-change="${safeSdefPath}" title="${t('project.replace')}">${getIcon('refresh-cw', 'w-4 h-4')}</button>` : ''}
+                ${hasAudio && (!asset.customWaves || asset.customWaves.length <= 1) ? `<button class="btn btn-danger btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-remove-audio="${safeSdefPath}" title="${t('project.removeAudio')}">${getIcon('trash-2', 'w-4 h-4')}</button>` : ''}
             </div>
           </td>
           <td style="text-align:center; vertical-align:middle;">
-            <button class="btn btn-secondary btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-edit-sdef="${asset.sdefPath}" title="${t('project.editSdef')}">${getIcon('sliders', 'w-4 h-4')}</button>
+            <button class="btn btn-secondary btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-edit-sdef="${safeSdefPath}" title="${t('project.editSdef')}">${getIcon('sliders', 'w-4 h-4')}</button>
           </td>
           <td style="text-align:center; vertical-align:middle;">
-            <button class="btn btn-danger btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-deselect="${asset.sdefPath}" title="${t('project.remove')}">${getIcon('x', 'w-4 h-4')}</button>
+            <button class="btn btn-danger btn-sm" style="width:32px; height:32px; padding:0; display:inline-flex; align-items:center; justify-content:center;" data-deselect="${safeSdefPath}" title="${t('project.remove')}">${getIcon('x', 'w-4 h-4')}</button>
           </td>
         </tr>
       `;

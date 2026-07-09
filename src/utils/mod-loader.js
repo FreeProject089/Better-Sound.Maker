@@ -31,8 +31,10 @@ export async function loadModFromZip(zipFile) {
     const audioFiles = zip.file(/Sounds\/Effects\/.*\.(wav|ogg)$/i);
 
     for (const sFile of sdefFiles) {
-        // Path relative to Sounds/sdef/
-        const sdefPath = sFile.name.replace(/^.*Sounds\/sdef\//i, '');
+        // Path relative to Sounds/sdef/, with the DCS-required "Effects/" wrapper
+        // stripped so asset keys stay consistent with what mod-builder expects
+        // (it re-adds the "Effects/" prefix when writing sdef files back out).
+        const sdefPath = sFile.name.replace(/^.*Sounds\/sdef\//i, '').replace(/^Effects\//i, '');
         const content = await sFile.async('string');
         const params = parseSdef(content);
 
@@ -134,6 +136,9 @@ export async function loadModFromFolder(folderPath) {
         let sdefPathKey = sFilePath.replace(/\\/g, '/');
         if (sdefPathKey.toLowerCase().includes('/sounds/sdef/')) {
             sdefPathKey = sdefPathKey.split(/\/sounds\/sdef\//i)[1];
+            // Strip the DCS-required "Effects/" wrapper so asset keys stay
+            // consistent with what mod-builder expects when re-exporting.
+            sdefPathKey = sdefPathKey.replace(/^Effects\//i, '');
         } else {
             // Fallback: just use the filename if structure is weird
             sdefPathKey = sdefPathKey.split('/').pop();

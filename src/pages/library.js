@@ -16,6 +16,7 @@ import { showToast } from '../components/toast.js';
 import { guessLoopType, detectSoundType, SOUND_TYPES, analyzeAudioFile, ensureRulesLoaded, getTypeIconHtml } from '../utils/audio-analyzer.js';
 import { pickTextFile, pickJsonFile } from '../utils/file-picker.js';
 import { showModal } from '../components/modal.js';
+import { escapeHtml } from '../utils/html.js';
 
 let allAssets = [];
 // currentPath is an array of folder segments (e.g. ['Aircrafts', 'AH-64D'])
@@ -605,12 +606,12 @@ function renderTreeNode(node, parentPath, depth) {
     const indent = depth * 14;
 
     html += `
-      <div class="folder-item ${isActive ? 'active' : ''}" data-path="${pathStr}" style="padding-left:${12 + indent}px;">
+      <div class="folder-item ${isActive ? 'active' : ''}" data-path="${escapeHtml(pathStr)}" style="padding-left:${12 + indent}px;">
         <span class="folder-toggle ${isOpen && hasSubfolders ? 'open' : ''}">
           ${hasSubfolders ? getIcon('chevron-right', 'w-4 h-4') : '<span style="width:14px;display:inline-block"></span>'}
         </span>
         <span class="folder-icon">${isOpen ? getIcon('folder-open') : getIcon('folder')}</span>
-        <span class="folder-label">${key}</span>
+        <span class="folder-label">${escapeHtml(key)}</span>
         <span class="folder-count">${count}</span>
       </div>
     `;
@@ -636,9 +637,12 @@ function renderBreadcrumb() {
     return;
   }
 
-  const crumbs = [{ label: getIcon('package') + ' ' + t('library.allAssets'), path: [] }];
+  // Root crumb's label is trusted (our own icon markup); folder-name crumbs
+  // come from asset paths (potentially attacker-controlled via imported mods)
+  // and must be escaped before going into innerHTML.
+  const crumbs = [{ label: getIcon('package') + ' ' + t('library.allAssets'), path: [], safe: true }];
   for (let i = 0; i < currentPath.length; i++) {
-    crumbs.push({ label: currentPath[i], path: currentPath.slice(0, i + 1) });
+    crumbs.push({ label: currentPath[i], path: currentPath.slice(0, i + 1), safe: false });
   }
 
   const count = filteredAssetsCache.length;
@@ -648,11 +652,12 @@ function renderBreadcrumb() {
       <ol class="breadcrumb-list">
         ${crumbs.map((c, i) => {
     const isLast = i === crumbs.length - 1;
+    const label = c.safe ? c.label : escapeHtml(c.label);
     return `
             <li class="breadcrumb-item">
               ${isLast
-        ? `<span class="breadcrumb-current">${c.label}</span>`
-        : `<button class="breadcrumb-link" data-bpath="${c.path.join('/')}">${c.label}</button>`
+        ? `<span class="breadcrumb-current">${label}</span>`
+        : `<button class="breadcrumb-link" data-bpath="${escapeHtml(c.path.join('/'))}">${label}</button>`
       }
               ${!isLast ? '<span class="breadcrumb-sep">›</span>' : ''}
             </li>`;
@@ -811,11 +816,15 @@ function renderVirtualList(reset = false) {
     const typeIconHtml = getTypeIconHtml(typeInfo, 'w-3 h-3');
     // Strip all type labels from note display (they're shown in the Type column)
     const note = rawNote ? stripTypeLabels(rawNote) : '';
+    const safeAssetName = escapeHtml(asset.name);
+    const safeSdefPath = escapeHtml(asset.sdefPath);
+    const safeWaves = escapeHtml(asset.waves.join(', '));
+    const safeNote = escapeHtml(note);
     const NOTE_MAX = 10;
     const noteSnippet = note
       ? (note.length > NOTE_MAX
-        ? `<div style="display:flex; justify-content:center; width:100%;"><button class="btn-expand-note" data-note="${note.replace(/"/g, '&quot;')}" onclick="event.stopPropagation()" title="View full note" style="background:var(--bg-tertiary); border:1px solid var(--accent-blue); color:var(--accent-blue); cursor:pointer; padding:4px; border-radius:6px; transition:all 0.2s; display:flex; align-items:center;">${getIcon('maximize', 'w-4 h-4')}</button></div>`
-        : `<span class="asset-note-snippet" style="font-style:italic; opacity:0.8;" title="${note.replace(/"/g, '&quot;')}">${note}</span>`)
+        ? `<div style="display:flex; justify-content:center; width:100%;"><button class="btn-expand-note" data-note="${safeNote}" onclick="event.stopPropagation()" title="View full note" style="background:var(--bg-tertiary); border:1px solid var(--accent-blue); color:var(--accent-blue); cursor:pointer; padding:4px; border-radius:6px; transition:all 0.2s; display:flex; align-items:center;">${getIcon('maximize', 'w-4 h-4')}</button></div>`
+        : `<span class="asset-note-snippet" style="font-style:italic; opacity:0.8;" title="${safeNote}">${safeNote}</span>`)
       : '<span style="color:var(--text-muted);font-size:11px; opacity:0.3;">—</span>';
 
     html += `
@@ -824,18 +833,18 @@ function renderVirtualList(reset = false) {
            style="position:absolute; top:${i * ROW_HEIGHT}px; width:100%; height:${ROW_HEIGHT}px; cursor:pointer;">
         <div onclick="event.stopPropagation()">
           <label class="checkbox-wrapper">
-            <input type="checkbox" ${selected ? 'checked' : ''} data-sdef="${asset.sdefPath}" />
+            <input type="checkbox" ${selected ? 'checked' : ''} data-sdef="${safeSdefPath}" />
           </label>
         </div>
-        <div class="asset-sdef-path truncate" style="line-height: 1.2; display: flex; flex-direction: column; justify-content: center;" title="${asset.sdefPath}">
-          <div style="font-weight: 600; font-size: 13px; color: var(--text-color);">${audioIndicator}${asset.name}</div>
-          <div class="truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${asset.sdefPath}">${asset.sdefPath}</div>
+        <div class="asset-sdef-path truncate" style="line-height: 1.2; display: flex; flex-direction: column; justify-content: center;" title="${safeSdefPath}">
+          <div style="font-weight: 600; font-size: 13px; color: var(--text-color);">${audioIndicator}${safeAssetName}</div>
+          <div class="truncate" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;" title="${safeSdefPath}">${safeSdefPath}</div>
         </div>
-        <div class="asset-wave-paths truncate" title="${asset.waves.join(', ')}">
-          ${asset.waves.join(', ') || '—'}
+        <div class="asset-wave-paths truncate" title="${safeWaves}">
+          ${safeWaves || '—'}
         </div>
         <div>
-          <span class="tag" title="${typeInfo.description}" style="font-size:10px; display:inline-flex; align-items:center; gap:4px;">${typeIconHtml} ${typeInfo.label}</span>
+          <span class="tag" title="${escapeHtml(typeInfo.description)}" style="font-size:10px; display:inline-flex; align-items:center; gap:4px;">${typeIconHtml} ${escapeHtml(typeInfo.label)}</span>
         </div>
         <div>${loopTag}</div>
         <div>${noteSnippet}</div>
@@ -854,7 +863,10 @@ function renderVirtualList(reset = false) {
       const { showModal } = await import('../components/modal.js');
       await showModal({
         title: 'Note',
-        content: `<div style="white-space:pre-wrap; font-size:13px; color:var(--text-secondary); max-height:400px; overflow-y:auto; padding:4px 0;">${btn.dataset.note}</div>`,
+        // btn.dataset.note is already HTML-escaped when the attribute was written,
+        // but the DOM decodes attribute entities back to raw text on read — re-escape
+        // before it goes into innerHTML again.
+        content: `<div style="white-space:pre-wrap; font-size:13px; color:var(--text-secondary); max-height:400px; overflow-y:auto; padding:4px 0;">${escapeHtml(btn.dataset.note)}</div>`,
         actions: [{ id: 'close', label: 'Close', class: 'btn-secondary' }]
       });
     });
@@ -931,26 +943,27 @@ function openDetailPanel(asset) {
 
   const waveRows = asset.waves.map((w, wi) => {
     const wNote = getAssetNote(`wave::${w}`);
+    const safeW = escapeHtml(w);
     return `
       <div class="wave-entry" data-wi="${wi}">
-        <div class="wave-path-label" title="${w}">
+        <div class="wave-path-label" title="${safeW}">
           <span class="wave-path-icon">${getIcon('volume-2')}</span>
-          <code class="wave-path-text">${w}</code>
+          <code class="wave-path-text">${safeW}</code>
         </div>
         <div class="wave-note-row">
           <textarea
             class="wave-note-input input-field"
-            data-wave="${w}"
+            data-wave="${safeW}"
             placeholder="${t('library.waveNotePlaceholder') || 'Note about this wave file…'}"
             rows="2"
-          >${wNote}</textarea>
+          >${escapeHtml(wNote)}</textarea>
           <div class="wave-audio-upload">
             <label class="btn btn-secondary btn-sm wave-audio-label" title="${t('library.uploadWaveReplacement')}">
               ${getIcon('upload', 'w-3 h-3')} ${t('library.uploadWav')}
-              <input type="file" accept=".wav,.ogg,.mp3" class="hidden" data-wave-upload="${w}" />
+              <input type="file" accept=".wav,.ogg,.mp3" class="hidden" data-wave-upload="${safeW}" />
             </label>
             <span class="wave-audio-name" id="wave-audio-${wi}">
-              ${getWaveAudioFileName(asset.sdefPath, w) || ''}
+              ${escapeHtml(getWaveAudioFileName(asset.sdefPath, w) || '')}
             </span>
           </div>
         </div>
@@ -958,10 +971,13 @@ function openDetailPanel(asset) {
     `;
   }).join('');
 
+  const safeAssetName = escapeHtml(asset.name);
+  const safeSdefPath = escapeHtml(asset.sdefPath);
+
   panel.innerHTML = `
     <div class="detail-header">
-      <div class="detail-sdef-name truncate" title="${asset.sdefPath}">${asset.name}</div>
-      <div class="detail-sdef-path truncate" title="${asset.sdefPath}">${asset.sdefPath}</div>
+      <div class="detail-sdef-name truncate" title="${safeSdefPath}">${safeAssetName}</div>
+      <div class="detail-sdef-path truncate" title="${safeSdefPath}">${safeSdefPath}</div>
       <div style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
         <button class="btn btn-${isSelected ? 'danger' : 'primary'} btn-sm" id="detail-toggle-btn">
           ${isSelected ? getIcon('x', 'w-3 h-3') + ' ' + t('library.deselect') : getIcon('plus', 'w-3 h-3') + ' ' + t('library.select')}
@@ -972,12 +988,12 @@ function openDetailPanel(asset) {
         </label>
         ${hasAudio ? `<button class="btn btn-danger btn-sm" id="detail-audio-remove">${getIcon('trash-2', 'w-3 h-3')} ${t('library.remove')}</button>` : ''}
       </div>
-      ${audioFileName ? `<div class="detail-audio-info">${getIcon('paperclip', 'w-3 h-3')} ${audioFileName}</div>` : ''}
+      ${audioFileName ? `<div class="detail-audio-info">${getIcon('paperclip', 'w-3 h-3')} ${escapeHtml(audioFileName)}</div>` : ''}
     </div>
 
     <div class="detail-section">
       <div class="detail-section-title">${getIcon('file-text', 'w-4 h-4')} ${t('library.sdefNote')}</div>
-      <textarea class="input-field" id="detail-sdef-note" rows="3" placeholder="${t('library.sdefNotePlaceholder')}">${sdefNote}</textarea>
+      <textarea class="input-field" id="detail-sdef-note" rows="3" placeholder="${t('library.sdefNotePlaceholder')}">${escapeHtml(sdefNote)}</textarea>
     </div>
 
     <div class="detail-section">

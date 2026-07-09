@@ -12,12 +12,17 @@
  * ├── entry.lua
  * ├── Sounds/
  * │   ├── sdef/
- * │   │   └── Aircrafts/FA-18/...   (.sdef files)
+ * │   │   └── Effects/
+ * │   │       └── Aircrafts/FA-18/...   (.sdef files)
  * │   └── Effects/
  * │       └── Aircrafts/FA-18/...   (.wav/.ogg files)
  * └── Theme/
  *     ├── icon.png
  *     └── ME/
+ *
+ * Note: DCS only picks up sdef files nested under an "Effects/" subfolder
+ * of Sounds/sdef/ — a flat Sounds/sdef/SoundName.sdef is detected by the
+ * DCS mod manager but never actually wired into the sound engine.
  */
 
 import JSZip from 'jszip';
@@ -109,7 +114,7 @@ async function processSdefToFolderElectron(sdefBasePath, effectsBasePath, assetK
     // Write sdef file
     const sdefContent = getSdefContent(assetKey, assetData);
     if (sdefContent) {
-        const sdefFilePath = `${sdefBasePath}/${assetKey}`;
+        const sdefFilePath = `${sdefBasePath}/Effects/${assetKey}`;
         const sdefDir = sdefFilePath.substring(0, sdefFilePath.lastIndexOf('/'));
         await window.electronAPI.mkdir(sdefDir);
         await window.electronAPI.writeFile(sdefFilePath, sdefContent);
@@ -211,10 +216,10 @@ async function buildToFolder(modFolderName, config, selected, audioFormat, repor
 }
 
 async function processSdefToFolder(sdefRootDir, effectsDir, assetKey, assetData, audioFormat) {
-    // Navigate/create the sdef directory tree
+    // Navigate/create the sdef directory tree (DCS requires sdef files under sdef/Effects/)
     const sdefParts = assetKey.split('/');
     const sdefFileName = sdefParts.pop();
-    let sdefDir = sdefRootDir;
+    let sdefDir = await sdefRootDir.getDirectoryHandle('Effects', { create: true });
     for (const part of sdefParts) {
         sdefDir = await sdefDir.getDirectoryHandle(part, { create: true });
     }
@@ -336,7 +341,8 @@ async function buildToZip(modFolderName, config, selected, audioFormat, report) 
 async function processSdefToZip(sdefFolder, effectsFolder, assetKey, assetData, audioFormat) {
     const sdefContent = getSdefContent(assetKey, assetData);
     if (sdefContent) {
-        sdefFolder.file(assetKey, sdefContent);
+        // DCS requires sdef files nested under sdef/Effects/
+        sdefFolder.file(`Effects/${assetKey}`, sdefContent);
     }
 
     const waves = assetData.customWaves || assetData.originalAsset?.waves || [];
