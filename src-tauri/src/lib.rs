@@ -199,6 +199,69 @@ fn open_path(app: AppHandle, path: String) -> CmdResult<()> {
     app.opener().open_path(path, None::<&str>).map_err(err)
 }
 
+/* ── BetterInstaller updater ─────────────────────────────────────── */
+
+const APP_ID: &str = "com.bettersoundmaker.app";
+
+/// The BetterInstaller maintenance exe, only when this copy was installed by it.
+///
+/// Tauri's NSIS bundle also leaves an `uninstall.exe` beside the app, so the
+/// exe alone proves nothing: BetterInstaller writes `uninstall-info.json`
+/// with our app id, NSIS never does.
+fn better_installer_exe() -> Option<PathBuf> {
+    let dir = std::env::current_exe().ok()?.parent()?.to_path_buf();
+    let info: serde_json::Value =
+        serde_json::from_slice(&fs::read(dir.join("uninstall-info.json")).ok()?).ok()?;
+    if info["app_id"].as_str() != Some(APP_ID) {
+        return None;
+    }
+    let exe = dir.join(if cfg!(windows) { "uninstall.exe" } else { "uninstall" });
+    exe.is_file().then_some(exe)
+}
+
+/// `uninstall.exe --check-update`. Null when this is not a BetterInstaller
+/// install (the frontend then uses the Tauri updater); otherwise its JSON
+/// report, with `error` set when the check failed (exit code 2).
+#[tauri::command]
+async fn bi_check_update() -> CmdResult<Option<serde_json::Value>> {
+    let Some(exe) = better_installer_exe() else {
+        return Ok(None);
+    };
+    let out = tauri::async_runtime::spawn_blocking(move || {
+        let mut cmd = std::process::Command::new(exe);
+        cmd.arg("--check-update");
+        #[cfg(windows)]
+        {
+            use std::os::windows::process::CommandExt;
+            cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
+        }
+        cmd.output()
+    })
+    .await
+    .map_err(err)?
+    .map_err(err)?;
+
+    let mut report: serde_json::Value = serde_json::from_slice(&out.stdout)
+        .unwrap_or_else(|_| serde_json::json!({ "update_available": false }));
+    if out.status.code() == Some(2) && report.get("error").is_none() {
+        report["error"] = "BetterInstaller check failed".into();
+    }
+    Ok(Some(report))
+}
+
+/// Hand over to `uninstall.exe --update`: it waits for this process to exit,
+/// applies the signed update with rollback, then relaunches the app.
+#[tauri::command]
+fn bi_apply_update(app: AppHandle) -> CmdResult<()> {
+    let exe = better_installer_exe().ok_or("not a BetterInstaller install")?;
+    std::process::Command::new(exe)
+        .args(["--update", "--wait-pid", &std::process::id().to_string(), "--launch"])
+        .spawn()
+        .map_err(err)?;
+    app.exit(0);
+    Ok(())
+}
+
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -218,6 +281,8 @@ pub fn run() {
             get_app_path,
             get_user_home,
             open_path,
+            bi_check_update,
+            bi_apply_update,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Better Sound.Maker");

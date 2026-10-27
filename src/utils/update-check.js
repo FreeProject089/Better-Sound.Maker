@@ -7,7 +7,69 @@ import { showToast } from '../components/toast.js';
 import { APP_VERSION, GITHUB_REPO } from './version.js';
 
 /**
- * Desktop: signed in-place update through the Tauri updater (NSIS/MSI).
+ * Desktop update chain:
+ *   1. BetterInstaller   — when this copy was installed by BetterInstaller (signed .bpkg, rollback)
+ *   2. Tauri updater     — NSIS/MSI installs, or when BetterInstaller could not answer
+ *   3. GitHub version check → releases page
+ */
+
+/**
+ * Returns true when BetterInstaller answered (update offered or none available),
+ * false when this is not a BetterInstaller install or its check failed.
+ */
+async function checkBetterInstallerUpdate(quiet) {
+    let report;
+    try {
+        report = await window.nativeAPI.biCheckUpdate();
+    } catch (e) {
+        console.warn('BetterInstaller check failed:', e);
+        return false;
+    }
+    if (!report) return false;
+    if (report.error) {
+        console.warn('BetterInstaller check failed, falling back to the Tauri updater:', report.error);
+        return false;
+    }
+    if (!report.update_available) {
+        if (!quiet) showToast('You are running the latest version!', 'success');
+        return true;
+    }
+    showModal({
+        title: '🚀 Update Available!',
+        content: `
+            <div style="text-align:center; padding: 10px 0;">
+                <p>A new version of <strong>Better Sound.Maker</strong> is ready!</p>
+                <div style="font-size: 24px; font-weight: 800; margin: 15px 0;">
+                    ${escapeText(report.current_version || APP_VERSION)} → <span style="color:var(--accent-green)">${escapeText(report.latest_version)}</span>
+                </div>
+                ${report.notes ? `<p style="font-size: 13px; white-space: pre-line;">${escapeText(report.notes)}</p>` : ''}
+                <p style="color:var(--text-muted); font-size: 13px;">The app will close, update, then restart.</p>
+            </div>
+        `,
+        buttons: [
+            {
+                text: 'Update Now',
+                primary: true,
+                onClick: async () => {
+                    try {
+                        await window.nativeAPI.biApplyUpdate();
+                    } catch (e) {
+                        console.warn('BetterInstaller update failed to start:', e);
+                        showToast('Update failed, trying the standard updater...', 'error');
+                        if (!(await checkNativeUpdate(false))) {
+                            window.open(`https://github.com/${GITHUB_REPO}/releases/latest`, '_blank');
+                        }
+                    }
+                }
+            },
+            { text: 'Later', primary: false }
+        ]
+    });
+    return true;
+}
+
+/**
+ * Signed in-place update through the Tauri updater (NSIS/MSI).
  * Returns true when the updater answered (update installed or none available),
  * false when it could not be reached so the caller falls back to the GitHub check.
  */
@@ -64,6 +126,7 @@ function escapeText(s) {
 export async function checkUpdate(quiet = true) {
     if (window.nativeAPI) {
         if (!quiet) showToast('Checking for updates...', 'info');
+        if (await checkBetterInstallerUpdate(quiet)) return;
         if (await checkNativeUpdate(quiet)) return;
     }
 
