@@ -12,11 +12,12 @@ import {
 import { SDEF_PARAMS, generateSdef, parseSdef } from '../utils/sdef-generator.js';
 import { lintSdef, attenuationRadii, gainAtDistance } from '../utils/sdef-lint.js';
 import { escapeHtml } from '../utils/html.js';
+import { renderWavePanel, attachWavePanel } from '../components/wave-panel.js';
 import { showToast } from '../components/toast.js';
 import { showModal } from '../components/modal.js';
 import { detectSoundType, getTypeDefaults, SOUND_TYPES, getTypeIconHtml } from '../utils/audio-analyzer.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
-import { t, updateTranslations } from '../utils/i18n.js';
+import { t, updateTranslations, getCurrentLanguage } from '../utils/i18n.js';
 
 let currentMode = 'visual'; // 'visual' or 'raw'
 let currentParams = {};
@@ -324,21 +325,14 @@ function renderEditorContent() {
 
     for (const param of params) {
       if (param.key === 'wave') {
-        const waves = currentParams.wave || [];
-        const waveStr = Array.isArray(waves) ? waves.join('\n') : waves;
-
+        const waves = Array.isArray(currentParams.wave) ? currentParams.wave : currentParams.wave ? [currentParams.wave] : [];
         fieldsHtml += `
-          <div class="sdef-param-row sdef-param-row--tall">
+          <div class="sdef-param-row sdef-param-row--tall" data-param-row="wave">
             <div class="sdef-param-meta">
               <div class="sdef-param-name">${param.key}</div>
               <div class="sdef-param-desc">${param.desc}</div>
             </div>
-            <div class="sdef-param-control">
-              <textarea class="input-field" data-param="wave" rows="3"
-                placeholder="Effects/path/to/sound (one per line for multiple)"
-                style="font-size: 12px; min-height: 72px; font-family: var(--font-mono);">${escapeHtml(waveStr)}</textarea>
-              <div class="sdef-param-hint">One path per line for random sample selection</div>
-            </div>
+            <div class="sdef-param-control" id="wave-panel-host">${renderWavePanel(currentSdef || '', waves)}</div>
           </div>
         `;
         continue;
@@ -480,7 +474,23 @@ async function showTemplatesModal(container) {
   const entriesCount = Object.keys(state.selectedAssets).length;
   const currentSdef = state.currentSdef;
 
+  // Batch scopes: one per aircraft / module folder (first two path levels)
+  const folderCounts = {};
+  for (const p of Object.keys(state.selectedAssets)) {
+    const parts = p.split('/');
+    if (parts.length < 3) continue;
+    const f = parts.slice(0, 2).join('/');
+    folderCounts[f] = (folderCounts[f] || 0) + 1;
+  }
+  const folders = Object.entries(folderCounts).sort((a, b) => b[1] - a[1]);
+  const defaultFolder = currentSdef ? currentSdef.split('/').slice(0, 2).join('/') : folders[0]?.[0];
+  const folderLabel = () => (getCurrentLanguage() === 'fr' ? 'Dossier' : 'Folder');
+
   const renderTemplateList = (listEl) => {
+    if (folders.length && !document.getElementById('tpl-folder')) {
+      listEl.insertAdjacentHTML('beforebegin', `<label class="tpl-scope">${getIcon('plane', 'w-3.5 h-3.5')}
+        <select id="tpl-folder" class="input-field">${folders.map(([f, n]) => `<option value="${escapeHtml(f)}" ${f === defaultFolder ? 'selected' : ''}>${escapeHtml(f)} (${n})</option>`).join('')}</select></label>`);
+    }
     if (templates.length === 0) {
       listEl.innerHTML = `
         <div class="tpl-empty">
@@ -505,6 +515,7 @@ async function showTemplatesModal(container) {
         </div>
         <div class="tpl-item-apply">
           <button class="tpl-btn-apply" data-apply-current="${escapeHtml(tpl.id)}" style="${!currentSdef ? 'display:none' : ''}">${t('sdef.templates.applyCurrent')}</button>
+          ${folders.length ? `<button class="tpl-btn-apply" data-apply-folder="${escapeHtml(tpl.id)}">${getIcon('folder', 'w-3 h-3')} ${escapeHtml(folderLabel())}</button>` : ''}
           <button class="tpl-btn-apply primary" data-apply-all="${escapeHtml(tpl.id)}" style="${entriesCount <= 1 ? 'display:none' : ''}">${t('sdef.templates.applyAll', { count: entriesCount })}</button>
         </div>
       </div>
@@ -512,6 +523,15 @@ async function showTemplatesModal(container) {
 
     listEl.querySelectorAll('[data-apply-current]').forEach(btn => {
       btn.addEventListener('click', () => applyTemplate(templates.find(x => x.id === btn.dataset.applyCurrent), false));
+    });
+    listEl.querySelectorAll('[data-apply-folder]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const folder = document.getElementById('tpl-folder')?.value;
+        const n = Object.keys(getState().selectedAssets).filter(p => p.startsWith(folder + '/')).length;
+        if (folder && confirm(t('sdef.templates.confirmAll', { count: n }))) {
+          applyTemplate(templates.find(x => x.id === btn.dataset.applyFolder), folder);
+        }
+      });
     });
     listEl.querySelectorAll('[data-apply-all]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -706,7 +726,9 @@ function applyTemplate(template, applyToAll = false) {
   if (applyToAll) {
     const assets = state.selectedAssets;
     const updates = {};
-    for (const path of Object.keys(assets)) {
+    // applyToAll: true = every SDEF, a string = every SDEF under that folder
+    const paths = Object.keys(assets).filter(p => applyToAll === true || p.startsWith(applyToAll + '/'));
+    for (const path of paths) {
       const existingContent = state.unsavedSdefs[path] || getSdefContent(path);
       const existingParams = parseSdef(existingContent);
       const newParams = { ...template.params };
@@ -857,6 +879,8 @@ function attachEditorContentHandlers() {
     renderSdefFileList();
     showToast(t('sdef.saved'), 'success');
   });
+
+  bindWavePanel();
 
   refreshInsights(currentMode === 'raw'
     ? parseSdef(document.getElementById('raw-editor-textarea')?.value || '')
@@ -1051,4 +1075,19 @@ function renderAttenuationCurve(params) {
       }).join('')}
       <polyline class="curve" points="${pts.join(' ')}" />
     </svg>`;
+}
+
+/* ── Sound samples panel ──────────────────────────────────────────── */
+
+function bindWavePanel() {
+  const host = document.getElementById('wave-panel-host');
+  const sdef = getState().currentSdef;
+  if (!host || !sdef) return;
+  attachWavePanel(host, sdef, () => { collectVisualParams(); return currentParams; }, () => {
+    collectVisualParams();
+    updateUnsavedSdef(sdef, generateSdef(currentParams));
+    refreshInsights(currentParams);
+    host.innerHTML = renderWavePanel(sdef, currentParams.wave || []);
+    bindWavePanel();
+  });
 }

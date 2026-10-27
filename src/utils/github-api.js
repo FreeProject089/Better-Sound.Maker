@@ -173,7 +173,7 @@ export async function pullProjectState(pat, repo) {
 export async function pushNote(pat, repo, username, text) {
     try {
         const ts = new Date().toISOString().replace(/[:.]/g, '-');
-        const filePath = `notes/${username}-${ts}.json`;
+        const filePath = `.bsm/notes/${username}-${ts}.json`;
         const content = JSON.stringify({
             author: username,
             date: new Date().toISOString(),
@@ -194,7 +194,7 @@ export async function pushNote(pat, repo, username, text) {
  */
 export async function listNotes(pat, repo) {
     try {
-        const res = await fetch(`${GH_API}/repos/${repo}/contents/notes`, {
+        const res = await fetch(`${GH_API}/repos/${repo}/contents/.bsm/notes`, {
             headers: headers(pat),
         });
         if (res.status === 404) return [];

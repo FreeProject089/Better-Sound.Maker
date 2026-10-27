@@ -1,657 +1,280 @@
 /**
- * collaboration.js — GitHub-backed collaboration page
- * Better Sound.Maker
+ * collaboration.js — Team sync through a GitHub repository
  *
- * Features:
- *  - GitHub PAT + repo settings
- *  - Push / Pull project state
- *  - Commit history log with snapshot restore
- *  - Team notes system
+ * Not connected: a 3-field setup (token, repository, branch) with a link that
+ * pre-fills the right token scopes. Connected: a status bar (who, where, local
+ * changes / team changes / up to date), Pull and Push with a commit message,
+ * the history with restore, and team notes. The sync itself is in
+ * src/collab/sync.js (one commit per push, the repo is a working mod).
  */
 
-import {
-  testConnection, pushProjectState, pullProjectState,
-  pushNote, listNotes, getCommitLog, getStateAtCommit,
-  putBinaryFile, getFile
-} from '../utils/github-api.js';
-import { getState, setState, updateProjectConfig, setAudioFile, getAudioFile } from '../state/store.js';
+import { getCurrentLanguage } from '../utils/i18n.js';
+import { getIcon } from '../utils/icons.js';
+import { escapeHtml } from '../utils/html.js';
 import { showToast } from '../components/toast.js';
-import { generateEntryLua } from '../utils/entry-generator.js';
-import { generateSdef } from '../utils/sdef-generator.js';
-import { detectSoundType, getTypeDefaults } from '../utils/audio-analyzer.js';
-import { t, updateTranslations } from '../utils/i18n.js';
-import { getIcon, renderIcons } from '../utils/icons.js';
+import { showModal } from '../components/modal.js';
+import { loadCollabConfig, saveCollabConfig, isConfigured, getSyncStatus, pushProject, pullProject, listCommits } from '../collab/sync.js';
+import { pushNote, listNotes } from '../utils/github-api.js';
+import './collaboration.css';
 
-const COLLAB_KEY = 'bsm-collab';
+const TOKEN_URL = 'https://github.com/settings/tokens/new?scopes=repo&description=Better%20Sound.Maker';
 
-function loadCollabConfig() {
-  try {
-    return JSON.parse(localStorage.getItem(COLLAB_KEY) || '{}');
-  } catch { return {}; }
-}
+const UI = {
+    en: {
+        title: 'Collaboration', desc: 'Work on one mod as a team through a GitHub repository. Each push is one commit, and the repository is itself a ready-to-install mod.',
+        setupTitle: 'Connect a repository', setupDesc: 'Three fields and you are synced. The token stays on this computer.',
+        token: 'GitHub token', tokenHelp: 'Create a token', tokenHint: 'needs the "repo" scope', repo: 'Repository', repoPh: 'owner/name', branch: 'Branch',
+        connect: 'Connect', disconnect: 'Disconnect', checking: 'Checking…', connected: 'Connected as',
+        upToDate: 'Up to date', local: 'Local changes not pushed', remote: 'Team pushed changes', both: 'Both sides changed', never: 'Never synced',
+        pull: 'Pull', push: 'Push', msgPh: 'What changed? (e.g. New F-16 afterburner)', lastSync: 'Last sync', readOnly: 'Read-only access: you can pull but not push.',
+        history: 'History', notes: 'Team notes', notePh: 'Leave a note for the team…', post: 'Post', empty: 'Nothing yet', restore: 'Restore', open: 'Open on GitHub',
+        pushed: 'Pushed: {n} file(s) in one commit', nothing: 'Nothing to push, already up to date', pulled: 'Pulled {a} sound(s) and {b} audio file(s)',
+        pullFirst: 'The team pushed changes. Pull them first, or your push will be refused.', confirmPull: 'Pulling replaces your local project with the repository\'s. Local changes that were not pushed are lost.',
+        confirmRestore: 'Restore the project as it was at this commit? Your current project is replaced (push afterwards to share it).', refresh: 'Refresh', viewRepo: 'Open repository', clone: 'Use it as a mod', cloneDesc: 'Download the repository as a zip and extract it into Saved Games\\DCS\\Mods\\resource.',
+    },
+    fr: {
+        title: 'Collaboration', desc: 'Travaillez à plusieurs sur un mod via un dépôt GitHub. Chaque envoi est un seul commit, et le dépôt est lui-même un mod prêt à installer.',
+        setupTitle: 'Connecter un dépôt', setupDesc: 'Trois champs et c\'est synchronisé. Le jeton reste sur cet ordinateur.',
+        token: 'Jeton GitHub', tokenHelp: 'Créer un jeton', tokenHint: 'nécessite la portée « repo »', repo: 'Dépôt', repoPh: 'propriétaire/nom', branch: 'Branche',
+        connect: 'Connecter', disconnect: 'Déconnecter', checking: 'Vérification…', connected: 'Connecté en tant que',
+        upToDate: 'À jour', local: 'Modifications locales non envoyées', remote: 'L\'équipe a envoyé des modifications', both: 'Les deux côtés ont changé', never: 'Jamais synchronisé',
+        pull: 'Récupérer', push: 'Envoyer', msgPh: 'Qu\'est-ce qui a changé ? (ex. Nouvel afterburner F-16)', lastSync: 'Dernière synchro', readOnly: 'Accès en lecture seule : vous pouvez récupérer mais pas envoyer.',
+        history: 'Historique', notes: 'Notes d\'équipe', notePh: 'Laissez une note à l\'équipe…', post: 'Publier', empty: 'Rien pour l\'instant', restore: 'Restaurer', open: 'Ouvrir sur GitHub',
+        pushed: 'Envoyé : {n} fichier(s) en un commit', nothing: 'Rien à envoyer, déjà à jour', pulled: '{a} son(s) et {b} fichier(s) audio récupérés',
+        pullFirst: 'L\'équipe a envoyé des modifications. Récupérez-les d\'abord, sinon votre envoi sera refusé.', confirmPull: 'Récupérer remplace votre projet local par celui du dépôt. Les modifications locales non envoyées sont perdues.',
+        confirmRestore: 'Restaurer le projet tel qu\'il était à ce commit ? Votre projet actuel est remplacé (envoyez ensuite pour le partager).', refresh: 'Actualiser', viewRepo: 'Ouvrir le dépôt', clone: 'L\'utiliser comme mod', cloneDesc: 'Téléchargez le dépôt en zip et extrayez-le dans Saved Games\\DCS\\Mods\\resource.',
+    },
+};
+const ui = () => UI[getCurrentLanguage() === 'fr' ? 'fr' : 'en'];
+const fmt = (s, v) => s.replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
 
-function saveCollabConfig(cfg) {
-  localStorage.setItem(COLLAB_KEY, JSON.stringify(cfg));
-}
+let busy = false;
+let status = null;
 
 export function renderCollaboration(container) {
-  const cfg = loadCollabConfig();
-
-  container.innerHTML = `
-    <div class="page-header">
-      <h1 class="page-title" data-i18n="collabPage.title">Collaboration</h1>
-      <p class="page-description" data-i18n="collabPage.description">
-        ${t('collabPage.description')}
-      </p>
-    </div>
-
-    <div class="collab-grid">
-      <div class="collab-left">
-
-        <!-- GitHub Settings -->
-        <div class="card collab-card" style="margin-bottom:20px;">
-          <div class="collab-card-header">
-            <div class="collab-card-icon" style="background:rgba(255,255,255,0.08);">
-              ${getIcon('github')}
-            </div>
-            <div>
-              <div class="collab-card-title">${t('collabPage.settings.title')}</div>
-              <div class="collab-card-sub">${t('collabPage.settings.sub')}</div>
-            </div>
-          </div>
-          <div class="flex-col" style="gap:14px;">
-            <div class="input-group">
-              <label class="input-label">${t('collabPage.settings.pat')}
-                <span style="font-size:10px;color:var(--text-muted);margin-left:6px;">${t('collabPage.settings.patNote')}</span>
-              </label>
-              <input type="password" class="input-field" id="collab-pat"
-                     placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
-                     value="${escHtml(cfg.pat || '')}" />
-              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
-                ${t('collabPage.settings.repoScope')}
-                <a href="https://github.com/settings/tokens/new" target="_blank"
-                   style="color:var(--accent-blue);">${t('collabPage.settings.createToken')} ↗</a>
-              </div>
-            </div>
-            <div class="input-group">
-              <label class="input-label">${t('collabPage.settings.repo')}</label>
-              <input type="text" class="input-field" id="collab-repo"
-                     placeholder="owner/my-sound-mod"
-                     value="${escHtml(cfg.repo || '')}" />
-            </div>
-            <div class="input-group">
-              <label class="input-label">${t('collabPage.settings.username')}</label>
-              <input type="text" class="input-field" id="collab-username"
-                     placeholder="YourName"
-                     value="${escHtml(cfg.username || '')}" />
-            </div>
-            <div class="flex-gap" style="gap:10px;margin-top:4px;">
-              <button class="btn btn-secondary" id="collab-save-btn" style="flex:1;">
-                ${getIcon('save', 'w-3 h-3')}
-                ${t('collabPage.buttons.save')}
-              </button>
-              <button class="btn btn-secondary" id="collab-test-btn" style="flex:1;">
-                ${getIcon('zap', 'w-3 h-3')}
-                ${t('collabPage.buttons.test')}
-              </button>
-            </div>
-            <div id="collab-status" class="collab-status-bar" style="display:none;"></div>
-          </div>
-        </div>
-
-        <!-- Sync -->
-        <div class="card collab-card" style="margin-bottom:20px;">
-          <div class="collab-card-header">
-            <div class="collab-card-icon" style="background:rgba(16,185,129,0.12);color:var(--accent-green);">
-              ${getIcon('refresh-cw')}
-            </div>
-            <div>
-              <div class="collab-card-title">${t('collabPage.sync.title')}</div>
-              <div class="collab-card-sub">${t('collabPage.sync.sub')}</div>
-            </div>
-          </div>
-          <div class="collab-sync-btns">
-            <button class="btn btn-success collab-sync-btn" id="collab-push-btn">
-              ${getIcon('upload', 'w-4 h-4')}
-              ${t('collabPage.buttons.push')}
-            </button>
-            <button class="btn btn-secondary collab-sync-btn" id="collab-pull-btn">
-              ${getIcon('download', 'w-4 h-4')}
-              ${t('collabPage.buttons.pull')}
-            </button>
-          </div>
-          <div id="collab-sync-status" class="collab-status-bar" style="display:none;margin-top:10px;"></div>
-        </div>
-
-        <!-- Notes -->
-        <div class="card collab-card">
-          <div class="collab-card-header">
-            <div class="collab-card-icon" style="background:rgba(139,92,246,0.12);color:var(--accent-purple);">
-              ${getIcon('message-square')}
-            </div>
-            <div>
-              <div class="collab-card-title">${t('collabPage.notes.title')}</div>
-              <div class="collab-card-sub">${t('collabPage.notes.sub')}</div>
-            </div>
-          </div>
-          <textarea class="input-field" id="collab-note-text" rows="3" placeholder="${t('collabPage.notes.placeholder')}"></textarea>
-          <div style="display:flex;gap:8px;margin-top:10px;">
-            <button class="btn btn-primary" id="collab-note-send" style="flex:1;">
-              ${getIcon('send', 'w-3 h-3')}
-              ${t('collabPage.buttons.post')}
-            </button>
-            <button class="btn btn-secondary" id="collab-notes-load">
-              ${getIcon('refresh-cw', 'w-3 h-3')}
-              ${t('collabPage.buttons.refresh')}
-            </button>
-          </div>
-          <div id="collab-notes-list" style="margin-top:16px;"></div>
-        </div>
-
+    const u = ui();
+    container.innerHTML = `
+      <div class="page-header">
+        <h1 class="page-title">${u.title}</h1>
+        <p class="page-description">${u.desc}</p>
       </div>
-
-      <!-- History -->
-      <div class="collab-right">
-        <div class="card collab-card" style="height:100%;">
-          <div class="collab-card-header" style="margin-bottom:16px;">
-            <div class="collab-card-icon" style="background:rgba(59,130,246,0.12);color:var(--accent-blue);">
-              ${getIcon('git-commit')}
-            </div>
-            <div style="flex:1;">
-              <div class="collab-card-title">${t('collabPage.history.title')}</div>
-              <div class="collab-card-sub">${t('collabPage.history.sub')}</div>
-            </div>
-            <button class="btn btn-secondary btn-sm" id="collab-history-load">
-              ${getIcon('refresh-cw', 'w-3 h-3')}
-              ${t('collabPage.buttons.refresh')}
-            </button>
-          </div>
-          <div id="collab-history-list">
-            <div class="collab-history-empty">
-              <div style="color:var(--text-muted);margin-bottom:10px;">${getIcon('git-commit', 'w-8 h-8')}</div>
-              <div>${t('collabPage.history.empty')}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  addCollabStyles();
-  bindCollabEvents();
-  updateTranslations();
-  renderIcons(container);
+      <div id="collab-root"></div>`;
+    if (isConfigured()) renderConnected(container); else renderSetup(container);
 }
 
-/* ── Event binding ────────────────────────────────────────────────── */
+/* ── Setup ──────────────────────────────────────────────────────── */
 
-function bindCollabEvents() {
-  // Save settings
-  document.getElementById('collab-save-btn')?.addEventListener('click', () => {
-    const cfg = {
-      pat: document.getElementById('collab-pat')?.value.trim() || '',
-      repo: document.getElementById('collab-repo')?.value.trim() || '',
-      username: document.getElementById('collab-username')?.value.trim() || '',
-    };
-    saveCollabConfig(cfg);
-    showToast(t('collabPage.toast.settingsSaved'), 'success');
-  });
-
-  // Test connection
-  document.getElementById('collab-test-btn')?.addEventListener('click', async () => {
-    const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast(t('collabPage.toast.enterPat'), 'warning'); return; }
-
-    const statusEl = document.getElementById('collab-status');
-    statusEl.style.display = 'block';
-    statusEl.textContent = t('collabPage.status.testing');
-
-    const result = await testConnection(pat, repo);
-    if (result.ok) {
-      statusEl.innerHTML = `${t('collabPage.status.connected')} <strong>${result.user}</strong> → <strong>${result.repoName}</strong>`;
-      statusEl.style.color = 'var(--accent-green)';
-    } else {
-      statusEl.textContent = `❌ ${result.error}`;
-      statusEl.style.color = 'var(--accent-red, #f85149)';
-    }
-  });
-
-  // Push (Re-implemented as "Push Build")
-  document.getElementById('collab-push-btn')?.addEventListener('click', async () => {
-    const { pat, repo, username } = getCollabInputs();
-    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
-
-    const syncEl = document.getElementById('collab-sync-status');
-    syncEl.style.display = 'block';
-    syncEl.textContent = t('collabPage.status.pushing');
-
-    const state = getState();
-    const config = state.projectConfig;
-    const selected = state.selectedAssets;
-
-    // 1. Upload project.json (meta-data & notes)
-    const toSync = {
-      projectConfig: state.projectConfig,
-      selectedAssets: state.selectedAssets,
-      presets: state.presets,
-      themeImages: state.themeImages,
-    };
-
-    try {
-      // Helper to upload file efficiently
-      const upload = async (path, content, isBinary = false) => {
-        // Check existence to get sha for update, or null for create
-        // We catch 404s in getFile so returning null is fine
-        const existing = await getFile(pat, repo, path).catch(() => null);
-        if (isBinary) {
-          await putBinaryFile(pat, repo, path, content, `sync: ${path} (bin)`, existing?.sha);
-        } else {
-          // Serialize for text
-          const b64 = btoa(unescape(encodeURIComponent(content)));
-          // We use putFile logic but inline here or use putBinaryFile with string conversion?
-          // putBinaryFile expects ArrayBuffer usually, let's use a small helper or just use putBinaryContent equivalent
-          // Actually, our putBinaryFile handles ArrayBuffer. Text -> ArrayBuffer:
-          const enc = new TextEncoder();
-          await putBinaryFile(pat, repo, path, enc.encode(content), `sync: ${path}`, existing?.sha);
-        }
-      };
-
-      // A. Push project.json
-      syncEl.innerHTML = '⬆️ pushing project.json...';
-      const projectJsonStr = JSON.stringify(toSync, null, 2);
-      await upload('project.json', projectJsonStr);
-
-      // B. Push entry.lua
-      syncEl.innerHTML = '⬆️ pushing entry.lua...';
-      const entryLua = generateEntryLua(config);
-      await upload('entry.lua', entryLua);
-
-      // C. Push Assets (SDEF + Waves)
-      const assetKeys = Object.keys(selected);
-      let count = 0;
-      const total = assetKeys.length;
-
-      for (const key of assetKeys) {
-        // Asset Key is like "Aircrafts/FA-18/..."
-        const assetData = selected[key];
-        count++;
-        syncEl.innerHTML = `⬆️ Processing asset ${count}/${total}: ${key}`;
-
-        // 1. Generate & Upload SDEF
-        let sdefContent = assetData.sdefContent;
-        if (!sdefContent && assetData.customWaves?.length) {
-          const soundType = detectSoundType(key);
-          const typeDefaults = getTypeDefaults(soundType);
-          sdefContent = generateSdef({
-            wave: assetData.customWaves,
-            ...typeDefaults,
-          });
-        }
-
-        if (sdefContent) {
-          // Standard mod structure: Sounds/sdef/<path>
-          await upload(`Sounds/sdef/${key}`, sdefContent);
-        }
-
-        // 2. Upload Waves (Sounds/Effects/...)
-        const waves = assetData.customWaves || assetData.originalAsset?.waves || [];
-        // We only upload if we have a Custom Audio File in memory (for new/replaced sounds)
-        // OR if the user expects us to upload original sounds (unlikely for "originalAsset" unless we extracted them).
-        // BUT `getAudioFile` only returns what the user *added* or *replaced*.
-        const audioFile = getAudioFile(key);
-
-        if (audioFile && waves.length > 0) {
-          let buffer = null;
-
-          // Try reading from disk first (desktop)
-          if (assetData.audioPath && window.nativeAPI) {
-            try {
-              buffer = await window.nativeAPI.readFile(assetData.audioPath);
-            } catch (e) { console.warn('Native read failed, falling back to memory', e); }
-          }
-
-          // If not read from disk (or failed), try converting the in-memory File/Blob to buffer
-          if (!buffer && audioFile.arrayBuffer) {
-            buffer = await audioFile.arrayBuffer();
-          }
-
-          if (buffer) {
-            // Determine extension
-            const ext = audioFile.name.split('.').pop() || 'wav';
-
-            // Upload for EACH wave path defined in the SDEF
-            // (Mirroring mod-builder logic)
-            for (const wavePath of waves) {
-              // wavePath: "Effects/Aircrafts/..."
-              const parts = wavePath.split('/');
-              if (parts[0] === 'Effects') parts.shift();
-              const relPath = parts.join('/'); // "Aircrafts/FA-18/Engine.wav" (maybe)
-              // Strip ext from path provided in SDEF, append real ext
-              const finalPathTarget = relPath.replace(/\.[^.]+$/, '') + '.' + ext;
-
-              await upload(`Sounds/Effects/${finalPathTarget}`, buffer, true);
-            }
-          }
-        }
-      }
-
-      syncEl.innerHTML = `${t('collabPage.status.pushSuccess')} ${count} assets synced.`;
-      syncEl.style.color = 'var(--accent-green)';
-      showToast(t('collabPage.status.pushSuccess'), 'success');
-
-    } catch (err) {
-      console.error(err);
-      syncEl.textContent = `${t('collabPage.status.failed')}: ${err.message}`;
-      syncEl.style.color = 'var(--accent-red, #f85149)';
-    }
-  });
-
-  // Pull
-  document.getElementById('collab-pull-btn')?.addEventListener('click', async () => {
-    const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
-
-    const syncEl = document.getElementById('collab-sync-status');
-    syncEl.style.display = 'block';
-    syncEl.textContent = t('collabPage.status.pulling');
-
-    const result = await pullProjectState(pat, repo);
-    if (result.ok) {
-      applyPulledState(result.state);
-
-      // --- AUDIO PULL START ---
-      syncEl.innerHTML += '<br>🎵 Downloading audio files...';
-      try {
-        let downloaded = 0;
-        const assets = result.state.selectedAssets || {};
-        for (const key of Object.keys(assets)) {
-          const asset = assets[key];
-          if (asset.audioFileName) {
-            const safeName = asset.audioFileName.replace(/[^a-zA-Z0-9.-]/g, '_');
-            const repoPath = `sounds/${safeName}`;
-
-            // Try to download from repo
-            try {
-              const fileData = await getFile(pat, repo, repoPath);
-              if (fileData && fileData.contentBase64) {
-                // Convert base64 to Blob
-                const byteCharacters = atob(fileData.contentBase64.replace(/\n/g, ''));
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {
-                  byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], { type: asset.audioFileName.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav' });
-
-                // Re-attach to store (in-memory)
-                // We cannot write to disk easily in the exact same path as the original user,
-                // so we keep it in memory (Blob). 
-                // The user will need to re-save/export to write it to their disk eventually.
-                setAudioFile(key, new File([blob], asset.audioFileName), { name: asset.audioFileName, size: blob.size });
-                downloaded++;
-              }
-            } catch (e) {
-              console.warn(`Could not download audio ${safeName}`, e);
-            }
-          }
-        }
-        syncEl.innerHTML = `${t('collabPage.status.pullSuccess')} + ${downloaded} audio files loaded!`;
-      } catch (err) {
-        console.error('Audio pull error', err);
-        syncEl.innerHTML += `<br>⚠ Audio dl warning: ${err.message}`;
-      }
-      // --- AUDIO PULL END ---
-
-      syncEl.style.color = 'var(--accent-green)';
-      showToast(t('collabPage.status.pullSuccess'), 'success');
-    } else {
-      syncEl.textContent = `${t('collabPage.status.failed')}: ${result.error}`;
-      syncEl.style.color = 'var(--accent-red, #f85149)';
-      showToast(t('collabPage.status.failed') + ': ' + result.error, 'error');
-    }
-  });
-
-  // Post note
-  document.getElementById('collab-note-send')?.addEventListener('click', async () => {
-    const { pat, repo, username } = getCollabInputs();
-    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
-    const text = document.getElementById('collab-note-text')?.value.trim();
-    if (!text) { showToast(t('collabPage.toast.noteEmpty'), 'warning'); return; }
-
-    const result = await pushNote(pat, repo, username || 'user', text);
-    if (result.ok) {
-      showToast(t('collabPage.toast.notePosted'), 'success');
-      if (document.getElementById('collab-note-text')) {
-        document.getElementById('collab-note-text').value = '';
-      }
-    } else {
-      showToast('Failed to post note: ' + result.error, 'error');
-    }
-  });
-
-  // Load notes
-  document.getElementById('collab-notes-load')?.addEventListener('click', async () => {
-    const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
-
-    const listEl = document.getElementById('collab-notes-list');
-    listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;">${t('collabPage.notes.loading')}</div>`;
-
-    const notes = await listNotes(pat, repo);
-    if (notes.length === 0) {
-      listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0;">${t('collabPage.notes.empty')}</div>`;
-      return;
-    }
-
-    listEl.innerHTML = notes.map(n => `
-          <div class="collab-note-card">
-            <div class="collab-note-header">
-              <strong>${escHtml(n.author)}</strong>
-              <span style="color:var(--text-muted);font-size:10px;">${new Date(n.date).toLocaleString()}</span>
-            </div>
-            <div class="collab-note-body">${escHtml(n.text)}</div>
+function renderSetup(container) {
+    const u = ui();
+    const cfg = loadCollabConfig();
+    container.querySelector('#collab-root').innerHTML = `
+      <div class="card collab-setup">
+        <div class="collab-setup-icon">${getIcon('github', 'w-6 h-6')}</div>
+        <h2>${u.setupTitle}</h2>
+        <p>${u.setupDesc}</p>
+        <div class="collab-fields">
+          <label class="input-group"><span class="input-label">${u.token} <a href="${TOKEN_URL}" target="_blank" rel="noopener">${u.tokenHelp} ↗</a></span>
+            <input type="password" class="input-field" id="c-pat" value="${escapeHtml(cfg.pat || '')}" placeholder="ghp_… / github_pat_…" autocomplete="off" />
+            <small>${u.tokenHint}</small></label>
+          <div class="collab-row">
+            <label class="input-group"><span class="input-label">${u.repo}</span>
+              <input class="input-field" id="c-repo" value="${escapeHtml(cfg.repo || '')}" placeholder="${u.repoPh}" /></label>
+            <label class="input-group collab-branch"><span class="input-label">${u.branch}</span>
+              <input class="input-field" id="c-branch" value="${escapeHtml(cfg.branch || 'main')}" /></label>
           </div>
-        `).join('');
-  });
-
-  // Load history
-  document.getElementById('collab-history-load')?.addEventListener('click', async () => {
-    const { pat, repo } = getCollabInputs();
-    if (!pat || !repo) { showToast(t('collabPage.toast.configureFirst'), 'warning'); return; }
-    await loadHistory(pat, repo);
-  });
-}
-
-
-async function loadHistory(pat, repo) {
-  const listEl = document.getElementById('collab-history-list');
-  listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px 0;">${t('collabPage.history.loading')}</div>`;
-
-  const commits = await getCommitLog(pat, repo);
-  if (commits.length === 0) {
-    listEl.innerHTML = `<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:30px 0;">${t('collabPage.history.empty')}</div>`;
-    return;
-  }
-
-  listEl.innerHTML = commits.map((c, i) => `
-      <div class="collab-commit-card">
-        <div class="collab-commit-header">
-          <span class="collab-commit-sha">${c.sha.slice(0, 7)}</span>
-          <span style="color:var(--text-muted);font-size:10px;">${new Date(c.date).toLocaleString()}</span>
         </div>
-        <div style="font-size:12px;margin:4px 0;">${escHtml(c.message)}</div>
-        <div style="font-size:11px;color:var(--text-muted);">by ${escHtml(c.author)}</div>
-        <button class="btn btn-secondary btn-sm" style="margin-top:8px;width:100%;"
-                data-sha="${c.sha}" data-pat="${pat}" data-repo="${encodeURIComponent(repo)}"
-                id="restore-btn-${i}">
-          ↩️ ${t('collabPage.buttons.restore')}
-        </button>
-      </div>
-    `).join('');
+        <div class="collab-error" id="c-error" hidden></div>
+        <button class="btn btn-primary" id="c-connect">${getIcon('plug-zap', 'w-4 h-4')} ${u.connect}</button>
+      </div>`;
 
-  // Bind restore buttons
-  commits.forEach((c, i) => {
-    document.getElementById(`restore-btn-${i}`)?.addEventListener('click', async () => {
-      const btn = document.getElementById(`restore-btn-${i}`);
-      btn.disabled = true;
-      btn.textContent = t('collabPage.status.restoring');
-      const state = await getStateAtCommit(pat, repo, c.sha);
-      if (state) {
-        applyPulledState(state);
-        showToast(`${t('collabPage.toast.restoreSuccess')} ${c.sha.slice(0, 7)}`, 'success');
-        btn.textContent = t('collabPage.status.restored');
-      } else {
-        showToast('Failed to restore snapshot', 'error');
-        btn.textContent = t('collabPage.status.failed');
-        btn.disabled = false;
-      }
+    container.querySelector('#c-connect').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const repo = container.querySelector('#c-repo').value.trim().replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').replace(/\/$/, '');
+        const next = { pat: container.querySelector('#c-pat').value.trim(), repo, branch: container.querySelector('#c-branch').value.trim() || 'main' };
+        const err = container.querySelector('#c-error');
+        if (!next.pat || !/^[\w.-]+\/[\w.-]+$/.test(next.repo)) { err.hidden = false; err.textContent = `${u.token} + ${u.repo} (${u.repoPh})`; return; }
+        btn.disabled = true;
+        btn.innerHTML = `${getIcon('loader-2', 'w-4 h-4 spin')} ${u.checking}`;
+        try {
+            status = await getSyncStatus(next);
+            saveCollabConfig(next);
+            renderConnected(container);
+        } catch (ex) {
+            err.hidden = false;
+            err.textContent = ex.message;
+            btn.disabled = false;
+            btn.innerHTML = `${getIcon('plug-zap', 'w-4 h-4')} ${u.connect}`;
+        }
     });
-  });
 }
 
+/* ── Connected ──────────────────────────────────────────────────── */
 
-/* ── Helpers ─────────────────────────────────────────────────────── */
+function renderConnected(container) {
+    const u = ui();
+    const cfg = loadCollabConfig();
+    container.querySelector('#collab-root').innerHTML = `
+      <div class="card collab-status" id="c-status"><div class="collab-skeleton">${u.checking}</div></div>
+      <div class="collab-grid">
+        <div class="card">
+          <div class="collab-card-head">${getIcon('history', 'w-4 h-4')} <b>${u.history}</b>
+            <button class="btn btn-ghost btn-sm" id="c-refresh">${getIcon('refresh-cw', 'w-3.5 h-3.5')} ${u.refresh}</button></div>
+          <div id="c-history" class="collab-history"></div>
+        </div>
+        <div class="card">
+          <div class="collab-card-head">${getIcon('message-square', 'w-4 h-4')} <b>${u.notes}</b></div>
+          <div class="collab-note-form">
+            <textarea class="input-field" id="c-note" rows="2" placeholder="${u.notePh}"></textarea>
+            <button class="btn btn-secondary btn-sm" id="c-post">${getIcon('send', 'w-3.5 h-3.5')} ${u.post}</button>
+          </div>
+          <div id="c-notes" class="collab-notes"></div>
+          <div class="collab-clone">${getIcon('package-open', 'w-4 h-4')}<div><b>${u.clone}</b><small>${u.cloneDesc}</small></div>
+            <a class="btn btn-ghost btn-sm" href="https://github.com/${escapeHtml(cfg.repo)}/archive/refs/heads/${encodeURIComponent(cfg.branch)}.zip" target="_blank" rel="noopener">${getIcon('download', 'w-3.5 h-3.5')} zip</a></div>
+        </div>
+      </div>`;
 
-function getCollabInputs() {
-  return {
-    pat: document.getElementById('collab-pat')?.value.trim() || loadCollabConfig().pat || '',
-    repo: document.getElementById('collab-repo')?.value.trim() || loadCollabConfig().repo || '',
-    username: document.getElementById('collab-username')?.value.trim() || loadCollabConfig().username || 'user',
-  };
+    container.querySelector('#c-refresh').addEventListener('click', () => refreshAll(container));
+    container.querySelector('#c-post').addEventListener('click', async () => {
+        const text = container.querySelector('#c-note').value.trim();
+        if (!text) return;
+        const r = await pushNote(cfg.pat, cfg.repo, status?.user || 'user', text);
+        if (!r.ok) { showToast(r.error, 'error'); return; }
+        container.querySelector('#c-note').value = '';
+        loadNotesList(container);
+    });
+    refreshAll(container);
 }
 
-function applyPulledState(remoteState) {
-  if (remoteState.projectConfig) updateProjectConfig(remoteState.projectConfig);
-  if (remoteState.selectedAssets) setState('selectedAssets', remoteState.selectedAssets);
-  if (remoteState.presets) setState('presets', remoteState.presets);
-  if (remoteState.themeImages) setState('themeImages', remoteState.themeImages);
+async function refreshAll(container) {
+    renderStatus(container, null);
+    try {
+        status = await getSyncStatus();
+        renderStatus(container, status);
+    } catch (e) {
+        renderStatus(container, { error: e.message });
+    }
+    loadHistory(container);
+    loadNotesList(container);
 }
 
-function escHtml(str) {
-  return String(str || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+function renderStatus(container, s) {
+    const u = ui();
+    const el = container.querySelector('#c-status');
+    if (!el) return;
+    if (!s) { el.innerHTML = `<div class="collab-skeleton">${getIcon('loader-2', 'w-4 h-4 spin')} ${u.checking}</div>`; return; }
+    const cfg = loadCollabConfig();
+    if (s.error) {
+        el.innerHTML = `<div class="collab-error">${escapeHtml(s.error)}</div><button class="btn btn-ghost btn-sm" id="c-disc">${u.disconnect}</button>`;
+        el.querySelector('#c-disc').addEventListener('click', () => { saveCollabConfig({ ...cfg, pat: '' }); renderCollaboration(container); });
+        return;
+    }
+    const state = !s.lastSync ? ['never', 'circle-dashed', 'neutral'] : s.local && s.remote ? ['both', 'git-merge', 'warning'] : s.remote ? ['remote', 'cloud-download', 'info'] : s.local ? ['local', 'upload', 'warning'] : ['upToDate', 'check-circle-2', 'success'];
+    el.innerHTML = `
+      <div class="collab-who">
+        <div class="collab-avatar">${getIcon('github', 'w-5 h-5')}</div>
+        <div><small>${u.connected} <b>${escapeHtml(s.user)}</b></small>
+          <a href="https://github.com/${escapeHtml(s.repo)}/tree/${encodeURIComponent(s.branch)}" target="_blank" rel="noopener" class="collab-repo">${getIcon(s.private ? 'lock' : 'globe', 'w-3.5 h-3.5')} ${escapeHtml(s.repo)} <span>${getIcon('git-branch', 'w-3 h-3')} ${escapeHtml(s.branch)}</span></a></div>
+        <span class="collab-pill collab-pill--${state[2]}">${getIcon(state[1], 'w-3.5 h-3.5')} ${u[state[0]]}</span>
+        <button class="btn btn-ghost btn-sm collab-disc" id="c-disc" title="${u.disconnect}">${getIcon('log-out', 'w-3.5 h-3.5')}</button>
+      </div>
+      ${s.canPush ? '' : `<div class="collab-warn">${getIcon('eye', 'w-4 h-4')} ${u.readOnly}</div>`}
+      <div class="collab-actions">
+        <button class="btn ${s.remote ? 'btn-primary' : 'btn-secondary'}" id="c-pull">${getIcon('arrow-down-to-line', 'w-4 h-4')} ${u.pull}</button>
+        <input class="input-field" id="c-msg" placeholder="${u.msgPh}" ${s.canPush ? '' : 'disabled'} />
+        <button class="btn ${s.local && !s.remote ? 'btn-primary' : 'btn-secondary'}" id="c-push" ${s.canPush ? '' : 'disabled'}>${getIcon('arrow-up-from-line', 'w-4 h-4')} ${u.push}</button>
+      </div>
+      <div class="collab-progress" id="c-progress" hidden><div class="collab-bar"><i></i></div><span></span></div>
+      ${s.lastSync ? `<div class="collab-last">${u.lastSync}: ${new Date(s.lastSync.at).toLocaleString()} · <code>${s.lastSync.sha.slice(0, 7)}</code></div>` : ''}`;
+
+    el.querySelector('#c-disc').addEventListener('click', () => { saveCollabConfig({ ...cfg, pat: '' }); renderCollaboration(container); });
+    el.querySelector('#c-pull').addEventListener('click', () => doPull(container));
+    el.querySelector('#c-push').addEventListener('click', () => doPush(container));
+    el.querySelector('#c-msg').addEventListener('keydown', (e) => { if (e.key === 'Enter') doPush(container); });
 }
 
-function addCollabStyles() {
-  if (document.getElementById('collab-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'collab-styles';
-  style.textContent = `
-      .collab-grid {
-        display: grid;
-        grid-template-columns: 420px 1fr;
-        gap: 20px;
-        align-items: start;
-      }
-      @media (max-width: 900px) {
-        .collab-grid { grid-template-columns: 1fr; }
-      }
-      @media (max-width: 480px) {
-        .collab-grid { gap: 12px; }
-      }
-      .collab-right { min-height: 400px; }
-
-      .collab-card {
-        border-top: 2px solid var(--border-subtle);
-        transition: border-color 0.2s;
-      }
-      .collab-card:hover { border-top-color: rgba(59,130,246,0.4); }
-
-      .collab-card-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-      }
-      .collab-card-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        color: var(--text-primary);
-      }
-      .collab-card-title {
-        font-size: 15px;
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-      .collab-card-sub {
-        font-size: 11px;
-        color: var(--text-muted);
-        margin-top: 2px;
-      }
-      .collab-sync-btns {
-        display: flex;
-        gap: 10px;
-      }
-      .collab-sync-btn { flex: 1; justify-content: center; }
-      .collab-status-bar {
-        font-size: 12px;
-        padding: 8px 12px;
-        border-radius: var(--radius-sm);
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--border-subtle);
-      }
-      .collab-history-empty {
-        color: var(--text-muted);
-        font-size: 12px;
-        text-align: center;
-        padding: 40px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .collab-note-card {
-        background: rgba(139,92,246,0.06);
-        border: 1px solid rgba(139,92,246,0.2);
-        border-radius: 10px;
-        padding: 12px 14px;
-        margin-bottom: 10px;
-        position: relative;
-      }
-      .collab-note-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 6px;
-      }
-      .collab-note-body {
-        font-size: 13px;
-        color: var(--text-secondary);
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-      .collab-commit-card {
-        background: var(--bg-secondary);
-        border: 1px solid var(--border-subtle);
-        border-left: 3px solid var(--accent-blue);
-        border-radius: 8px;
-        padding: 12px;
-        margin-bottom: 10px;
-        transition: border-left-color 0.2s;
-      }
-      .collab-commit-card:hover { border-left-color: var(--accent-cyan); }
-      .collab-commit-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 4px;
-      }
-      .collab-commit-sha {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
-        color: var(--accent-blue);
-        background: var(--bg-tertiary);
-        padding: 2px 6px;
-        border-radius: 4px;
-      }
-    `;
-  document.head.appendChild(style);
+function progress(container) {
+    const box = container.querySelector('#c-progress');
+    box.hidden = false;
+    return (msg, done, total) => {
+        box.querySelector('span').textContent = msg;
+        box.querySelector('i').style.width = total ? `${Math.round((done / total) * 100)}%` : '100%';
+        box.classList.toggle('is-indeterminate', !total);
+    };
 }
 
+async function doPush(container) {
+    const u = ui();
+    if (busy) return;
+    if (status?.remote) { showToast(u.pullFirst, 'warning', 6000); return; }
+    busy = true;
+    try {
+        const msg = container.querySelector('#c-msg').value.trim();
+        const r = await pushProject(msg, progress(container));
+        showToast(r.nothing ? u.nothing : fmt(u.pushed, { n: r.changed }), 'success');
+    } catch (e) {
+        showToast(e.message, 'error', 8000);
+    } finally {
+        busy = false;
+        refreshAll(container);
+    }
+}
+
+async function doPull(container) {
+    const u = ui();
+    if (busy) return;
+    if (status?.local && status?.lastSync) {
+        const ok = await showModal({ title: u.pull, icon: 'arrow-down-to-line', tone: 'warning', size: 'sm', content: `<p>${u.confirmPull}</p>`,
+            actions: [{ id: 'no', label: 'Cancel' }, { id: 'yes', label: u.pull, class: 'btn-primary' }] });
+        if (ok !== 'yes') return;
+    }
+    busy = true;
+    try {
+        const r = await pullProject(progress(container));
+        showToast(fmt(u.pulled, { a: r.assets, b: r.audio }), 'success');
+    } catch (e) {
+        showToast(e.message, 'error', 8000);
+    } finally {
+        busy = false;
+        refreshAll(container);
+    }
+}
+
+async function loadHistory(container) {
+    const u = ui();
+    const el = container.querySelector('#c-history');
+    if (!el) return;
+    let commits = [];
+    try { commits = await listCommits(); } catch { /* shown as empty */ }
+    if (!commits.length) { el.innerHTML = `<p class="collab-empty">${u.empty}</p>`; return; }
+    el.innerHTML = commits.map((c, i) => `
+      <div class="collab-commit ${c.sha === status?.lastSync?.sha ? 'is-synced' : ''}">
+        ${c.avatar ? `<img src="${escapeHtml(c.avatar)}&s=48" alt="" />` : `<span class="collab-dot"></span>`}
+        <div class="collab-commit-main"><b>${escapeHtml(c.message)}</b>
+          <small>${escapeHtml(c.author)} · ${new Date(c.date).toLocaleString()} · <code>${c.sha.slice(0, 7)}</code></small></div>
+        <div class="collab-commit-act">
+          <a class="btn btn-ghost btn-sm btn-icon" href="${escapeHtml(c.url)}" target="_blank" rel="noopener" title="${u.open}">${getIcon('external-link', 'w-3.5 h-3.5')}</a>
+          ${i > 0 ? `<button class="btn btn-ghost btn-sm" data-restore="${c.sha}">${getIcon('rotate-ccw', 'w-3.5 h-3.5')} ${u.restore}</button>` : ''}
+        </div>
+      </div>`).join('');
+    el.querySelectorAll('[data-restore]').forEach(b => b.addEventListener('click', async () => {
+        const ok = await showModal({ title: u.restore, icon: 'rotate-ccw', tone: 'warning', size: 'sm', content: `<p>${u.confirmRestore}</p>`,
+            actions: [{ id: 'no', label: 'Cancel' }, { id: 'yes', label: u.restore, class: 'btn-primary' }] });
+        if (ok !== 'yes') return;
+        try {
+            const r = await pullProject(progress(container), undefined, b.dataset.restore);
+            showToast(fmt(u.pulled, { a: r.assets, b: r.audio }), 'success');
+        } catch (e) { showToast(e.message, 'error'); }
+        refreshAll(container);
+    }));
+}
+
+async function loadNotesList(container) {
+    const u = ui();
+    const cfg = loadCollabConfig();
+    const el = container.querySelector('#c-notes');
+    if (!el) return;
+    const notes = await listNotes(cfg.pat, cfg.repo);
+    el.innerHTML = notes.length ? notes.slice(0, 20).map(n => `
+      <div class="collab-note"><b>${escapeHtml(n.author)}</b> <small>${new Date(n.date).toLocaleString()}</small><p>${escapeHtml(n.text)}</p></div>`).join('')
+        : `<p class="collab-empty">${u.empty}</p>`;
+}

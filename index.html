@@ -16,8 +16,7 @@
   <link rel="stylesheet" href="./src/style.css" />
   <style>
     /* First paint = the intro background (full styles: src/intro/intro.css) */
-    #bsm-intro { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center;
-      background: radial-gradient(1200px 700px at 50% 45%, #111a2e 0%, #0a0e17 60%, #070a11 100%); }
+    #bsm-intro { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; background: #0a0e17; }
     html, body { background: #0a0e17; }
   </style>
 </head>
@@ -25,33 +24,19 @@
 <body>
   <div id="bsm-intro" role="status" aria-busy="true" aria-label="Better Sound.Maker">
     <div class="bi-stage">
-      <div class="bi-core">
-        <div class="bi-glow"></div>
-        <div class="bi-orb bi-orb--a"></div>
-        <div class="bi-orb bi-orb--b"></div>
-        <div class="bi-orb bi-orb--c"></div>
-        <div class="bi-ring bi-ring--shock"></div>
-        <div class="bi-ring bi-ring--h1"></div>
-        <div class="bi-ring bi-ring--h2"></div>
-        <div class="bi-ring bi-ring--ping"></div>
-        <div class="bi-flash"></div>
-        <div class="bi-tasky">
-          <img class="bi-idle" src="./Tasky.webp" alt="" draggable="false" />
-          <img class="bi-happy" src="./Tasky_Happy.webp" alt="" draggable="false" />
-          <div class="bi-tasky-flare"></div>
-        </div>
+      <div class="bi-tasky">
+        <img class="bi-idle" src="./Tasky.webp" alt="" draggable="false" />
+        <img class="bi-happy" src="./Tasky_Happy.webp" alt="" draggable="false" />
       </div>
-      <div class="bi-brand"><span class="bi-w1">Better</span><span class="bi-w2">Sound.Maker</span></div>
+      <div class="bi-brand"><span class="bi-w1">Better </span><span class="bi-w2">Sound.Maker</span></div>
       <div class="bi-eq" aria-hidden="true">
         <span style="--i:0"></span><span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span>
         <span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span><span style="--i:7"></span>
-        <span style="--i:8"></span><span style="--i:9"></span><span style="--i:10"></span><span style="--i:11"></span>
       </div>
       <div class="bi-status" id="loader-text"></div>
       <div class="bi-sub" id="loader-subtext"></div>
     </div>
-    <div class="bi-foot"><span id="bi-version"></span><span>·</span><span>By <b>BetterCommunity</b></span></div>
-    <div class="bi-skip" id="bi-skip"></div>
+    <div class="bi-foot" id="bi-version"></div>
   </div>
 
   <script>
@@ -59,8 +44,6 @@
       var fr = (localStorage.getItem('dcs-sound-mod-creator::language') || 'en') === 'fr';
       var t = document.getElementById('loader-text');
       if (t) t.textContent = fr ? 'Chargement de Better Sound.Maker…' : 'Loading Better Sound.Maker…';
-      var k = document.getElementById('bi-skip');
-      if (k) k.textContent = fr ? 'Cliquez pour passer' : 'Click to skip';
     })();
   </script>
   <!-- Mobile hamburger button -->

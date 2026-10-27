@@ -314,6 +314,11 @@ async function init() {
         renderNav(document.getElementById('sidebar'));
     });
 
+    // Undo / redo (Ctrl+Z, Ctrl+Y); redraw the page after a step
+    const { initHistory } = await import('./state/history.js');
+    initHistory();
+    window.addEventListener('bsm-history-applied', () => renderCurrentPage());
+
     // Initial render
     await renderCurrentPage();
 

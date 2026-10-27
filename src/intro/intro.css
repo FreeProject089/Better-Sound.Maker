@@ -1,14 +1,8 @@
-/* ═══ Start-up intro — « Soundwave » ═════════════════════════════════════════
-   Same structure as BMM's « Convergence », told with sound:
-   1. three sound rings ripple in from the corners and meet behind Tasky;
-   2. impact: a flash, a shockwave and two halo rings;
-   3. Tasky spins in and settles, the glow breathes;
-   4. the wordmark lands letter by letter, the equalizer starts (= loading);
-   5. app ready → Tasky turns happy, the bars level out, the splash fades.
-   Only transform and opacity animate. Every element is visible in its final
-   state, the keyframes animate FROM hidden: no JS → a still splash.
-   Inlined in index.html? No: imported by intro.js, but the critical rules are
-   duplicated in index.html's <style> so the first paint is already the splash. */
+/* ═══ Start-up intro ═══════════════════════════════════════════════════════
+   Kept simple on purpose: Tasky rises in, the name appears, a small
+   equalizer moves while BSM loads, Tasky smiles when it is ready, fade out.
+   Only transform and opacity animate. Everything is visible in its final
+   state, so without JS the splash is still, not empty. */
 
 #bsm-intro {
   position: fixed;
@@ -16,237 +10,43 @@
   z-index: 99999;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  background:
-    radial-gradient(1200px 700px at 50% 45%, #111a2e 0%, #0a0e17 60%, #070a11 100%);
+  background: #0a0e17;
   color: #f1f5f9;
   font-family: 'Inter', system-ui, sans-serif;
-  cursor: default;
   user-select: none;
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
 }
 #bsm-intro.is-done { opacity: 0; visibility: hidden; }
 
-/* Faint grid, like a waveform editor */
-#bsm-intro::before {
+.bi-stage { display: flex; flex-direction: column; align-items: center; }
+
+.bi-tasky { position: relative; width: 96px; height: 96px; animation: bi-rise 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.bi-tasky::before {
   content: "";
-  position: absolute;
-  inset: -50%;
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.045) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 55%);
-  animation: bi-grid 1.4s ease-out both;
-}
-
-.bi-stage {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transform: translate(var(--mx, 0px), var(--my, 0px));
-  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* ── Tasky + effects ── */
-.bi-core { position: relative; width: 132px; height: 132px; display: grid; place-items: center; }
-
-.bi-glow {
-  position: absolute;
-  inset: -90px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.38) 0%, rgba(6, 182, 212, 0.14) 35%, transparent 65%);
-  animation: bi-glow-in 0.9s 0.75s ease-out both, bi-breathe 3.2s 1.7s ease-in-out infinite;
-}
-
-.bi-orb {
-  position: absolute;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  box-shadow: 0 0 18px currentColor, inset 0 0 10px currentColor;
-  opacity: 0;
-}
-.bi-orb::after { content: ""; position: absolute; inset: 7px; border-radius: 50%; background: currentColor; }
-.bi-orb--a { color: #3b82f6; animation: bi-orb-a 0.8s cubic-bezier(0.5, 0, 0.75, 0) both; }
-.bi-orb--b { color: #06b6d4; animation: bi-orb-b 0.8s 0.06s cubic-bezier(0.5, 0, 0.75, 0) both; }
-.bi-orb--c { color: #a78bfa; animation: bi-orb-c 0.8s 0.12s cubic-bezier(0.5, 0, 0.75, 0) both; }
-
-.bi-flash {
   position: absolute;
   inset: -40px;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0%, rgba(147, 197, 253, 0.6) 30%, transparent 65%);
-  opacity: 0;
-  animation: bi-flash 0.55s 0.85s ease-out both;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.22), transparent 65%);
+  z-index: -1;
 }
+.bi-tasky img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.2, 1.6, 0.4, 1); }
+.bi-tasky .bi-happy { opacity: 0; }
+#bsm-intro.is-ready .bi-idle { opacity: 0; }
+#bsm-intro.is-ready .bi-happy { opacity: 1; transform: scale(1.06); }
 
-.bi-ring {
-  position: absolute;
-  width: 360px;
-  height: 360px;
-  border-radius: 50%;
-  border: 2px solid rgba(96, 165, 250, 0.7);
-  opacity: 0;
-  transform: scale(0.1);
-}
-.bi-ring--shock { animation: bi-ring 0.9s 0.88s cubic-bezier(0.1, 0.7, 0.3, 1) both; }
-.bi-ring--h1 { width: 210px; height: 210px; border-color: rgba(6, 182, 212, 0.55); animation: bi-ring 1.1s 0.98s cubic-bezier(0.1, 0.7, 0.3, 1) both; }
-.bi-ring--h2 { width: 260px; height: 260px; border-color: rgba(167, 139, 250, 0.4); animation: bi-ring 1.3s 1.08s cubic-bezier(0.1, 0.7, 0.3, 1) both; }
-/* While loading: a slow "ping" from the speaker */
-.bi-ring--ping { width: 150px; height: 150px; border-width: 1.5px; animation: bi-ping 2.4s 2s ease-out infinite; }
+.bi-brand { margin-top: 22px; font-size: 26px; line-height: 1; white-space: nowrap; animation: bi-fade 0.5s 0.2s ease-out both; }
+.bi-w1 { font-weight: 300; color: #cbd5e1; }
+.bi-w2 { font-weight: 700; color: #60a5fa; }
 
-.bi-tasky {
-  position: relative;
-  width: 112px;
-  height: 112px;
-  animation: bi-tasky-in 0.9s 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both;
-}
-.bi-tasky img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
-  transition: opacity 0.25s ease, transform 0.4s cubic-bezier(0.2, 1.6, 0.4, 1);
-}
-.bi-tasky .bi-happy { opacity: 0; transform: scale(0.9); }
-#bsm-intro.is-ready .bi-tasky .bi-idle { opacity: 0; }
-#bsm-intro.is-ready .bi-tasky .bi-happy { opacity: 1; transform: scale(1.08); }
-.bi-tasky-flare {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), transparent 70%);
-  animation: bi-flare 0.7s 0.9s ease-out both;
-  pointer-events: none;
-}
+.bi-eq { margin-top: 20px; height: 18px; display: flex; align-items: flex-end; gap: 3px; animation: bi-fade 0.4s 0.35s ease-out both; }
+.bi-eq span { width: 3px; height: 100%; border-radius: 2px; background: #3b82f6; opacity: 0.85; transform-origin: bottom; transform: scaleY(0.3); animation: bi-eq 0.8s calc(var(--i) * -0.11s) ease-in-out infinite alternate; }
+#bsm-intro.is-ready .bi-eq span { animation: none; transform: scaleY(0.3); }
 
-/* ── Wordmark ── */
-.bi-brand {
-  margin-top: 34px;
-  display: flex;
-  align-items: baseline;
-  gap: 0.35em;
-  font-size: 34px;
-  line-height: 1;
-  white-space: nowrap;
-}
-.bi-w1 { font-weight: 300; letter-spacing: 0.14em; color: #e2e8f0; }
-.bi-w2 {
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  background: linear-gradient(92deg, #60a5fa 0%, #22d3ee 55%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.bi-char {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(14px);
-  animation: bi-char 0.5s calc(1.35s + var(--i) * 0.035s) cubic-bezier(0.2, 0.9, 0.3, 1) both;
-}
-.bi-w2 .bi-char { background: inherit; -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bi-status { margin-top: 12px; min-height: 16px; font-size: 12px; color: #94a3b8; animation: bi-fade 0.4s 0.4s ease-out both; }
+.bi-sub { min-height: 14px; font: 11px 'JetBrains Mono', Consolas, monospace; color: #64748b; }
 
-/* ── Equalizer = progress ── */
-.bi-eq {
-  margin-top: 26px;
-  height: 28px;
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  animation: bi-fade-up 0.5s 1.9s ease-out both;
-}
-.bi-eq span {
-  width: 4px;
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(to top, #3b82f6, #22d3ee);
-  transform-origin: bottom;
-  transform: scaleY(0.2);
-  animation: bi-eq 0.9s calc(var(--i) * -0.13s) ease-in-out infinite alternate;
-  opacity: 0.9;
-}
-#bsm-intro.is-ready .bi-eq span { animation: none; transform: scaleY(0.35); transition: transform 0.3s ease; }
+.bi-foot { position: absolute; bottom: 22px; left: 0; right: 0; text-align: center; font-size: 11px; color: #475569; }
 
-.bi-status {
-  margin-top: 14px;
-  min-height: 18px;
-  font-size: 12.5px;
-  font-weight: 500;
-  color: #94a3b8;
-  text-align: center;
-  animation: bi-fade-up 0.5s 2s ease-out both;
-}
-.bi-sub {
-  margin-top: 4px;
-  min-height: 14px;
-  font: 11px 'JetBrains Mono', Consolas, monospace;
-  color: #64748b;
-  animation: bi-fade-up 0.5s 2.05s ease-out both;
-}
-
-.bi-foot {
-  position: absolute;
-  bottom: 26px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  font-size: 11px;
-  color: #64748b;
-  letter-spacing: 0.04em;
-  animation: bi-fade-up 0.6s 2.1s ease-out both;
-}
-.bi-foot b { color: #94a3b8; font-weight: 600; }
-.bi-skip {
-  position: absolute;
-  bottom: 24px;
-  right: 28px;
-  font-size: 11px;
-  color: #475569;
-  animation: bi-fade-up 0.6s 1.2s ease-out both;
-}
-
-/* Click ripple */
-.bi-ripple {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  margin: -9px 0 0 -9px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(96, 165, 250, 0.7);
-  pointer-events: none;
-  animation: bi-ripple 0.7s ease-out forwards;
-}
-
-/* ── Skipped: jump every entrance to its end ── */
-#bsm-intro.is-skipped *, #bsm-intro.is-skipped::before { animation-delay: 0s !important; animation-duration: 0.01s !important; }
-#bsm-intro.is-skipped .bi-eq span { animation: bi-eq 0.9s calc(var(--i) * -0.13s) ease-in-out infinite alternate !important; }
-#bsm-intro.is-skipped .bi-glow { animation: bi-breathe 3.2s ease-in-out infinite !important; }
-#bsm-intro.is-skipped .bi-ring--ping { animation: bi-ping 2.4s ease-out infinite !important; }
-
-/* No prefers-reduced-motion rule on purpose (same choice as BMM): Windows'
-   « Animation effects » is off on many gaming PCs for speed, which would freeze
-   the intro for people who never asked BSM for that. It is skippable instead. */
-
-@keyframes bi-grid { from { opacity: 0; transform: scale(1.15); } to { opacity: 1; transform: none; } }
-@keyframes bi-orb-a { 0% { opacity: 0; transform: translate(-42vw, -36vh) scale(1.6); } 15% { opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; transform: translate(0, 0) scale(0.4); } }
-@keyframes bi-orb-b { 0% { opacity: 0; transform: translate(44vw, -30vh) scale(1.6); } 15% { opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; transform: translate(0, 0) scale(0.4); } }
-@keyframes bi-orb-c { 0% { opacity: 0; transform: translate(4vw, 44vh) scale(1.6); } 15% { opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; transform: translate(0, 0) scale(0.4); } }
-@keyframes bi-flash { 0% { opacity: 0; transform: scale(0.3); } 25% { opacity: 1; } 100% { opacity: 0; transform: scale(1.5); } }
-@keyframes bi-ring { 0% { opacity: 0.95; transform: scale(0.1); } 100% { opacity: 0; transform: scale(1); } }
-@keyframes bi-ping { 0% { opacity: 0.5; transform: scale(0.75); } 100% { opacity: 0; transform: scale(1.9); } }
-@keyframes bi-glow-in { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: none; } }
-@keyframes bi-breathe { 0%, 100% { opacity: 0.85; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
-@keyframes bi-tasky-in { 0% { opacity: 0; transform: scale(0.2) rotate(-540deg); } 70% { opacity: 1; } 100% { opacity: 1; transform: none; } }
-@keyframes bi-flare { 0% { opacity: 1; transform: scale(0.6); } 100% { opacity: 0; transform: scale(1.6); } }
-@keyframes bi-char { to { opacity: 1; transform: none; } }
-@keyframes bi-fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@keyframes bi-eq { 0% { transform: scaleY(0.15); } 100% { transform: scaleY(1); } }
-@keyframes bi-ripple { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(5); } }
+@keyframes bi-rise { from { opacity: 0; transform: translateY(10px) scale(0.92); } }
+@keyframes bi-fade { from { opacity: 0; } }
+@keyframes bi-eq { to { transform: scaleY(1); } }

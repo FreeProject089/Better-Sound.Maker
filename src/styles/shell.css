@@ -393,3 +393,26 @@ input[type="range"] { accent-color: var(--accent-blue); }
 .cmdk-text small { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cmdk-empty { padding: 28px; text-align: center; color: var(--text-muted); }
 .cmdk-foot { padding: 8px 16px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); }
+
+/* Build page: packaging + pre-build check */
+.bl-options { display: grid; gap: 8px; }
+.bl-option { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-default); cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.bl-option:has(input:checked) { border-color: #3b82f6; background: var(--accent-dim); }
+.bl-option input { margin-top: 3px; }
+.bl-icon { color: #93c5fd; margin-top: 1px; }
+.bl-option b { display: block; font-size: 13px; color: var(--text-primary); }
+.bl-option small { font-size: 11.5px; color: var(--text-muted); }
+.pf-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; color: var(--text-primary); }
+.pf-head .btn { margin-left: auto; }
+.pf-ok { display: flex; gap: 8px; align-items: center; color: #6ee7b7; font-size: 13px; }
+.pf-item { display: flex; gap: 8px; align-items: flex-start; padding: 6px 8px; border-radius: 8px; font-size: 12.5px; color: var(--text-secondary); }
+.pf-item[data-sdef] { cursor: pointer; }
+.pf-item[data-sdef]:hover { background: var(--surface-2); }
+.pf-item svg { flex: none; margin-top: 2px; }
+.pf-error svg { color: #f87171; } .pf-warning svg { color: #fbbf24; } .pf-info svg { color: #60a5fa; }
+.pf-item code { font-family: var(--font-mono); font-size: 11.5px; color: var(--text-primary); }
+.pf-more { font-size: 12px; color: var(--text-muted); padding: 4px 8px; }
+#pf-list { max-height: 260px; overflow: auto; }
+
+.tpl-scope { display: flex; align-items: center; gap: 8px; margin: 0 15px 10px; color: var(--text-muted); }
+.tpl-scope select { flex: 1; min-height: 30px; padding: 4px 8px; font-size: 12px; }

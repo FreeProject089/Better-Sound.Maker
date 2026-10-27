@@ -44,6 +44,11 @@ export async function buildMod(onProgress, options = {}) {
     const config = state.projectConfig;
     const selected = state.selectedAssets;
     const audioFormat = options.audioFormat || 'original';
+    // Layout: 'plain'   → <Name>/entry.lua            (copy into Mods/resource)
+    //         'ovgme'   → <Name>/Mods/resource/<Name> (OVGME / Better Mods Manager: the
+    //                     package mirrors Saved Games/DCS, enable it and it works)
+    //         'install' → straight into <Saved Games>/Mods/resource (desktop app)
+    const layout = options.layout || 'plain';
 
     const modFolderName = config.modName
         ? config.modName.replace(/\s+/g, '')
@@ -55,11 +60,11 @@ export async function buildMod(onProgress, options = {}) {
 
     try {
         if (isNative) {
-            return await buildToFolderNative(modFolderName, config, selected, audioFormat, report);
+            return await buildToFolderNative(modFolderName, config, selected, audioFormat, report, layout, options.savedGamesPath);
         } else if (supportsDirectoryPicker) {
-            return await buildToFolder(modFolderName, config, selected, audioFormat, report);
+            return await buildToFolder(modFolderName, config, selected, audioFormat, report, layout);
         } else {
-            return await buildToZip(modFolderName, config, selected, audioFormat, report);
+            return await buildToZip(modFolderName, config, selected, audioFormat, report, layout);
         }
     } catch (e) {
         if (e.name === 'AbortError') {
@@ -74,12 +79,20 @@ export async function buildMod(onProgress, options = {}) {
    Strategy 0 — Desktop (Tauri): native commands
    ═══════════════════════════════════════════════════════════════════ */
 
-async function buildToFolderNative(modFolderName, config, selected, audioFormat, report) {
-    const basePath = await window.nativeAPI.selectDirectory();
-    if (!basePath) return { success: false, error: 'Export cancelled by user' };
+async function buildToFolderNative(modFolderName, config, selected, audioFormat, report, layout, savedGamesPath) {
+    let basePath;
+    if (layout === 'install') {
+        if (!savedGamesPath) return { success: false, error: 'Set your Saved Games folder in Settings to install directly' };
+        basePath = `${savedGamesPath.replace(/[\\/]+$/, '')}/Mods/resource`;
+    } else {
+        basePath = await window.nativeAPI.selectDirectory();
+        if (!basePath) return { success: false, error: 'Export cancelled by user' };
+    }
 
-    const modPath = `${basePath}/${modFolderName}`;
+    const outer = `${basePath}/${modFolderName}`;
+    const modPath = layout === 'ovgme' ? `${outer}/Mods/resource/${modFolderName}` : outer;
     await window.nativeAPI.mkdir(modPath);
+    if (layout === 'ovgme') await window.nativeAPI.writeFile(`${outer}/README.txt`, ovgmeReadme(config, modFolderName));
 
     report('Writing entry.lua…');
     await window.nativeAPI.writeFile(`${modPath}/entry.lua`, generateEntryLua(config));
@@ -107,7 +120,7 @@ async function buildToFolderNative(modFolderName, config, selected, audioFormat,
     }
 
     report('Build complete!');
-    return { success: true, folderName: modFolderName };
+    return { success: true, folderName: layout === 'install' ? `${basePath}/${modFolderName}` : modFolderName, path: outer };
 }
 
 async function processSdefToFolderNative(sdefBasePath, effectsBasePath, assetKey, assetData, audioFormat) {
@@ -185,11 +198,15 @@ async function writeThemeToFolderNative(themePath, mePath, report) {
    Strategy 1 — Chrome/Edge: showDirectoryPicker
    ═══════════════════════════════════════════════════════════════════ */
 
-async function buildToFolder(modFolderName, config, selected, audioFormat, report) {
+async function buildToFolder(modFolderName, config, selected, audioFormat, report, layout) {
     const rootDir = await window.showDirectoryPicker({ mode: 'readwrite' });
 
     report('Creating mod folder…');
-    const modDir = await rootDir.getDirectoryHandle(modFolderName, { create: true });
+    let modDir = await rootDir.getDirectoryHandle(modFolderName, { create: true });
+    if (layout === 'ovgme') {
+        await writeTextFS(modDir, 'README.txt', ovgmeReadme(config, modFolderName));
+        modDir = await (await (await modDir.getDirectoryHandle('Mods', { create: true })).getDirectoryHandle('resource', { create: true })).getDirectoryHandle(modFolderName, { create: true });
+    }
 
     report('Writing entry.lua…');
     await writeTextFS(modDir, 'entry.lua', generateEntryLua(config));
@@ -295,9 +312,10 @@ async function writeThemeToFolder(themeDir, meDir, report) {
    Strategy 2 — Firefox/Safari: JSZip → download .zip
    ═══════════════════════════════════════════════════════════════════ */
 
-async function buildToZip(modFolderName, config, selected, audioFormat, report) {
+async function buildToZip(modFolderName, config, selected, audioFormat, report, layout) {
     const zip = new JSZip();
-    const root = zip.folder(modFolderName);
+    if (layout === 'ovgme') zip.file(`${modFolderName}/README.txt`, ovgmeReadme(config, modFolderName));
+    const root = zip.folder(layout === 'ovgme' ? `${modFolderName}/Mods/resource/${modFolderName}` : modFolderName);
 
     report('Writing entry.lua…');
     root.file('entry.lua', generateEntryLua(config));
@@ -521,4 +539,20 @@ async function writeBlobFS(dirHandle, fileName, blob) {
     const w = await fh.createWritable();
     await w.write(blob);
     await w.close();
+}
+
+function ovgmeReadme(config, name) {
+    return `${config.displayName || config.modName || name} ${config.version || ''}
+by ${config.author || 'unknown'}
+
+${config.description || ''}
+
+Install with OVGME or Better Mods Manager: add this folder to your mods
+library with Saved Games\\DCS as the target, then enable it.
+
+Manual install: copy Mods\\resource\\${name} into
+%USERPROFILE%\\Saved Games\\DCS\\Mods\\resource\\
+
+Made with Better Sound.Maker
+`;
 }

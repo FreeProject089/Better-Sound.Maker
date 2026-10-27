@@ -260,6 +260,42 @@ fn open_path(app: AppHandle, path: String) -> CmdResult<()> {
     app.opener().open_path(path, None::<&str>).map_err(err)
 }
 
+/* ── Original DCS audio (A/B comparison) ─────────────────────────── */
+
+/// Find the game's own audio for a `wave` path. Module sounds are plain files
+/// under `<root>/{CoreMods,Mods}/<category>/<module>/Sounds/Effects`; the base
+/// game's sounds are inside the packed `Sounds.edce` and cannot be read.
+/// Returns the first match, or null.
+#[tauri::command]
+async fn find_dcs_wave(dcs_path: String, wave: String) -> Option<String> {
+    let rel = wave.replace('\\', "/");
+    let rel = rel.trim_start_matches('/');
+    let rel = rel.strip_prefix("Effects/").unwrap_or(rel);
+    let has_ext = Path::new(rel).extension().is_some();
+    let candidates: Vec<String> = if has_ext {
+        vec![rel.to_string()]
+    } else {
+        vec![format!("{rel}.wav"), format!("{rel}.ogg")]
+    };
+    let root = PathBuf::from(&dcs_path);
+    for top in ["CoreMods", "Mods"] {
+        let Ok(categories) = fs::read_dir(root.join(top)) else { continue };
+        for cat in categories.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()) {
+            let Ok(modules) = fs::read_dir(cat.path()) else { continue };
+            for module in modules.filter_map(|e| e.ok()) {
+                let effects = module.path().join("Sounds").join("Effects");
+                for c in &candidates {
+                    let p = effects.join(c);
+                    if p.is_file() {
+                        return Some(p.to_string_lossy().replace('\\', "/"));
+                    }
+                }
+            }
+        }
+    }
+    None
+}
+
 /* ── Diagnostics: crash logs ─────────────────────────────────────── */
 
 /// Where crash logs and panic reports go: the OS app-log folder
@@ -492,6 +528,7 @@ pub fn run() {
             open_path,
             bi_check_update,
             encode_ogg,
+            find_dcs_wave,
             app_info,
             write_crash_log,
             read_panic_logs,

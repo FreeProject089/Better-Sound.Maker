@@ -176,12 +176,16 @@ export const DOC_ARTICLES = [
         body: {
             en: `<table class="help-table"><tr><th>Keys</th><th>Action</th></tr>
 <tr><td><kbd>Ctrl</kbd> <kbd>K</kbd></td><td>Command palette: jump to any page or action</td></tr>
+<tr><td><kbd>Ctrl</kbd> <kbd>Z</kbd> / <kbd>Ctrl</kbd> <kbd>Y</kbd></td><td>Undo / redo (selection, SDEFs, project, presets)</td></tr>
 <tr><td><kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>L</kbd></td><td>Generate a crash log</td></tr>
+<tr><td><kbd>Space</kbd> · <kbd>A</kbd> / <kbd>B</kbd></td><td>In the Listen window: play/stop, switch yours / original</td></tr>
 <tr><td><kbd>Esc</kbd></td><td>Close a dialog or the tour</td></tr>
 <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next step of the tour</td></tr></table>`,
             fr: `<table class="help-table"><tr><th>Touches</th><th>Action</th></tr>
 <tr><td><kbd>Ctrl</kbd> <kbd>K</kbd></td><td>Palette de commandes : aller à une page ou une action</td></tr>
+<tr><td><kbd>Ctrl</kbd> <kbd>Z</kbd> / <kbd>Ctrl</kbd> <kbd>Y</kbd></td><td>Annuler / rétablir (sélection, SDEF, projet, presets)</td></tr>
 <tr><td><kbd>Ctrl</kbd> <kbd>Maj</kbd> <kbd>L</kbd></td><td>Générer un crash log</td></tr>
+<tr><td><kbd>Espace</kbd> · <kbd>A</kbd> / <kbd>B</kbd></td><td>Dans la fenêtre Écouter : lire/arrêter, basculer le vôtre / l'original</td></tr>
 <tr><td><kbd>Échap</kbd></td><td>Fermer une fenêtre ou la visite</td></tr>
 <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Étape précédente / suivante de la visite</td></tr></table>`,
         },

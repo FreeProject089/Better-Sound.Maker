@@ -4,13 +4,20 @@
  */
 
 import { getState, updateProjectConfig, saveAllUnsavedSdefs, setCurrentSdef, navigate } from '../state/store.js';
+import { quickCheck, deepCheck, okMessage } from '../utils/preflight.js';
+import { getCurrentLanguage } from '../utils/i18n.js';
 import { generateEntryLua } from '../utils/entry-generator.js';
 import { buildMod } from '../utils/mod-builder.js';
 import { showToast } from '../components/toast.js';
 import { t, updateTranslations } from '../utils/i18n.js';
 import { getIcon } from '../utils/icons.js';
 
+const LEN = { layoutTitle: 'Package as', plain: 'Mod folder', plainDesc: 'Copy it into Saved Games\\DCS\\Mods\\resource.', ovgme: 'OVGME / Better Mods Manager', ovgmeDesc: 'Mirrors Saved Games\\DCS: add it to your mod manager and enable it.', install: 'Install now', installDesc: 'Writes straight into your Saved Games Mods\\resource (set in Settings).', checkTitle: 'Pre-build check', deep: 'Check the audio' };
+const LFR = { layoutTitle: 'Format du paquet', plain: 'Dossier du mod', plainDesc: 'À copier dans Saved Games\\DCS\\Mods\\resource.', ovgme: 'OVGME / Better Mods Manager', ovgmeDesc: 'Reproduit Saved Games\\DCS : ajoutez-le à votre gestionnaire de mods et activez-le.', install: 'Installer maintenant', installDesc: 'Écrit directement dans Mods\\resource de votre Saved Games (défini dans Paramètres).', checkTitle: 'Vérification avant construction', deep: "Vérifier l'audio" };
+let L = LEN;
+
 export function renderBuild(container) {
+  L = getCurrentLanguage() === 'fr' ? LFR : LEN;
   const state = getState();
   const config = state.projectConfig;
   const selected = state.selectedAssets;
@@ -123,6 +130,15 @@ export function renderBuild(container) {
             </div>
           </div>
         </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+          <div class="card-title" style="margin-bottom: 12px;">${getIcon('package-open', 'w-4 h-4')} ${L.layoutTitle}</div>
+          <div class="bl-options">
+            ${[['plain', 'folder', L.plain, L.plainDesc], ['ovgme', 'boxes', L.ovgme, L.ovgmeDesc], ...(window.nativeAPI ? [['install', 'download', L.install, L.installDesc]] : [])].map(([v, ic, title, desc]) => `
+              <label class="bl-option"><input type="radio" name="bl-layout" value="${v}" ${v === (localStorage.getItem('bsm-build-layout') || 'plain') ? 'checked' : ''} />
+                <span class="bl-icon">${getIcon(ic, 'w-4 h-4')}</span><span><b>${title}</b><small>${desc}</small></span></label>`).join('')}
+          </div>
+        </div>
       </div>
 
       <div>
@@ -181,6 +197,12 @@ ${config.themeEnabled ? `├── Theme/
             </div>
           </div>
         ` : ''}
+
+        <div class="card pf" style="margin-bottom: 16px;">
+          <div class="pf-head">${getIcon('shield-check', 'w-4 h-4')} <b>${L.checkTitle}</b>
+            <button class="btn btn-ghost btn-sm" id="pf-deep">${getIcon('scan-search', 'w-3.5 h-3.5')} ${L.deep}</button></div>
+          <div id="pf-list"></div>
+        </div>
 
         <button class="btn btn-success btn-lg" id="build-mod-btn" style="width: 100%; font-size: 16px; padding: 16px;">
           ${getIcon('package', 'w-5 h-5')} ${t('build.action.build')}
@@ -290,7 +312,7 @@ ${config.themeEnabled ? `├── Theme/
     const result = await buildMod((progress, message) => {
       if (fillEl) fillEl.style.width = `${Math.round(progress * 100)}%`;
       if (textEl) textEl.textContent = message;
-    }, { audioFormat });
+    }, { audioFormat, layout: document.querySelector('[name="bl-layout"]:checked')?.value || 'plain', savedGamesPath: getState().globalSettings?.savedGamesPath });
 
     if (result.success) {
       showToast(`Mod exported successfully: ${result.folderName}`, 'success', 5000);
@@ -301,7 +323,30 @@ ${config.themeEnabled ? `├── Theme/
     }
   });
 
+  container.querySelectorAll('[name="bl-layout"]').forEach(r => r.addEventListener('change', () => localStorage.setItem('bsm-build-layout', r.value)));
+  renderPreflight(quickCheck());
+  document.getElementById('pf-deep')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    const res = await deepCheck((i, n) => { btn.textContent = `${i}/${n}`; });
+    btn.disabled = false;
+    btn.innerHTML = `${getIcon('scan-search', 'w-3.5 h-3.5')} ${L.deep}`;
+    renderPreflight(res);
+  });
+
   updateTranslations();
+}
+
+function renderPreflight(findings) {
+  const el = document.getElementById('pf-list');
+  if (!el) return;
+  if (!findings.length) { el.innerHTML = `<div class="pf-ok">${getIcon('check-circle-2', 'w-4 h-4')} ${okMessage()}</div>`; return; }
+  const icons = { error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+  const shown = findings.slice(0, 40);
+  el.innerHTML = shown.map((f, i) => `<div class="pf-item pf-${f.level}" ${f.sdef ? `data-sdef="${escapeHtml(f.sdef)}"` : ''}>
+      ${getIcon(icons[f.level], 'w-3.5 h-3.5')}<span>${f.sdef ? `<code>${escapeHtml(f.sdef.split('/').pop())}</code> ` : ''}${escapeHtml(f.message)}</span></div>`).join('')
+    + (findings.length > shown.length ? `<div class="pf-more">+${findings.length - shown.length}</div>` : '');
+  el.querySelectorAll('[data-sdef]').forEach(row => row.addEventListener('click', () => { setCurrentSdef(row.dataset.sdef); navigate('sdef-editor'); }));
 }
 
 function escapeHtml(str) {
