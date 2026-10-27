@@ -5,9 +5,9 @@ The catalog lists presets and sound-type packs; each entry points at its own JSO
 
 | File | Schema | Where |
 |---|---|---|
-| `catalog.json` | [`schemas/catalog.schema.json`](../schemas/catalog.schema.json) | community repo root (remote) · `public/catalog.json` (bundled) |
-| `preset_*.json` | [`schemas/preset.schema.json`](../schemas/preset.schema.json) | anywhere the catalog points to |
-| sound-type pack | [`schemas/sound-types.schema.json`](../schemas/sound-types.schema.json) | `public/sound-types/` (bundled) or listed in `soundTypes` |
+| `catalog.json` | [`schemas/catalog.schema.json`](https://github.com/FreeProject089/Better-Sound.Maker/blob/main/schemas/catalog.schema.json) | community repo root (remote) · `public/catalog.json` (bundled) |
+| `preset_*.json` | [`schemas/preset.schema.json`](https://github.com/FreeProject089/Better-Sound.Maker/blob/main/schemas/preset.schema.json) | anywhere the catalog points to |
+| sound-type pack | [`schemas/sound-types.schema.json`](https://github.com/FreeProject089/Better-Sound.Maker/blob/main/schemas/sound-types.schema.json) | `public/sound-types/` (bundled) or listed in `soundTypes` |
 
 All files are **UTF-8 JSON**. The validator rejects anything else.
 

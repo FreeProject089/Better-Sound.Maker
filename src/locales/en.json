@@ -603,7 +603,8 @@
             "desc": "The file <code>sdef_and_wave_list.txt</code> contains the full exhaustive list of all sound events and parameters inside DCS World.",
             "location": "File Location",
             "tip": "You can find it in the installation directory of DCS World. Usually located in your Program Files or Saved Games depending on your setup."
-        }
+        },
+        "fullDocs": "Full documentation (website)"
     },
     "creditsPage": {
         "subtitle": "About Better Sound.Maker",

@@ -403,7 +403,8 @@
             "desc": "Le fichier <code>sdef_and_wave_list.txt</code> contient la liste complète et exhaustive de tous les événements sonores de DCS World.",
             "location": "Emplacement du fichier",
             "tip": "Il se trouve dans le répertoire d'installation de DCS World, généralement dans Program Files ou vos Parties Enregistrées."
-        }
+        },
+        "fullDocs": "Documentation complète (site web)"
     },
     "docs_content": {
         "defaults": {

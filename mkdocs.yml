@@ -1,0 +1,151 @@
+site_name: Better Sound.Maker — Documentation
+site_description: The complete Better Sound.Maker guide / Le guide complet de Better Sound.Maker
+site_url: https://freeproject089.github.io/Better-Sound.Maker/
+repo_url: https://github.com/FreeProject089/Better-Sound.Maker
+edit_uri: edit/main/docs/
+
+# Same toolchain and layout as the BMM docs (MkDocs Material + mkdocs-static-i18n, suffix
+# structure: page.md + page.fr.md). Build: `pip install -r docs/requirements.txt` then
+# `mkdocs serve` or `mkdocs build --strict` from the repo root. Output goes to site/.
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  logo: assets/logo.png
+  favicon: assets/favicon.ico
+  # System fonts (stacks in assets/extra.css): no request to Google Fonts.
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+    admonition:
+      tip: material/lightbulb-on-outline
+      note: material/pencil-outline
+      warning: material/alert-outline
+      danger: material/alert-octagon-outline
+      info: material/information-outline
+      example: material/flask-outline
+      question: material/help-circle-outline
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle: { icon: material/brightness-auto, name: Follow system / Suivre le système }
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle: { icon: material/brightness-7, name: Dark mode / Mode sombre }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle: { icon: material/brightness-4, name: Light mode / Mode clair }
+  features:
+    # No navigation.instant: it breaks the i18n language switcher.
+    - navigation.tabs
+    - navigation.path
+    - navigation.tracking
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+    - content.action.edit
+    - toc.follow
+
+plugins:
+  - search:
+      lang: [en, fr]
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+        - locale: fr
+          name: Français
+          build: true
+          nav_translations:
+            Getting started: Premiers pas
+            Step by step: Pas à pas
+            Features: Fonctionnalités
+            How it works: Comment ça marche
+            Reference: Référence
+
+markdown_extensions:
+  - admonition
+  - pymdownx.keys
+  - pymdownx.details
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Getting started:
+      - index.md
+      - getting-started/install.md
+      - getting-started/first-launch.md
+      - getting-started/dcs-sound-mods.md
+  - Step by step:
+      - guide/index.md
+      - guide/first-mod.md
+      - guide/tune-a-sound.md
+      - guide/use-a-preset.md
+      - guide/collaborate.md
+      - guide/update-the-app.md
+  - Features:
+      - features/library.md
+      - features/project.md
+      - features/sdef-editor.md
+      - features/presets.md
+      - features/sound-types.md
+      - features/theme.md
+      - features/collaboration.md
+      - features/build.md
+      - features/settings.md
+  - How it works:
+      - how-it-works/index.md
+      - how-it-works/architecture.md
+      - how-it-works/desktop-bridge.md
+      - how-it-works/state-and-storage.md
+      - how-it-works/sdef-model.md
+      - how-it-works/mod-build.md
+      - how-it-works/catalog-loading.md
+      - how-it-works/updates-and-releases.md
+      - how-it-works/security.md
+  - Reference:
+      - reference/sdef-parameters.md
+      - reference/catalog-format.md
+      - reference/load-cfg.md
+      - reference/release.md
+      - reference/troubleshooting.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/FreeProject089/Better-Sound.Maker
+
+extra_css:
+  - assets/extra.css
+
+extra_javascript:
+  - assets/guide.js

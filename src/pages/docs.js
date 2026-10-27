@@ -4,14 +4,20 @@
  * Audio Guide, SDEF Guide, Theme Guide
  */
 
-import { t } from '../utils/i18n.js';
+import { t, getCurrentLanguage } from '../utils/i18n.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
+
+const DOCS_SITE = 'https://freeproject089.github.io/Better-Sound.Maker/';
 
 export function renderDocs(container) {
   container.innerHTML = `
     <div class="page-header">
       <h1 class="page-title">${t('docs.title')}</h1>
       <p class="page-description">${t('docs.desc')}</p>
+      <a class="btn btn-primary btn-sm" style="margin-top: 12px; display: inline-flex; gap: 6px;" target="_blank" rel="noopener"
+         href="${DOCS_SITE}${getCurrentLanguage() === 'fr' ? 'fr/' : ''}">
+        ${getIcon('book-open', 'w-4 h-4')} ${t('docs.fullDocs')}
+      </a>
     </div>
     <div class="tabs" id="docs-tabs">
       <div class="tab active" data-tab="audio">${getIcon('music', 'w-4 h-4')} ${t('docs.tabs.audio')}</div>
