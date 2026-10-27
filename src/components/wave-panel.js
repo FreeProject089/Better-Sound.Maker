@@ -46,7 +46,7 @@ export function renderWavePanel(sdefPath, waves) {
                 <span class="wv-file">${file ? `${getIcon('file-audio', 'w-3 h-3')} ${escapeHtml(file.name)}` : u.none}</span></div>
               <div class="wv-acts">
                 ${file ? `<button class="btn btn-ghost btn-sm btn-icon" data-act="play" title="${u.play}">${getIcon('play', 'w-3.5 h-3.5')}</button>
-                  <button class="btn btn-ghost btn-sm btn-icon" data-act="listen" title="${u.listen}">${getIcon('headphones', 'w-3.5 h-3.5')}</button>
+                  <button class="btn btn-secondary btn-sm wv-ab" data-act="listen" title="${u.listen}">${getIcon('headphones', 'w-3.5 h-3.5')} A/B</button>
                   <button class="btn btn-ghost btn-sm btn-icon" data-act="edit" title="${u.edit}">${getIcon('scissors', 'w-3.5 h-3.5')}</button>` : ''}
                 <button class="btn btn-ghost btn-sm btn-icon" data-act="attach" title="${u.attach}">${getIcon('upload', 'w-3.5 h-3.5')}</button>
                 ${i > 0 ? `<button class="btn btn-ghost btn-sm btn-icon" data-act="up" title="${u.up}">${getIcon('chevron-up', 'w-3.5 h-3.5')}</button>` : ''}
@@ -120,7 +120,7 @@ export function attachWavePanel(root, sdefPath, getParams, rerender) {
             const file = audioForWave(sdefPath, w, list);
             switch (btn.dataset.act) {
                 case 'play': togglePreview(file, btn); break;
-                case 'listen': (await import('../audio/audition.js')).openAudition({ sdefPath, params: getParams(), file, wave: w }); break;
+                case 'listen': (await import('../audio/audition.js')).openAudition({ sdefPath, params: getParams(), file, wave: w, originals: originalWaves(sdefPath, i, w) }); break;
                 case 'edit': {
                     const edited = await (await import('../audio/audio-editor.js')).openAudioEditor(file);
                     if (edited) { await attach(w, edited); rerender(); }
@@ -157,6 +157,20 @@ export function attachWavePanel(root, sdefPath, getParams, rerender) {
     };
     panel.querySelector('[data-add]').addEventListener('click', add);
     addInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); add(); } });
+}
+
+/** The game's own wave paths for this SDEF (from the library), best guess first. */
+function originalWaves(sdefPath, index, current) {
+    const asset = getState().selectedAssets?.[sdefPath];
+    let waves = asset?.originalAsset?.waves;
+    if (!waves?.length) {
+        for (const sec of getState().libraryData?.sections || []) {
+            const a = (sec.assets || []).find(x => x.sdefPath === sdefPath);
+            if (a?.waves?.length) { waves = a.waves; break; }
+        }
+    }
+    const list = waves?.length ? [waves[index] || waves[0], ...waves] : [];
+    return [...new Set([...list, current].filter(Boolean))];
 }
 
 function togglePreview(file, btn) {

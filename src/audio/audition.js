@@ -24,11 +24,11 @@ import { audioContext, decodeFile, drawWave } from './audio-utils.js';
 import './audio.css';
 
 const T = {
-    en: { title: 'Listen', dist: 'Distance', yours: 'A · Yours', orig: 'B · Original', play: 'Play', stop: 'Stop', loop: 'Loop', apply: 'Apply SDEF (gain, curve, pitch, filter)', gain: 'Gain here', looking: 'Looking for the original…', notFound: 'Original not found in your DCS folder (base-game sounds are packed in Sounds.edce).', drop: 'Drop or pick a reference file', noDcs: 'Set your DCS folder in Settings to load originals.', web: 'Loading originals needs the desktop app: drop a reference file instead.', tip: 'Press Space to play/stop, A/B to switch.', cockpit: 'Cockpit' },
-    fr: { title: 'Écouter', dist: 'Distance', yours: 'A · Le vôtre', orig: 'B · Original', play: 'Lire', stop: 'Stop', loop: 'Boucle', apply: 'Appliquer le SDEF (gain, courbe, hauteur, filtre)', gain: 'Gain ici', looking: 'Recherche de l\'original…', notFound: 'Original introuvable dans votre dossier DCS (les sons de base sont dans Sounds.edce).', drop: 'Déposez ou choisissez un fichier de référence', noDcs: 'Indiquez votre dossier DCS dans Paramètres pour charger les originaux.', web: 'Charger les originaux nécessite l\'application de bureau : déposez un fichier de référence.', tip: 'Espace pour lire/arrêter, A/B pour basculer.', cockpit: 'Cockpit' },
+    en: { title: 'Listen', dist: 'Distance', yours: 'A · Yours', orig: 'B · Original', play: 'Play', stop: 'Stop', loop: 'Loop', apply: 'Apply SDEF (gain, curve, pitch, filter)', gain: 'Gain here', looking: 'Looking for the original…', notFound: 'Not found in your DCS modules: base-game sounds are packed (Sounds.edce) and can\'t be read.', drop: 'Drop or pick a reference file', pick: 'Choose a reference file (or drop it here)', how: '<b>A</b> is your sound, <b>B</b> the original. Press Play, then click A or B (or press the A / B keys): both play in sync, so you hear the difference instantly. Move the distance slider to hear it as in game.', noDcs: 'Set your DCS folder in Settings to load originals.', web: 'Loading originals needs the desktop app: drop a reference file instead.', tip: 'Press Space to play/stop, A/B to switch.', cockpit: 'Cockpit' },
+    fr: { title: 'Écouter', dist: 'Distance', yours: 'A · Le vôtre', orig: 'B · Original', play: 'Lire', stop: 'Stop', loop: 'Boucle', apply: 'Appliquer le SDEF (gain, courbe, hauteur, filtre)', gain: 'Gain ici', looking: 'Recherche de l\'original…', notFound: 'Introuvable dans vos modules DCS : les sons de base sont compressés (Sounds.edce) et illisibles.', drop: 'Déposez ou choisissez un fichier de référence', pick: 'Choisir un fichier de référence (ou le déposer ici)', how: '<b>A</b> est votre son, <b>B</b> l\'original. Appuyez sur Lire, puis cliquez sur A ou B (ou touches A / B) : les deux jouent en même temps, vous entendez la différence tout de suite. Le curseur de distance fait entendre le son comme en jeu.', noDcs: 'Indiquez votre dossier DCS dans Paramètres pour charger les originaux.', web: 'Charger les originaux nécessite l\'application de bureau : déposez un fichier de référence.', tip: 'Espace pour lire/arrêter, A/B pour basculer.', cockpit: 'Cockpit' },
 };
 
-export async function openAudition({ sdefPath, params = {}, file, wave }) {
+export async function openAudition({ sdefPath, params = {}, file, wave, originals = [] }) {
     const t = T[getCurrentLanguage() === 'fr' ? 'fr' : 'en'];
     const ac = audioContext();
     const r = attenuationRadii(params);
@@ -49,9 +49,11 @@ export async function openAudition({ sdefPath, params = {}, file, wave }) {
         title: `${t.title} · ${escapeHtml(sdefPath.split('/').pop())}`, icon: 'headphones', size: 'lg',
         content: `
           <div class="au">
+            <p class="au-how">${t.how}</p>
             <div class="au-ab">
               <button class="au-side on" data-side="A"><canvas></canvas><span>${t.yours}</span></button>
-              <button class="au-side" data-side="B" id="au-b"><canvas></canvas><span>${t.orig}</span><em id="au-b-status">${t.looking}</em></button>
+              <button class="au-side" data-side="B" id="au-b"><canvas></canvas><span>${t.orig}</span><em id="au-b-status">${t.looking}</em>
+                <i class="au-b-pick" id="au-b-pick" hidden>${getIcon('file-plus', 'w-4 h-4')} ${t.pick}</i></button>
             </div>
             <div class="au-dist">
               <div class="au-dist-head"><b>${t.dist}</b><span id="au-d"></span><span class="au-g" id="au-g"></span></div>
@@ -110,10 +112,15 @@ export async function openAudition({ sdefPath, params = {}, file, wave }) {
     async function findOriginal(ov) {
         const st = ov.querySelector('#au-b-status');
         const dcs = getState().globalSettings?.dcsPath;
-        if (!window.nativeAPI) { st.textContent = t.web; return; }
-        if (!dcs || !wave) { st.textContent = t.noDcs; return; }
-        const path = await window.nativeAPI.findDcsWave(dcs, wave).catch(() => null);
-        if (!path) { st.textContent = `${t.notFound} ${t.drop}.`; return; }
+        if (!window.nativeAPI) { st.textContent = t.web; ov.querySelector('#au-b-pick').hidden = false; return; }
+        const showPick = (msg) => { st.textContent = msg; ov.querySelector('#au-b-pick').hidden = false; };
+        if (!dcs) { showPick(t.noDcs); return; }
+        let path = null;
+        for (const w of (originals.length ? originals : [wave]).filter(Boolean)) {
+            path = await window.nativeAPI.findDcsWave(dcs, w).catch(() => null);
+            if (path) break;
+        }
+        if (!path) { showPick(t.notFound); return; }
         const bytes = await window.nativeAPI.readFile(path);
         await setB(new File([bytes], path.split('/').pop()), ov);
     }
@@ -122,6 +129,7 @@ export async function openAudition({ sdefPath, params = {}, file, wave }) {
         try {
             bufB = await decodeFile(f);
             ov.querySelector('#au-b-status').textContent = f.name;
+            ov.querySelector('#au-b-pick').hidden = true;
             requestAnimationFrame(() => drawWave(ov.querySelector('[data-side="B"] canvas'), bufB, { color: '#a78bfa' }));
             if (nodes) { stop(); play(); }
         } catch (e) {

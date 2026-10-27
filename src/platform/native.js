@@ -38,6 +38,7 @@ if (isTauri) {
                 headers: { 'x-channels': String(channels), 'x-rate': String(rate), 'x-quality': String(quality) },
             }),
         findDcsWave: (dcsPath, wave) => invoke('find_dcs_wave', { dcsPath, wave }),
+        detectDcsInstalls: () => invoke('detect_dcs_installs'),
         appInfo: () => invoke('app_info'),
         writeCrashLog: (content) => invoke('write_crash_log', { content }),
         readPanicLogs: () => invoke('read_panic_logs'),

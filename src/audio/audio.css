@@ -54,3 +54,9 @@
 .wv-hint { font-size: 11.5px; color: var(--text-muted); }
 .sdef-param-row[data-param-row="wave"] { flex-direction: column; align-items: stretch; gap: 10px; }
 .sdef-param-row[data-param-row="wave"] .sdef-param-control { justify-content: stretch; }
+.au-how { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--info-dim); border: 1px solid rgba(59, 130, 246, 0.25); font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; }
+.au-how b { color: var(--text-primary); }
+.au-b-pick { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-style: normal; font-size: 12.5px; font-weight: 600; color: #c4b5fd; background: rgba(167, 139, 250, 0.06); }
+.au-b-pick[hidden] { display: none; }
+.au-side em { z-index: 1; }
+.wv-ab { height: 28px; padding: 0 8px; font-size: 11.5px; }

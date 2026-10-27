@@ -416,3 +416,8 @@ input[type="range"] { accent-color: var(--accent-blue); }
 
 .tpl-scope { display: flex; align-items: center; gap: 8px; margin: 0 15px 10px; color: var(--text-muted); }
 .tpl-scope select { flex: 1; min-height: 30px; padding: 4px 8px; font-size: 12px; }
+
+/* Library: loop / one-shot chip (short, never wraps) */
+.play-tag { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 7px; border-radius: 6px; font-size: 10.5px; font-weight: 600; white-space: nowrap; border: 1px solid; }
+.play-tag--loop { color: #93c5fd; background: var(--info-dim); border-color: rgba(59, 130, 246, 0.25); }
+.play-tag--once { color: #fcd34d; background: var(--warning-dim); border-color: rgba(245, 158, 11, 0.25); }

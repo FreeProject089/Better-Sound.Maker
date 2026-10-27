@@ -260,6 +260,49 @@ fn open_path(app: AppHandle, path: String) -> CmdResult<()> {
     app.opener().open_path(path, None::<&str>).map_err(err)
 }
 
+/* ── DCS install detection ───────────────────────────────────────── */
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct DcsInstall {
+    path: String,
+    /// Last change of Doc/Sounds/sdef_and_wave_list.txt (seconds since epoch):
+    /// the newest one is the install DCS last updated.
+    list_modified: u64,
+}
+
+/// Look for DCS installs on every drive (common folders) and return them,
+/// newest sound list first.
+#[tauri::command]
+async fn detect_dcs_installs() -> Vec<DcsInstall> {
+    const SUBDIRS: [&str; 8] = [
+        "DCS World", "DCS World OpenBeta", "Program Files/Eagle Dynamics/DCS World",
+        "Program Files/Eagle Dynamics/DCS World OpenBeta", "Games/DCS World", "Eagle Dynamics/DCS World",
+        "SteamLibrary/steamapps/common/DCSWorld", "Program Files (x86)/Steam/steamapps/common/DCSWorld",
+    ];
+    let mut found = Vec::new();
+    for letter in b'C'..=b'Z' {
+        let drive = format!("{}:/", letter as char);
+        if !Path::new(&drive).exists() {
+            continue;
+        }
+        for sub in SUBDIRS {
+            let root = PathBuf::from(&drive).join(sub);
+            let list = root.join("Doc/Sounds/sdef_and_wave_list.txt");
+            if let Ok(meta) = fs::metadata(&list) {
+                let list_modified = meta
+                    .modified()
+                    .ok()
+                    .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                    .map_or(0, |d| d.as_secs());
+                found.push(DcsInstall { path: root.to_string_lossy().replace('\\', "/"), list_modified });
+            }
+        }
+    }
+    found.sort_by(|a, b| b.list_modified.cmp(&a.list_modified));
+    found
+}
+
 /* ── Original DCS audio (A/B comparison) ─────────────────────────── */
 
 /// Find the game's own audio for a `wave` path. Module sounds are plain files
@@ -529,6 +572,7 @@ pub fn run() {
             bi_check_update,
             encode_ogg,
             find_dcs_wave,
+            detect_dcs_installs,
             app_info,
             write_crash_log,
             read_panic_logs,
@@ -564,6 +608,19 @@ mod tests {
         assert_eq!(ts.len(), 15);
         assert!(ts.starts_with("20"));
         assert_eq!(&ts[8..9], "-");
+    }
+
+    /// Runs only where a DCS install exists (developer machines).
+    #[test]
+    fn finds_dcs_and_a_module_wave() {
+        let installs = tauri::async_runtime::block_on(detect_dcs_installs());
+        let Some(first) = installs.first() else { return };
+        eprintln!("DCS found: {}", first.path);
+        let hit = tauri::async_runtime::block_on(find_dcs_wave(
+            first.path.clone(),
+            "Effects/Aircrafts/Engines/F14_Afterburner_Start_Int_01".into(),
+        ));
+        assert!(hit.is_some_and(|p| p.ends_with(".wav")), "AJS37 sound should resolve in {}", first.path);
     }
 
     #[test]

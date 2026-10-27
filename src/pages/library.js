@@ -801,9 +801,9 @@ function renderVirtualList(reset = false) {
     const typeInfo = SOUND_TYPES[soundType] || SOUND_TYPES.generic;
     const loopType = guessLoopType(asset.sdefPath);
     const loopTag = loopType === 'loop'
-      ? '<span class="tag tag-blue">loop</span>'
+      ? `<span class="play-tag play-tag--loop" title="Loop">${getIcon('repeat', 'w-3 h-3')}Loop</span>`
       : loopType === 'one-shot'
-        ? '<span class="tag tag-amber">one-shot</span>'
+        ? `<span class="play-tag play-tag--once" title="One-shot">${getIcon('zap', 'w-3 h-3')}1×</span>`
         : '';
 
     const rawNote = getAssetNote(asset.sdefPath);
@@ -1145,9 +1145,10 @@ async function openScannerModal(isFirstLaunch = false) {
   let savedGamesPath = globalSettings.savedGamesPath || '';
 
   // Auto detect if empty
+  // Desktop: search every drive and take the install DCS updated last
   if (!dcsPath && window.nativeAPI) {
-    const dcsDefault = 'C:/Program Files/Eagle Dynamics/DCS World';
-    if (await window.nativeAPI.exists(dcsDefault)) dcsPath = dcsDefault;
+    const installs = await window.nativeAPI.detectDcsInstalls().catch(() => []);
+    if (installs.length) dcsPath = installs[0].path;
   }
 
   if (!savedGamesPath && window.nativeAPI) {
@@ -1157,6 +1158,8 @@ async function openScannerModal(isFirstLaunch = false) {
     // even though user said no more openbeta, it doesn't hurt to check if 'DCS' doesn't exist.
     if (sgDefault && await window.nativeAPI.exists(sgDefault)) {
       savedGamesPath = sgDefault;
+    } else if (home && await window.nativeAPI.exists(`${home}/Saved Games/DCS.openbeta`)) {
+      savedGamesPath = `${home}/Saved Games/DCS.openbeta`;
     }
   }
 

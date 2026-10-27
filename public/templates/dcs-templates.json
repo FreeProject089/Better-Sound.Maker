@@ -1,0 +1,1158 @@
+{
+ "generatedAt": "2026-10-27T19:09:05.090Z",
+ "fileCount": 17149,
+ "byType": [
+  {
+   "id": "dcs-type-crew_voice",
+   "name": "Crew voice (Jester, Iceman…)",
+   "type": "crew_voice",
+   "lucideIcon": "mic",
+   "files": 15299,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 2,
+    "streaming": false,
+    "preload": false
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-explosion",
+   "name": "Explosion / impact",
+   "type": "explosion",
+   "lucideIcon": "bomb",
+   "files": 214,
+   "params": {
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "gain": 10,
+    "streaming": true
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-engine",
+   "name": "Engine (external)",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 212,
+   "params": {
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 1.25,
+    "inner_radius": 150,
+    "outer_radius": 1000,
+    "cone_inner_angle": 75,
+    "cone_outer_angle": 120,
+    "cone_outer_gain": 0.3,
+    "direction": [
+     1,
+     0,
+     0
+    ],
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-other",
+   "name": "Other",
+   "type": "other",
+   "lucideIcon": "music-2",
+   "files": 149,
+   "params": {
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "gain": 1.7,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-switch",
+   "name": "Cockpit switches",
+   "type": "switch",
+   "lucideIcon": "toggle-left",
+   "files": 145,
+   "params": {
+    "gain": 2.4,
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-gun",
+   "name": "Gun / cannon",
+   "type": "gun",
+   "lucideIcon": "crosshair",
+   "files": 39,
+   "params": {
+    "listmode": "RANDOM",
+    "position": [
+     8.8,
+     -0.138,
+     -0.64
+    ],
+    "inner_radius": 1000,
+    "outer_radius": 3000,
+    "gain": 5
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-canopy",
+   "name": "Canopy",
+   "type": "canopy",
+   "lucideIcon": "panel-top-open",
+   "files": 30,
+   "params": {
+    "inner_radius": 3,
+    "outer_radius": 25,
+    "gain": 1,
+    "position": [
+     -0.25,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-weapon",
+   "name": "Weapon launch / release",
+   "type": "weapon",
+   "lucideIcon": "rocket",
+   "files": 26,
+   "params": {
+    "inner_radius": 3,
+    "outer_radius": 5,
+    "gain_random": 0.1,
+    "pitch_random": 0.1,
+    "gain": 2.4
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-music",
+   "name": "Music / Walkman",
+   "type": "music",
+   "lucideIcon": "music",
+   "files": 26,
+   "params": {
+    "pitch": 1,
+    "gain": 0.8
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-tone",
+   "name": "Tones & beeps",
+   "type": "tone",
+   "lucideIcon": "radio",
+   "files": 25,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "gain": 0.9,
+    "position": [
+     -0.37,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-engine_cockpit",
+   "name": "Engine (cockpit)",
+   "type": "engine_cockpit",
+   "lucideIcon": "headphones",
+   "files": 23,
+   "params": {
+    "inner_radius": 12.5,
+    "outer_radius": 100,
+    "gain": 1,
+    "position": [
+     -0.37,
+     0,
+     0
+    ],
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-gear",
+   "name": "Landing gear / wheels",
+   "type": "gear",
+   "lucideIcon": "circle-dot",
+   "files": 21,
+   "params": {
+    "inner_radius": 20,
+    "outer_radius": 150,
+    "gain": 1.25
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-wind",
+   "name": "Wind / airflow",
+   "type": "wind",
+   "lucideIcon": "wind",
+   "files": 17,
+   "params": {
+    "position": [
+     0.75,
+     0,
+     0
+    ],
+    "gain": 1,
+    "inner_radius": 15,
+    "outer_radius": 150
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-apu",
+   "name": "APU",
+   "type": "apu",
+   "lucideIcon": "battery-charging",
+   "files": 7,
+   "params": {
+    "inner_radius": 50,
+    "outer_radius": 400,
+    "cone_inner_angle": 45,
+    "cone_outer_angle": 135,
+    "cone_outer_gain": 0.7,
+    "direction": [
+     -1,
+     0,
+     0
+    ],
+    "position": [
+     0,
+     -0.5,
+     0
+    ],
+    "pitch": 1,
+    "gain": 1.6,
+    "attack": 0.5,
+    "release": 0.2
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-type-radio",
+   "name": "Radio / intercom",
+   "type": "radio",
+   "lucideIcon": "radio-tower",
+   "files": 4,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 0.825
+   },
+   "source": "dcs"
+  }
+ ],
+ "byModule": [
+  {
+   "id": "dcs-mod-ajs37-engine",
+   "name": "AJS37 · Engine (external)",
+   "module": "AJS37",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 18,
+   "params": {
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 0.55,
+    "inner_radius": 300,
+    "outer_radius": 3000,
+    "cone_inner_angle": 35,
+    "cone_outer_angle": 120,
+    "cone_outer_gain": 0.125,
+    "direction": [
+     0.85,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-ajs37-gun",
+   "name": "AJS37 · Gun / cannon",
+   "module": "AJS37",
+   "type": "gun",
+   "lucideIcon": "crosshair",
+   "files": 6,
+   "params": {
+    "listmode": "RANDOM",
+    "position": [
+     8.8,
+     -0.138,
+     -0.64
+    ],
+    "inner_radius": 1000,
+    "outer_radius": 3000,
+    "gain": 5
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-av8bna-engine",
+   "name": "AV8BNA · Engine (external)",
+   "module": "AV8BNA",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 17,
+   "params": {
+    "inner_radius": 100,
+    "outer_radius": 1000,
+    "gain": 1,
+    "attack": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-c-101-engine",
+   "name": "C-101 · Engine (external)",
+   "module": "C-101",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 11,
+   "params": {
+    "gain": 2,
+    "inner_radius": 100,
+    "outer_radius": 1000,
+    "position": [
+     -0.25,
+     0,
+     0
+    ],
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-c-101-tone",
+   "name": "C-101 · Tones & beeps",
+   "module": "C-101",
+   "type": "tone",
+   "lucideIcon": "radio",
+   "files": 6,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "gain": 1.5
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-chinaassetpack-engine",
+   "name": "ChinaAssetPack · Engine (external)",
+   "module": "ChinaAssetPack",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 13,
+   "params": {
+    "inner_radius": 50,
+    "outer_radius": 600,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 0.8
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-christen-eagle-ii-engine",
+   "name": "Christen Eagle II · Engine (external)",
+   "module": "Christen Eagle II",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 5,
+   "params": {
+    "inner_radius": 300,
+    "outer_radius": 1500,
+    "cone_inner_angle": 45,
+    "cone_outer_angle": 145,
+    "cone_outer_gain": 0.7,
+    "direction": [
+     10,
+     0,
+     0
+    ],
+    "position": [
+     1.7,
+     0,
+     0
+    ],
+    "pitch": 1,
+    "gain": 1,
+    "attack": 0.5,
+    "release": 0.2
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-crew_voice",
+   "name": "F-4E · Crew voice (Jester, Iceman…)",
+   "module": "F-4E",
+   "type": "crew_voice",
+   "lucideIcon": "mic",
+   "files": 15278,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 2,
+    "streaming": false,
+    "preload": false
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-switch",
+   "name": "F-4E · Cockpit switches",
+   "module": "F-4E",
+   "type": "switch",
+   "lucideIcon": "toggle-left",
+   "files": 71,
+   "params": {
+    "gain": 2.4,
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-other",
+   "name": "F-4E · Other",
+   "module": "F-4E",
+   "type": "other",
+   "lucideIcon": "music-2",
+   "files": 50,
+   "params": {
+    "gain": 2.4,
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-engine",
+   "name": "F-4E · Engine (external)",
+   "module": "F-4E",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 40,
+   "params": {
+    "inner_radius": 150,
+    "outer_radius": 800,
+    "cone_inner_angle": 80,
+    "cone_outer_angle": 120,
+    "cone_outer_gain": 0.275,
+    "direction": [
+     1,
+     0,
+     0
+    ],
+    "position": [
+     1,
+     0,
+     0
+    ],
+    "gain": 1.5,
+    "cone_inner_gain": 1,
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-gun",
+   "name": "F-4E · Gun / cannon",
+   "module": "F-4E",
+   "type": "gun",
+   "lucideIcon": "crosshair",
+   "files": 15,
+   "params": {
+    "listmode": "RANDOM",
+    "position": [
+     8.8,
+     -0.138,
+     -0.64
+    ],
+    "inner_radius": 1000,
+    "outer_radius": 3000,
+    "gain": 5
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-tone",
+   "name": "F-4E · Tones & beeps",
+   "module": "F-4E",
+   "type": "tone",
+   "lucideIcon": "radio",
+   "files": 10,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 0.9,
+    "pitch": 1.625
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-weapon",
+   "name": "F-4E · Weapon launch / release",
+   "module": "F-4E",
+   "type": "weapon",
+   "lucideIcon": "rocket",
+   "files": 10,
+   "params": {
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "gain": 2.4,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-canopy",
+   "name": "F-4E · Canopy",
+   "module": "F-4E",
+   "type": "canopy",
+   "lucideIcon": "panel-top-open",
+   "files": 8,
+   "params": {
+    "gain": 2,
+    "position": [
+     -1.75,
+     0,
+     0
+    ],
+    "inner_radius": 2,
+    "outer_radius": 4,
+    "release": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-gear",
+   "name": "F-4E · Landing gear / wheels",
+   "module": "F-4E",
+   "type": "gear",
+   "lucideIcon": "circle-dot",
+   "files": 7,
+   "params": {
+    "inner_radius": 20,
+    "outer_radius": 150,
+    "gain": 4
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-wind",
+   "name": "F-4E · Wind / airflow",
+   "module": "F-4E",
+   "type": "wind",
+   "lucideIcon": "wind",
+   "files": 6,
+   "params": {
+    "position": [
+     0.425,
+     0,
+     0
+    ],
+    "gain": 2.5,
+    "inner_radius": 10,
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-engine_cockpit",
+   "name": "F-4E · Engine (cockpit)",
+   "module": "F-4E",
+   "type": "engine_cockpit",
+   "lucideIcon": "headphones",
+   "files": 6,
+   "params": {
+    "position": [
+     -1,
+     0,
+     -0.5
+    ],
+    "gain": 1.2,
+    "peak_radius": 10,
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-explosion",
+   "name": "F-4E · Explosion / impact",
+   "module": "F-4E",
+   "type": "explosion",
+   "lucideIcon": "bomb",
+   "files": 3,
+   "params": {
+    "inner_radius": 11.5,
+    "outer_radius": 77.5,
+    "gain": 5.25
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f-4e-radio",
+   "name": "F-4E · Radio / intercom",
+   "module": "F-4E",
+   "type": "radio",
+   "lucideIcon": "radio-tower",
+   "files": 3,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-explosion",
+   "name": "F14 · Explosion / impact",
+   "module": "F14",
+   "type": "explosion",
+   "lucideIcon": "bomb",
+   "files": 211,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "gain": 10,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "streaming": true
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-engine",
+   "name": "F14 · Engine (external)",
+   "module": "F14",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 75,
+   "params": {
+    "inner_radius": 100,
+    "outer_radius": 1000,
+    "cone_inner_angle": 75,
+    "cone_outer_angle": 120,
+    "cone_outer_gain": 0.25,
+    "direction": [
+     1,
+     0,
+     0
+    ],
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 1.5,
+    "cone_inner_gain": 1,
+    "pitch": 1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-switch",
+   "name": "F14 · Cockpit switches",
+   "module": "F14",
+   "type": "switch",
+   "lucideIcon": "toggle-left",
+   "files": 74,
+   "params": {
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "position": [
+     -0.37,
+     -0.25,
+     0
+    ],
+    "gain": 2.4,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-other",
+   "name": "F14 · Other",
+   "module": "F14",
+   "type": "other",
+   "lucideIcon": "music-2",
+   "files": 66,
+   "params": {
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "gain": 2.2,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-music",
+   "name": "F14 · Music / Walkman",
+   "module": "F14",
+   "type": "music",
+   "lucideIcon": "music",
+   "files": 24,
+   "params": {
+    "pitch": 1,
+    "gain": 0.8
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-crew_voice",
+   "name": "F14 · Crew voice (Jester, Iceman…)",
+   "module": "F14",
+   "type": "crew_voice",
+   "lucideIcon": "mic",
+   "files": 21,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "gain": 10
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-engine_cockpit",
+   "name": "F14 · Engine (cockpit)",
+   "module": "F14",
+   "type": "engine_cockpit",
+   "lucideIcon": "headphones",
+   "files": 15,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "gain": 1,
+    "position": [
+     -0.37,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-canopy",
+   "name": "F14 · Canopy",
+   "module": "F14",
+   "type": "canopy",
+   "lucideIcon": "panel-top-open",
+   "files": 13,
+   "params": {
+    "gain": 1.4,
+    "pitch": 1,
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "position": [
+     0,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-gear",
+   "name": "F14 · Landing gear / wheels",
+   "module": "F14",
+   "type": "gear",
+   "lucideIcon": "circle-dot",
+   "files": 12,
+   "params": {
+    "inner_radius": 20,
+    "outer_radius": 150,
+    "position": [
+     -1.685,
+     -0.8,
+     0
+    ],
+    "gain": 0.8
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-weapon",
+   "name": "F14 · Weapon launch / release",
+   "module": "F14",
+   "type": "weapon",
+   "lucideIcon": "rocket",
+   "files": 11,
+   "params": {
+    "inner_radius": 1,
+    "outer_radius": 3,
+    "gain": 2.4,
+    "pitch_random": 0.1,
+    "gain_random": 0.1
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-tone",
+   "name": "F14 · Tones & beeps",
+   "module": "F14",
+   "type": "tone",
+   "lucideIcon": "radio",
+   "files": 9,
+   "params": {
+    "gain": 0.5,
+    "inner_radius": 10,
+    "outer_radius": 100,
+    "looping": true,
+    "position": [
+     -0.37,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-gun",
+   "name": "F14 · Gun / cannon",
+   "module": "F14",
+   "type": "gun",
+   "lucideIcon": "crosshair",
+   "files": 6,
+   "params": {
+    "listmode": "RANDOM",
+    "position": [
+     8.8,
+     -0.138,
+     -0.64
+    ],
+    "inner_radius": 1000,
+    "outer_radius": 3000,
+    "gain": 5
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-wind",
+   "name": "F14 · Wind / airflow",
+   "module": "F14",
+   "type": "wind",
+   "lucideIcon": "wind",
+   "files": 6,
+   "params": {
+    "inner_radius": 10,
+    "outer_radius": 125,
+    "gain": 1,
+    "position": [
+     0,
+     0,
+     0
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-f14-apu",
+   "name": "F14 · APU",
+   "module": "F14",
+   "type": "apu",
+   "lucideIcon": "battery-charging",
+   "files": 4,
+   "params": {
+    "position": [
+     -0.37,
+     -0.5,
+     0
+    ],
+    "gain": 0.5,
+    "inner_radius": 50,
+    "outer_radius": 200
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-i-16-other",
+   "name": "I-16 · Other",
+   "module": "I-16",
+   "type": "other",
+   "lucideIcon": "music-2",
+   "files": 24,
+   "params": {
+    "inner_radius": 25,
+    "outer_radius": 700,
+    "gain": 1.5
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-i-16-engine",
+   "name": "I-16 · Engine (external)",
+   "module": "I-16",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 5,
+   "params": {
+    "inner_radius": 37.5,
+    "outer_radius": 700,
+    "position": [
+     -1.35,
+     0,
+     0
+    ],
+    "gain": 1.4,
+    "cone_inner_angle": 75,
+    "cone_outer_angle": 60,
+    "cone_outer_gain": 0.55,
+    "direction": [
+     0,
+     0,
+     1
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-m-2000c-engine",
+   "name": "M-2000C · Engine (external)",
+   "module": "M-2000C",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 22,
+   "params": {
+    "inner_radius": 250,
+    "outer_radius": 3000,
+    "cone_inner_angle": 60,
+    "cone_outer_angle": 180,
+    "cone_outer_gain": 0.5,
+    "direction": [
+     0,
+     0,
+     0
+    ],
+    "position": [
+     -3,
+     0.5,
+     0
+    ],
+    "gain": 0.275
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-m-2000c-gun",
+   "name": "M-2000C · Gun / cannon",
+   "module": "M-2000C",
+   "type": "gun",
+   "lucideIcon": "crosshair",
+   "files": 6,
+   "params": {
+    "inner_radius": 300,
+    "outer_radius": 3000,
+    "gain": 15,
+    "lowpass": 1000
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-m-2000c-wind",
+   "name": "M-2000C · Wind / airflow",
+   "module": "M-2000C",
+   "type": "wind",
+   "lucideIcon": "wind",
+   "files": 4,
+   "params": {
+    "inner_radius": 35,
+    "outer_radius": 275,
+    "gain": 0.5,
+    "position": [
+     1.1,
+     0,
+     0
+    ],
+    "nodoppler": true
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-m-2000c-other",
+   "name": "M-2000C · Other",
+   "module": "M-2000C",
+   "type": "other",
+   "lucideIcon": "music-2",
+   "files": 3,
+   "params": {
+    "inner_radius": 50,
+    "outer_radius": 500,
+    "gain": 0.15,
+    "position": [
+     -2,
+     -2,
+     5
+    ]
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-m-2000c-rwr",
+   "name": "M-2000C · RWR / radar tones",
+   "module": "M-2000C",
+   "type": "rwr",
+   "lucideIcon": "radar",
+   "files": 3,
+   "params": {
+    "inner_radius": 50,
+    "outer_radius": 150,
+    "gain": 3,
+    "lowpass": 1000
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-mig-21bis-engine",
+   "name": "MiG-21bis · Engine (external)",
+   "module": "MiG-21bis",
+   "type": "engine",
+   "lucideIcon": "flame",
+   "files": 4,
+   "params": {
+    "inner_radius": 2000,
+    "outer_radius": 5000,
+    "cone_inner_angle": 45,
+    "cone_outer_angle": 140,
+    "cone_outer_gain": 0.85,
+    "direction": [
+     -10,
+     0,
+     0
+    ],
+    "position": [
+     -3,
+     0,
+     0
+    ],
+    "pitch": 1,
+    "gain": 1.7,
+    "attack": 0.5,
+    "release": 0.2
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-mig-21bis-apu",
+   "name": "MiG-21bis · APU",
+   "module": "MiG-21bis",
+   "type": "apu",
+   "lucideIcon": "battery-charging",
+   "files": 3,
+   "params": {
+    "inner_radius": 100,
+    "outer_radius": 600,
+    "cone_inner_angle": 45,
+    "cone_outer_angle": 135,
+    "cone_outer_gain": 0.7,
+    "direction": [
+     -1,
+     0,
+     0
+    ],
+    "position": [
+     0,
+     0,
+     0
+    ],
+    "pitch": 1,
+    "gain": 1.6,
+    "attack": 0.5,
+    "release": 0.2
+   },
+   "source": "dcs"
+  },
+  {
+   "id": "dcs-mod-sa342-weapon",
+   "name": "SA342 · Weapon launch / release",
+   "module": "SA342",
+   "type": "weapon",
+   "lucideIcon": "rocket",
+   "files": 4,
+   "params": {
+    "inner_radius": 50,
+    "outer_radius": 3000,
+    "gain": 20,
+    "listmode": "RANDOM",
+    "position": [
+     0.007,
+     0.05,
+     0
+    ]
+   },
+   "source": "dcs"
+  }
+ ]
+}
