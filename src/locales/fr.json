@@ -306,6 +306,15 @@
             "auto_width": "Largeur Auto",
             "nodoppler": "Désactiver Doppler",
             "distance_filter_offset": "Offset Filtre Distance"
+        },
+        "unset": "— non défini —",
+        "undocumentedHint": "Absent du example.sdef d’ED, mais utilisé dans les fichiers officiels de DCS",
+        "lint": {
+            "ok": "Aucun problème détecté"
+        },
+        "curve": {
+            "title": "Atténuation selon la distance",
+            "hint": "Gain relatif selon la distance (échelle log), multiplié par gain"
         }
     },
     "themePage": {

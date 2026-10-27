@@ -3623,3 +3623,26 @@ body.onboarding-active #sidebar {
   color: var(--text-secondary);
   line-height: 1.5;
 }
+/* ── SDEF editor insights (lint panel, attenuation curve) ── */
+.sdef-lint { margin-bottom: 12px; font-size: 12px; }
+.sdef-lint-ok { display: flex; align-items: center; gap: 6px; color: var(--accent-green); padding: 6px 2px; }
+.sdef-lint-box { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-surface); }
+.sdef-lint-box summary { display: flex; align-items: center; gap: 6px; padding: 8px 12px; cursor: pointer; font-weight: 600; color: var(--text-primary); }
+.sdef-lint-box ul { list-style: none; margin: 0; padding: 0 12px 8px; display: grid; gap: 4px; }
+.sdef-lint-item { display: flex; align-items: flex-start; gap: 6px; padding: 4px 6px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-secondary); }
+.sdef-lint-item:hover { background: var(--bg-secondary); }
+.sdef-lint-item svg { flex-shrink: 0; margin-top: 1px; }
+.sdef-lint-error svg { color: var(--accent-red); }
+.sdef-lint-warning svg { color: var(--accent-amber); }
+.sdef-lint-info svg { color: var(--accent-blue); }
+.sdef-param-row.sdef-row-error { box-shadow: inset 3px 0 0 var(--accent-red); }
+.sdef-param-row.sdef-row-warning { box-shadow: inset 3px 0 0 var(--accent-amber); }
+.sdef-badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: .04em; padding: 1px 5px; margin-left: 4px; border-radius: 999px; vertical-align: middle; color: var(--accent-purple); border: 1px solid currentColor; cursor: help; }
+.sdef-curve { margin: 12px 0 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-secondary); }
+.sdef-curve-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.sdef-curve-title span { font-weight: 400; color: var(--text-muted); font-size: 11px; }
+.sdef-curve svg { width: 100%; height: auto; display: block; }
+.sdef-curve .axis { stroke: var(--border); stroke-width: 1; }
+.sdef-curve .mark { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: .6; }
+.sdef-curve .curve { fill: none; stroke: var(--accent-cyan); stroke-width: 2; stroke-linejoin: round; }
+.sdef-curve .lbl { fill: var(--text-muted); font-size: 10px; font-family: var(--font-mono, monospace); }
