@@ -96,12 +96,10 @@ The panel never blocks you: you can save an SDEF with problems.
 **Templates** (top right) opens the template manager. A template is a set of parameter values you
 saved to reuse on other sounds.
 
-- **Create one:** on the right (*Nouveau Template*), name it, pick the source asset, save.
-- **Apply it:** *Actuel* applies it to the SDEF you are editing; *Tous (n)* applies it to every
+- **Create one:** on the right (*New template*), name it, pick the source asset, press **Create template**.
+- **Apply it:** *Current* applies it to the SDEF you are editing; *All (n)* applies it to every
   SDEF in the project. The `wave` of each SDEF is kept: only the other parameters change.
-- **Share:** *Importer* / *Exporter* load and save templates as files.
-
-The template manager is only in French for now.
+- **Share:** *Import* / *Export* load and save templates as files.
 
 ## Related
 

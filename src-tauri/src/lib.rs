@@ -69,6 +69,67 @@ async fn write_buffer(request: Request<'_>) -> CmdResult<bool> {
     Ok(true)
 }
 
+/// Encode PCM to Ogg Vorbis (the format DCS reads besides WAV).
+///
+/// Body: planar little-endian f32 samples, channel after channel.
+/// Headers: `x-channels` (1–2), `x-rate` (Hz), optional `x-quality` (-0.1..1, default 0.5).
+#[tauri::command]
+async fn encode_ogg(request: Request<'_>) -> CmdResult<Response> {
+    let header = |name: &str| {
+        request
+            .headers()
+            .get(name)
+            .and_then(|v| v.to_str().ok())
+            .map(str::to_owned)
+    };
+    let channels: u8 = header("x-channels").and_then(|v| v.parse().ok()).ok_or("bad x-channels")?;
+    let rate: u32 = header("x-rate").and_then(|v| v.parse().ok()).ok_or("bad x-rate")?;
+    let quality: f32 = header("x-quality").and_then(|v| v.parse().ok()).unwrap_or(0.5);
+    let InvokeBody::Raw(bytes) = request.body() else {
+        return Err("expected raw binary body".into());
+    };
+    if channels == 0 || channels > 2 || bytes.len() % (4 * channels as usize) != 0 {
+        return Err("PCM size does not match the channel count".into());
+    }
+    let samples: Vec<f32> = bytes
+        .chunks_exact(4)
+        .map(|b| f32::from_le_bytes([b[0], b[1], b[2], b[3]]))
+        .collect();
+    let frames = samples.len() / channels as usize;
+    let planes: Vec<&[f32]> = samples.chunks(frames.max(1)).collect();
+    encode_vorbis(&planes, rate, quality).map(Response::new)
+}
+
+fn encode_vorbis(planes: &[&[f32]], rate: u32, quality: f32) -> CmdResult<Vec<u8>> {
+    use vorbis_rs::{VorbisBitrateManagementStrategy, VorbisEncoderBuilder};
+    let channels = u8::try_from(planes.len()).map_err(err)?;
+    let frames = planes.first().map_or(0, |p| p.len());
+    let mut out = Vec::new();
+    let mut enc = VorbisEncoderBuilder::new(
+        std::num::NonZeroU32::new(rate).ok_or("rate is 0")?,
+        std::num::NonZeroU8::new(channels).ok_or("channels is 0")?,
+        &mut out,
+    )
+    .map_err(err)?
+    .bitrate_management_strategy(VorbisBitrateManagementStrategy::QualityVbr {
+        target_quality: quality.clamp(-0.1, 1.0),
+    })
+    .build()
+    .map_err(err)?;
+    // Feed in blocks to keep libvorbis' internal buffers small
+    const BLOCK: usize = 4096;
+    let mut start = 0;
+    while start < frames {
+        let end = (start + BLOCK).min(frames);
+        let block: Vec<&[f32]> = planes.iter().map(|p| &p[start..end]).collect();
+        enc.encode_audio_block(&block).map_err(err)?;
+        start = end;
+    }
+    enc.finish().map_err(err)?;
+    Ok(out)
+}
+
+
 #[tauri::command]
 async fn mkdir(path: String) -> CmdResult<bool> {
     fs::create_dir_all(path).map_err(err)?;
@@ -282,6 +343,7 @@ pub fn run() {
             get_user_home,
             open_path,
             bi_check_update,
+            encode_ogg,
             bi_apply_update,
         ])
         .run(tauri::generate_context!())
@@ -296,6 +358,15 @@ mod tests {
     fn waves_are_extracted_and_normalized() {
         let sdef = "wave = \"\\\\Aircrafts\\\\F18\\\\eng.wav\"\n  wave=\"/a/b.ogg\"\ngain = 1";
         assert_eq!(parse_waves(sdef), vec!["Aircrafts/F18/eng.wav", "a/b.ogg"]);
+    }
+
+    #[test]
+    fn vorbis_encoding_produces_an_ogg_stream() {
+        let tone: Vec<f32> = (0..44_100).map(|i| (i as f32 * 0.0627).sin() * 0.5).collect();
+        let ogg = encode_vorbis(&[&tone, &tone], 44_100, 0.5).unwrap();
+        assert_eq!(&ogg[..4], b"OggS");
+        assert!(ogg.windows(6).any(|w| w == b"vorbis"));
+        assert!(ogg.len() < tone.len() * 2 * 2, "should be smaller than 16-bit PCM");
     }
 
     #[test]

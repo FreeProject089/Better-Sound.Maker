@@ -31,7 +31,7 @@ fichier vient bien de la page officielle des versions GitHub avant de choisir de
 ## Mises à jour
 
 Inutile de revenir ici à chaque version. BSM recherche les mises à jour peu après son démarrage,
-et le bouton **Check for Updates** de la barre latérale vérifie à la demande. Il utilise la voie
+et le bouton **Vérifier les mises à jour** de la barre latérale vérifie à la demande. Il utilise la voie
 qui correspond à votre installation :
 
 1. **BetterInstaller**, si vous avez installé avec l'installeur BetterInstaller. L'application se

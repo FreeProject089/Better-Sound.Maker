@@ -42,6 +42,7 @@ le même chemin de code choisit entre le comportement bureau et navigateur.
 | `openExternal(path)` | `open_path` | `path` | rien | rejet |
 | `biCheckUpdate()` | `bi_check_update` | aucun | `null`, ou le rapport JSON de BetterInstaller | voir [Mises à jour](updates-and-releases.md) |
 | `biApplyUpdate()` | `bi_apply_update` | aucun | l'application se ferme | rejet avec `not a BetterInstaller install` |
+| `encodeOgg(planar, channels, rate, quality = 0.5)` | `encode_ogg` | corps brut : `f32` little-endian planaire, canal après canal ; en-têtes `x-channels` (1–2), `x-rate`, `x-quality` | octets Ogg Vorbis (`ArrayBuffer`) | rejet si un en-tête est invalide ou si la taille ne correspond pas au nombre de canaux |
 | `openUrl(url)` | plugin `opener` | `url` | rien | selon le plugin |
 
 Détails utiles :

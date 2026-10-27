@@ -70,11 +70,14 @@ The build page offers `original`, `wav` or `ogg`.
 |---|---|
 | `original` | bytes copied unchanged, original extension kept |
 | `wav` | non-WAV files are decoded with the Web Audio API (`decodeAudioData`) and re-encoded as **16-bit PCM WAV** by `audioBufferToWav`; if decoding fails, the original file is used |
-| `ogg` | **no encoder exists**: `convertAudioIfNeeded` returns the original file, but the file is still written with a `.ogg` extension |
+| `ogg` | decoded with `decodeAudioData`, then encoded to **Ogg Vorbis** (quality 0.5, VBR) by the `encode_ogg` Tauri command (Rust, libvorbis via `vorbis_rs`); more than 2 channels are folded into stereo |
 
-!!! warning "Known limitation: OGG output"
-    Choosing `ogg` with WAV sources currently writes WAV data in a file named `.ogg`. Use
-    `original` with files that are already OGG, or `wav`.
+The output extension always comes from the converted file's own name (`extOf(converted.name)`), so
+a file is never named `.ogg` unless it really is Ogg Vorbis.
+
+!!! note "OGG in the browser"
+    The browser has no Vorbis encoder. In the web build, choosing `ogg` writes **WAV** files (named
+    `.wav`) and logs a console warning. If the native encoder fails, the desktop app does the same.
 
 The WAV encoder keeps the source sample rate and channel count; DCS accepts 1–2 channels in any PCM
 format (`example.sdef`).

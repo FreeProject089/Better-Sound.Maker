@@ -97,8 +97,8 @@ en avertit et propose **Save All**.
 **Templates** (en haut à droite) ouvre le gestionnaire de modèles. Un modèle est un ensemble de
 valeurs de paramètres enregistré pour être réutilisé sur d'autres sons.
 
-- **En créer un :** à droite (*Nouveau Template*), nommez-le, choisissez l'asset source,
-  enregistrez.
+- **En créer un :** à droite (*Nouveau template*), nommez-le, choisissez l'asset source, puis
+  **Créer le template**.
 - **L'appliquer :** *Actuel* l'applique au SDEF en cours d'édition ; *Tous (n)* l'applique à tous
   les SDEF du projet. Le `wave` de chaque SDEF est conservé : seuls les autres paramètres
   changent.

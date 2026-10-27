@@ -4,8 +4,8 @@ BSM se met à jour lui-même. Cette page montre comment vérifier à la main et 
 
 ## Étapes
 
-- [ ] **Appuyez sur Check for Updates** dans la barre latérale. *Vous voyez :* *Checking for updates...*, puis soit *You are running the latest version!*, soit une fenêtre **Update Available!** avec votre version et la nouvelle.
-- [ ] **Appuyez sur Update Now.** La suite dépend de la façon dont vous avez installé BSM (voir plus bas).
+- [ ] **Appuyez sur Vérifier les mises à jour** dans la barre latérale. *Vous voyez :* *Recherche de mises à jour...*, puis soit *Vous avez la dernière version !*, soit une fenêtre **Mise à jour disponible !** avec votre version et la nouvelle.
+- [ ] **Appuyez sur Mettre à jour.** La suite dépend de la façon dont vous avez installé BSM (voir plus bas).
 - [ ] **Attendez le redémarrage.** *Vous voyez :* BSM se rouvre sur la nouvelle version.
 
 BSM vérifie aussi de lui-même peu après chaque démarrage. Si une mise à jour existe, la même

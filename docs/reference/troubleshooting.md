@@ -19,7 +19,7 @@ shows them (English UI).
 |---|---|---|
 | An asset lost its audio after restart (desktop) | the original file was moved or deleted; the app only keeps its path | re-assign the file |
 | An asset lost its audio (browser) | site data / IndexedDB was cleared | re-assign the file |
-| Built `.ogg` files do not play | OGG encoding is not implemented: with *ogg* chosen, WAV sources are written unchanged with an `.ogg` name | build with *original* or *wav* |
+| You chose *ogg* but got `.wav` files | the web build has no Vorbis encoder (or the native encoder failed: see the console); WAV is written instead, under a `.wav` name | build from the desktop app |
 | *WAV conversion failed, using original* (console) | the browser could not decode the source | convert the file yourself |
 
 ## Build

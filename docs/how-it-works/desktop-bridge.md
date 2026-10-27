@@ -42,6 +42,7 @@ the same code path decides between the desktop and browser behaviour.
 | `openExternal(path)` | `open_path` | `path` | nothing | rejects |
 | `biCheckUpdate()` | `bi_check_update` | none | `null`, or the BetterInstaller JSON report | see [Updates](updates-and-releases.md) |
 | `biApplyUpdate()` | `bi_apply_update` | none | the app exits | rejects with `not a BetterInstaller install` |
+| `encodeOgg(planar, channels, rate, quality = 0.5)` | `encode_ogg` | raw body: planar little-endian `f32`, channel after channel; headers `x-channels` (1–2), `x-rate`, `x-quality` | Ogg Vorbis bytes (`ArrayBuffer`) | rejects on a bad header or a size that does not match the channel count |
 | `openUrl(url)` | plugin `opener` | `url` | nothing | from the plugin |
 
 Details worth knowing:

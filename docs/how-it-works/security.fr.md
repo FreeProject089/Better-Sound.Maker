@@ -86,8 +86,10 @@ Le troisième recours (vérification de version GitHub) n'installe rien ; il ouv
 
 ## Fichiers générés
 
-`entry.lua` échappe les guillemets doubles des champs texte qu'il écrit (nom du mod, auteur,
-description, URL, crédits, noms affiché et court) : un guillemet ne peut pas fermer la chaîne Lua. Les
-barres obliques inverses et retours à la ligne ne sont pas échappés, et `version` est écrit tel quel.
+`entry.lua` passe les champs texte qu'il écrit (nom du mod, auteur, description, URL, crédits, noms
+affiché et court) et la version par `luaString` : barres obliques inverses, guillemets, retours à la
+ligne, tabulations et autres caractères de contrôle sont échappés, donc aucune valeur ne peut fermer la
+chaîne Lua. Les lignes de commentaire de l'en-tête reçoivent les mêmes valeurs sans sauts de ligne :
+un retour à la ligne ne peut pas transformer la suite en code.
 Les valeurs SDEF sont écrites telles que saisies ; le linter signale les clés inconnues mais ne
 nettoie pas les valeurs.

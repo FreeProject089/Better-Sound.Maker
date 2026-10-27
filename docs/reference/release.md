@@ -11,7 +11,7 @@ How to publish a new version. The reasoning behind each step is in
 
 ## Steps
 
-1. **Bump the version** in `package.json`. Also update `APP_VERSION` in `src/utils/version.js`: the app compares it with the remote version and uses it for release notes, and the script does not touch it.
+1. **Bump the version** in `package.json`. It is the only place: `APP_VERSION` (`src/utils/version.js`) is read from it at build time, `tauri.conf.json` points at it, and the release script copies it into `installer.toml` and `Cargo.toml`.
 2. **Write the patch notes** in `Update/.md/PATCH_NOTES_v<version>.md` (shown once after the update).
 3. **Build every asset:**
    ```powershell

@@ -315,6 +315,30 @@
         "curve": {
             "title": "Atténuation selon la distance",
             "hint": "Gain relatif selon la distance (échelle log), multiplié par gain"
+        },
+        "templates": {
+            "title": "Gestionnaire de templates",
+            "library": "Bibliothèque",
+            "import": "Importer",
+            "export": "Exporter",
+            "close": "Fermer le gestionnaire",
+            "newTitle": "Nouveau template",
+            "newDesc": "Enregistrez les paramètres actuels comme template réutilisable.",
+            "name": "NOM DU TEMPLATE",
+            "namePlaceholder": "ex : Cinema Engine",
+            "source": "SOURCE (ASSET)",
+            "icon": "ICÔNE",
+            "create": "Créer le template",
+            "emptyTitle": "Aucun template",
+            "emptyDesc": "Créez votre premier template avec le formulaire à droite.",
+            "applyCurrent": "Actuel",
+            "applyAll": "Tous ({count})",
+            "confirmAll": "Appliquer ce template aux {count} fichiers ?",
+            "nameRequired": "Nom obligatoire",
+            "saved": "Template enregistré",
+            "importFailed": "Échec de l'import",
+            "appliedAll": "Appliqué à {count} assets",
+            "appliedCurrent": "Appliqué au SDEF actuel"
         }
     },
     "themePage": {
@@ -774,5 +798,23 @@
             "title": "DCS dit que le dossier Saved Games doit être propre. Pourquoi ?",
             "desc": "Eagle Dynamics recommande de ne pas modifier le dossier racine de DCS. Les mods doivent être placés dans <code>Saved Games\\DCS\\Mods\\resource\\</code> pour éviter les conflits, surtout après les mises à jour."
         }
+    },
+    "update": {
+        "checking": "Recherche de mises à jour...",
+        "upToDate": "Vous avez la dernière version !",
+        "title": "Mise à jour disponible !",
+        "ready": "Une nouvelle version de <strong>Better Sound.Maker</strong> est prête !",
+        "biRestart": "L'application va se fermer, se mettre à jour, puis redémarrer.",
+        "nativeRestart": "L'application redémarrera une fois la mise à jour installée.",
+        "now": "Mettre à jour",
+        "later": "Plus tard",
+        "downloading": "Téléchargement de la mise à jour...",
+        "biFailed": "Échec de la mise à jour, essai avec l'updater standard...",
+        "failed": "Échec de la mise à jour, ouverture de la page des versions.",
+        "unreachable": "Impossible de joindre le serveur de mise à jour.",
+        "checkFailed": "Échec de la vérification",
+        "manualDesktop": "Téléchargez le nouvel installeur sur la page des versions.",
+        "manualWeb": "La version en ligne va se recharger avec les nouveautés.",
+        "checkButton": "Vérifier les mises à jour"
     }
 }

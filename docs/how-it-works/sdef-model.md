@@ -66,9 +66,11 @@ stay unquoted. Keys starting with `_` are internal and never written.
 - `key = value` is typed in this order: quoted string, `{…}` (all-quoted items → string list, otherwise numbers), `true`/`false`, number (including `1.0`, `24000.0`, `1e3`), else raw text (enums).
 
 !!! note "Limits of the parser"
-    It is not a Lua parser. Only line comments are understood: for a block comment `--[[ … ]]`
-    the `--[[` line is dropped, but the lines inside the block are parsed as if they were active.
-    Expressions, variables and several statements on one line are not supported either.
+    It is not a Lua parser. Comments are removed first by `stripLuaComments`, with Lua's rules:
+    `-- line`, `--[[ block ]]` and `--[==[ block ]==]`, but not `--` inside a string. Blocks do not
+    nest, exactly as in Lua: in DCS's own `example.sdef` the outer `--[[` closes at the first `]]`,
+    so the cone and play-mode lines after it are live code there too. Expressions, variables and
+    several statements on one line are not supported.
 
 ## The linter
 

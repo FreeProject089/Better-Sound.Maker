@@ -133,7 +133,7 @@ async function processSdefToFolderNative(sdefBasePath, effectsBasePath, assetKey
     let defaultArrayBuf = null;
     if (audioFile) {
         defaultConverted = await convertAudioIfNeeded(audioFile, audioFormat);
-        defaultExt = getOutExt(audioFile.name, audioFormat);
+        defaultExt = extOf(defaultConverted.name);
         defaultArrayBuf = await defaultConverted.arrayBuffer();
     }
 
@@ -146,7 +146,7 @@ async function processSdefToFolderNative(sdefBasePath, effectsBasePath, assetKey
 
         if (waveFile) {
             const currentConverted = await convertAudioIfNeeded(waveFile, audioFormat);
-            currentExt = getOutExt(waveFile.name, audioFormat);
+            currentExt = extOf(currentConverted.name);
             currentArrayBuf = await currentConverted.arrayBuffer();
         }
 
@@ -240,7 +240,7 @@ async function processSdefToFolder(sdefRootDir, effectsDir, assetKey, assetData,
     let defaultExt = 'wav';
     if (audioFile) {
         const converted = await convertAudioIfNeeded(audioFile, audioFormat);
-        defaultExt = getOutExt(audioFile.name, audioFormat);
+        defaultExt = extOf(converted.name);
         const arrayBuf = await converted.arrayBuffer();
         defaultBlob = new Blob([arrayBuf]);
     }
@@ -253,7 +253,7 @@ async function processSdefToFolder(sdefRootDir, effectsDir, assetKey, assetData,
 
         if (waveFile) {
             const buf = await convertAudioIfNeeded(waveFile, audioFormat);
-            currentExt = getOutExt(waveFile.name, audioFormat);
+            currentExt = extOf(buf.name);
             const aBuf = await buf.arrayBuffer();
             currentBlob = new Blob([aBuf]);
         }
@@ -355,7 +355,7 @@ async function processSdefToZip(sdefFolder, effectsFolder, assetKey, assetData, 
     let defaultExt = 'wav';
     if (audioFile) {
         const converted = await convertAudioIfNeeded(audioFile, audioFormat);
-        defaultExt = getOutExt(audioFile.name, audioFormat);
+        defaultExt = extOf(defaultConverted.name);
         defaultArrayBuf = await converted.arrayBuffer();
     }
 
@@ -367,7 +367,7 @@ async function processSdefToZip(sdefFolder, effectsFolder, assetKey, assetData, 
 
         if (waveFile) {
             const buf = await convertAudioIfNeeded(waveFile, audioFormat);
-            currentExt = getOutExt(waveFile.name, audioFormat);
+            currentExt = extOf(buf.name);
             currentArrayBuf = await buf.arrayBuffer();
         }
 
@@ -419,28 +419,54 @@ function getSdefContent(assetKey, assetData) {
     return content;
 }
 
-function getOutExt(originalName, fmt) {
-    if (fmt === 'original') return originalName.split('.').pop() || 'wav';
-    return fmt;
-}
-
+/**
+ * Convert to the build's audio format. The returned file's extension always
+ * matches its real content, so callers name the output with extOf(result.name).
+ * OGG is encoded natively (Rust, libvorbis) in the desktop app; the browser has
+ * no Vorbis encoder, so it falls back to WAV and says so in the console.
+ */
 async function convertAudioIfNeeded(file, targetFormat) {
     if (targetFormat === 'original') return file;
-    const ext = file.name.split('.').pop().toLowerCase();
-    if (ext === targetFormat) return file;
+    if (extOf(file.name) === targetFormat) return file;
 
-    if (targetFormat === 'wav') {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const buf = await ctx.decodeAudioData(await file.arrayBuffer());
-            ctx.close();
-            return new File([audioBufferToWav(buf)],
-                file.name.replace(/\.[^.]+$/, '.wav'), { type: 'audio/wav' });
-        } catch (e) {
-            console.warn('WAV conversion failed, using original:', e);
-        }
+    let buf;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        buf = await ctx.decodeAudioData(await file.arrayBuffer());
+        ctx.close();
+    } catch (e) {
+        console.warn(`Could not decode ${file.name}, keeping the original file:`, e);
+        return file;
     }
-    return file;
+
+    if (targetFormat === 'ogg' && window.nativeAPI?.encodeOgg) {
+        try {
+            const channels = Math.min(buf.numberOfChannels, 2);
+            const planar = new Float32Array(buf.length * channels);
+            if (buf.numberOfChannels > 2) {
+                // DCS samples are mono or stereo: fold extra channels into L/R
+                for (let c = 0; c < buf.numberOfChannels; c++) {
+                    const src = buf.getChannelData(c);
+                    const off = (c % 2) * buf.length;
+                    for (let i = 0; i < buf.length; i++) planar[off + i] += src[i] / Math.ceil(buf.numberOfChannels / 2);
+                }
+            } else {
+                for (let c = 0; c < channels; c++) planar.set(buf.getChannelData(c), c * buf.length);
+            }
+            const ogg = await window.nativeAPI.encodeOgg(planar, channels, buf.sampleRate);
+            return new File([ogg], file.name.replace(/\.[^.]+$/, '.ogg'), { type: 'audio/ogg' });
+        } catch (e) {
+            console.warn('OGG encoding failed, writing WAV instead:', e);
+        }
+    } else if (targetFormat === 'ogg') {
+        console.warn(`OGG encoding needs the desktop app; ${file.name} is written as WAV.`);
+    }
+
+    return new File([audioBufferToWav(buf)], file.name.replace(/\.[^.]+$/, '.wav'), { type: 'audio/wav' });
+}
+
+function extOf(name) {
+    return (name.split('.').pop() || 'wav').toLowerCase();
 }
 
 function audioBufferToWav(buf) {

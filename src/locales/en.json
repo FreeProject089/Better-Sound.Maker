@@ -315,6 +315,30 @@
         "curve": {
             "title": "Distance attenuation",
             "hint": "Relative gain by distance (log scale), multiplied by gain"
+        },
+        "templates": {
+            "title": "Template manager",
+            "library": "Library",
+            "import": "Import",
+            "export": "Export",
+            "close": "Close the manager",
+            "newTitle": "New template",
+            "newDesc": "Save the current parameters as a reusable template.",
+            "name": "TEMPLATE NAME",
+            "namePlaceholder": "e.g. Cinema Engine",
+            "source": "SOURCE (ASSET)",
+            "icon": "ICON",
+            "create": "Create template",
+            "emptyTitle": "No template yet",
+            "emptyDesc": "Create your first template with the form on the right.",
+            "applyCurrent": "Current",
+            "applyAll": "All ({count})",
+            "confirmAll": "Apply this template to all {count} files?",
+            "nameRequired": "Name required",
+            "saved": "Template saved",
+            "importFailed": "Import failed",
+            "appliedAll": "Applied to {count} assets",
+            "appliedCurrent": "Applied to the current SDEF"
         }
     },
     "themePage": {
@@ -789,5 +813,23 @@
             "title": "DCS says the Saved Games folder must be clean. Why?",
             "desc": "Eagle Dynamics recommends keeping the DCS root installation folder free of third-party mods. All mods should be placed in <code>Saved Games\\DCS\\Mods\\resource\\</code> to avoid conflicts, especially after DCS updates."
         }
+    },
+    "update": {
+        "checking": "Checking for updates...",
+        "upToDate": "You are running the latest version!",
+        "title": "Update available!",
+        "ready": "A new version of <strong>Better Sound.Maker</strong> is ready!",
+        "biRestart": "The app will close, update, then restart.",
+        "nativeRestart": "The app will restart once the update is installed.",
+        "now": "Update now",
+        "later": "Later",
+        "downloading": "Downloading update...",
+        "biFailed": "Update failed, trying the standard updater...",
+        "failed": "Update failed, opening the releases page.",
+        "unreachable": "Could not reach the update server.",
+        "checkFailed": "Update check failed",
+        "manualDesktop": "Download the new installer from the releases page.",
+        "manualWeb": "The online version will refresh with new features.",
+        "checkButton": "Check for updates"
     }
 }

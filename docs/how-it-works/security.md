@@ -85,6 +85,7 @@ The third fallback (GitHub version check) installs nothing; it only opens the re
 ## Generated files
 
 `entry.lua` escapes double quotes in the text fields it writes (mod name, author, description, URL,
-credits, display and short name), so a quote cannot close the Lua string. Backslashes and newlines are
-not escaped, and `version` is written as typed. SDEF values are written as typed; the linter flags unknown keys
+credits, display and short name) and the version through `luaString`: backslashes, quotes, newlines,
+tabs and other control characters are escaped, so no value can close the Lua string. The header comment
+lines get the same values with line breaks flattened, so a newline cannot turn the rest of a line into code. SDEF values are written as typed; the linter flags unknown keys
 but does not sanitise values.

@@ -5,6 +5,7 @@
 import { showModal } from './modal.js';
 import { showToast } from '../components/toast.js';
 import { APP_VERSION, GITHUB_REPO } from './version.js';
+import { t } from './i18n.js';
 
 /**
  * Desktop update chain:
@@ -31,38 +32,38 @@ async function checkBetterInstallerUpdate(quiet) {
         return false;
     }
     if (!report.update_available) {
-        if (!quiet) showToast('You are running the latest version!', 'success');
+        if (!quiet) showToast(t('update.upToDate'), 'success');
         return true;
     }
     showModal({
-        title: '🚀 Update Available!',
+        title: `🚀 ${t('update.title')}`,
         content: `
             <div style="text-align:center; padding: 10px 0;">
-                <p>A new version of <strong>Better Sound.Maker</strong> is ready!</p>
+                <p>${t('update.ready')}</p>
                 <div style="font-size: 24px; font-weight: 800; margin: 15px 0;">
                     ${escapeText(report.current_version || APP_VERSION)} → <span style="color:var(--accent-green)">${escapeText(report.latest_version)}</span>
                 </div>
                 ${report.notes ? `<p style="font-size: 13px; white-space: pre-line;">${escapeText(report.notes)}</p>` : ''}
-                <p style="color:var(--text-muted); font-size: 13px;">The app will close, update, then restart.</p>
+                <p style="color:var(--text-muted); font-size: 13px;">${t('update.biRestart')}</p>
             </div>
         `,
         buttons: [
             {
-                text: 'Update Now',
+                text: t('update.now'),
                 primary: true,
                 onClick: async () => {
                     try {
                         await window.nativeAPI.biApplyUpdate();
                     } catch (e) {
                         console.warn('BetterInstaller update failed to start:', e);
-                        showToast('Update failed, trying the standard updater...', 'error');
+                        showToast(t('update.biFailed'), 'error');
                         if (!(await checkNativeUpdate(false))) {
                             window.open(`https://github.com/${GITHUB_REPO}/releases/latest`, '_blank');
                         }
                     }
                 }
             },
-            { text: 'Later', primary: false }
+            { text: t('update.later'), primary: false }
         ]
     });
     return true;
@@ -78,38 +79,38 @@ async function checkNativeUpdate(quiet) {
         const { check } = await import('@tauri-apps/plugin-updater');
         const update = await check();
         if (!update) {
-            if (!quiet) showToast('You are running the latest version!', 'success');
+            if (!quiet) showToast(t('update.upToDate'), 'success');
             return true;
         }
         showModal({
-            title: '🚀 Update Available!',
+            title: `🚀 ${t('update.title')}`,
             content: `
                 <div style="text-align:center; padding: 10px 0;">
-                    <p>A new version of <strong>Better Sound.Maker</strong> is ready!</p>
+                    <p>${t('update.ready')}</p>
                     <div style="font-size: 24px; font-weight: 800; margin: 15px 0;">
                         ${APP_VERSION} → <span style="color:var(--accent-green)">${escapeText(update.version)}</span>
                     </div>
-                    <p style="color:var(--text-muted); font-size: 13px;">The app will restart once the update is installed.</p>
+                    <p style="color:var(--text-muted); font-size: 13px;">${t('update.nativeRestart')}</p>
                 </div>
             `,
             buttons: [
                 {
-                    text: 'Update Now',
+                    text: t('update.now'),
                     primary: true,
                     onClick: async () => {
                         try {
-                            showToast('Downloading update...', 'info');
+                            showToast(t('update.downloading'), 'info');
                             await update.downloadAndInstall();
                             const { relaunch } = await import('@tauri-apps/plugin-process');
                             await relaunch();
                         } catch (e) {
                             console.warn('Update install failed:', e);
-                            showToast('Update failed, opening the releases page.', 'error');
+                            showToast(t('update.failed'), 'error');
                             window.open(`https://github.com/${GITHUB_REPO}/releases/latest`, '_blank');
                         }
                     }
                 },
-                { text: 'Later', primary: false }
+                { text: t('update.later'), primary: false }
             ]
         });
         return true;
@@ -125,13 +126,13 @@ function escapeText(s) {
 
 export async function checkUpdate(quiet = true) {
     if (window.nativeAPI) {
-        if (!quiet) showToast('Checking for updates...', 'info');
+        if (!quiet) showToast(t('update.checking'), 'info');
         if (await checkBetterInstallerUpdate(quiet)) return;
         if (await checkNativeUpdate(quiet)) return;
     }
 
     try {
-        if (!quiet) showToast('Checking for updates...', 'info');
+        if (!quiet) showToast(t('update.checking'), 'info');
 
         let resp;
         // Try various URL formats and branches
@@ -168,41 +169,41 @@ export async function checkUpdate(quiet = true) {
             }
         }
 
-        if (!quiet) showToast('Could not reach update server. The repo might be private or renamed.', 'error');
+        if (!quiet) showToast(t('update.unreachable'), 'error');
     } catch (err) {
         console.warn('Update check failed:', err);
-        if (!quiet) showToast('Update check failed', 'error');
+        if (!quiet) showToast(t('update.checkFailed'), 'error');
     }
 }
 
 function handleUpdate(remoteVersion, quiet) {
     if (remoteVersion !== APP_VERSION) {
         showModal({
-            title: '🚀 Update Available!',
+            title: `🚀 ${t('update.title')}`,
             content: `
                 <div style="text-align:center; padding: 10px 0;">
-                    <p>A new version of <strong>Better Sound.Maker</strong> is ready!</p>
+                    <p>${t('update.ready')}</p>
                     <div style="font-size: 24px; font-weight: 800; margin: 15px 0;">
                         ${APP_VERSION} → <span style="color:var(--accent-green)">${escapeText(remoteVersion)}</span>
                     </div>
                     <p style="color:var(--text-muted); font-size: 13px;">
-                        ${window.nativeAPI ? 'Download the new installer from the releases page.' : 'The online version will refresh with new features.'}
+                        ${window.nativeAPI ? t('update.manualDesktop') : t('update.manualWeb')}
                     </p>
                 </div>
             `,
             buttons: [
                 {
-                    text: 'Update Now',
+                    text: t('update.now'),
                     primary: true,
                     onClick: () => {
                         window.open(`https://github.com/${GITHUB_REPO}/releases/latest`, '_blank');
                         if (!window.nativeAPI) location.reload();
                     }
                 },
-                { text: 'Later', primary: false }
+                { text: t('update.later'), primary: false }
             ]
         });
     } else {
-        if (!quiet) showToast('You are running the latest version!', 'success');
+        if (!quiet) showToast(t('update.upToDate'), 'success');
     }
 }

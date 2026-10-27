@@ -4,8 +4,8 @@ BSM updates itself. This page shows how to check by hand and what to expect.
 
 ## Steps
 
-- [ ] **Press Check for Updates** in the sidebar. *You see:* *Checking for updates...*, then either *You are running the latest version!* or an **Update Available!** window with your version and the new one.
-- [ ] **Press Update Now.** What happens next depends on how you installed BSM (below).
+- [ ] **Press Check for updates** in the sidebar. *You see:* *Checking for updates...*, then either *You are running the latest version!* or an **Update available!** window with your version and the new one.
+- [ ] **Press Update now.** What happens next depends on how you installed BSM (below).
 - [ ] **Wait for the restart.** *You see:* BSM opens again on the new version.
 
 BSM also checks on its own a moment after each start. If an update exists, the same window

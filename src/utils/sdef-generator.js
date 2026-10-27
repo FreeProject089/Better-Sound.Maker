@@ -107,10 +107,7 @@ export function generateSdef(params) {
  */
 export function parseSdef(text) {
     const params = {};
-    const lines = text.split(/\r?\n/).map(line => {
-        const hashIdx = line.indexOf('--');
-        return hashIdx >= 0 ? line.substring(0, hashIdx).trim() : line.trim();
-    }).filter(Boolean);
+    const lines = stripLuaComments(text).split(/\r?\n/).map(line => line.trim()).filter(Boolean);
 
     let inWaveList = false;
     const waveList = [];
@@ -185,4 +182,42 @@ export function parseSdef(text) {
     }
 
     return params;
+}
+
+/**
+ * Remove Lua comments: `-- line` and `--[[ block ]]` / `--[==[ block ]==]`
+ * (DCS's own example.sdef is one big block comment). `--` inside a string is
+ * kept. Newlines inside a block are preserved so line structure stays intact.
+ */
+export function stripLuaComments(text) {
+    let out = '';
+    let i = 0;
+    let quote = null;
+    while (i < text.length) {
+        const ch = text[i];
+        if (quote) {
+            out += ch;
+            if (ch === '\\' && i + 1 < text.length) { out += text[++i]; }
+            else if (ch === quote) quote = null;
+            i++;
+            continue;
+        }
+        if (ch === '"' || ch === "'") { quote = ch; out += ch; i++; continue; }
+        if (ch === '-' && text[i + 1] === '-') {
+            const block = /^--\[(=*)\[/.exec(text.slice(i, i + 64));
+            if (block) {
+                const close = `]${block[1]}]`;
+                const end = text.indexOf(close, i + block[0].length);
+                const stop = end < 0 ? text.length : end + close.length;
+                out += text.slice(i, stop).replace(/[^\n]/g, '');
+                i = stop;
+            } else {
+                while (i < text.length && text[i] !== '\n') i++;
+            }
+            continue;
+        }
+        out += ch;
+        i++;
+    }
+    return out;
 }

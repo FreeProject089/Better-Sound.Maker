@@ -70,11 +70,15 @@ La page de construction propose `original`, `wav` ou `ogg`.
 |---|---|
 | `original` | octets copiés tels quels, extension d'origine conservée |
 | `wav` | les fichiers non WAV sont décodés par la Web Audio API (`decodeAudioData`) puis réencodés en **WAV PCM 16 bits** par `audioBufferToWav` ; si le décodage échoue, le fichier d'origine est utilisé |
-| `ogg` | **aucun encodeur n'existe** : `convertAudioIfNeeded` renvoie le fichier d'origine, mais il est écrit avec l'extension `.ogg` |
+| `ogg` | décodé par `decodeAudioData`, puis encodé en **Ogg Vorbis** (qualité 0,5, VBR) par la commande Tauri `encode_ogg` (Rust, libvorbis via `vorbis_rs`) ; au-delà de 2 canaux, le son est replié en stéréo |
 
-!!! warning "Limite connue : sortie OGG"
-    Choisir `ogg` avec des sources WAV écrit actuellement des données WAV dans un fichier nommé
-    `.ogg`. Utilisez `original` avec des fichiers déjà en OGG, ou `wav`.
+L'extension de sortie vient toujours du nom du fichier converti (`extOf(converted.name)`) : un
+fichier n'est jamais nommé `.ogg` s'il n'est pas réellement en Ogg Vorbis.
+
+!!! note "OGG dans le navigateur"
+    Le navigateur n'a pas d'encodeur Vorbis. Dans la version web, choisir `ogg` écrit des fichiers
+    **WAV** (nommés `.wav`) et affiche un avertissement dans la console. Si l'encodeur natif échoue,
+    l'application de bureau fait de même.
 
 L'encodeur WAV conserve la fréquence d'échantillonnage et le nombre de canaux de la source ; DCS
 accepte 1 à 2 canaux dans n'importe quel format PCM (`example.sdef`).

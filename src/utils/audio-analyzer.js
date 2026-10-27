@@ -122,7 +122,8 @@ export function getTypeIconHtml(typeInfo, className = '') {
  * Detect sound type from SDEF path using loaded JSON rules.
  */
 export function detectSoundType(sdefPath) {
-    if (!SOUND_RULES) return 'generic';
+    // Load.cfg `TypeDetection = false` turns the smart labels off
+    if (!SOUND_RULES || window.APP_CONFIG?.TypeDetection === 'false') return 'generic';
     const lower = sdefPath.toLowerCase();
     for (const r of SOUND_RULES) {
         if (r.match.test(lower)) return r.type;

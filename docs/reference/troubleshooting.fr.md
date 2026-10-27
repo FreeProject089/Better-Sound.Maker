@@ -19,7 +19,7 @@ tels que l'application les affiche (interface en anglais).
 |---|---|---|
 | Un asset a perdu son audio après redémarrage (bureau) | le fichier d'origine a été déplacé ou supprimé ; l'application ne garde que son chemin | réassignez le fichier |
 | Un asset a perdu son audio (navigateur) | les données du site / IndexedDB ont été effacées | réassignez le fichier |
-| Les fichiers `.ogg` produits ne se lisent pas | l'encodage OGG n'est pas implémenté : avec *ogg*, les sources WAV sont écrites telles quelles sous un nom `.ogg` | construisez en *original* ou *wav* |
+| Vous avez choisi *ogg* mais obtenez des `.wav` | la version web n'a pas d'encodeur Vorbis (ou l'encodeur natif a échoué : voir la console) ; du WAV est écrit à la place, sous un nom `.wav` | construisez depuis l'application de bureau |
 | *WAV conversion failed, using original* (console) | le navigateur n'a pas pu décoder la source | convertissez le fichier vous-même |
 
 ## Construction

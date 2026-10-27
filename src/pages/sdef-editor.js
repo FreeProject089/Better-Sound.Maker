@@ -485,27 +485,27 @@ async function showTemplatesModal(container) {
       listEl.innerHTML = `
         <div class="tpl-empty">
           <div class="tpl-empty-icon">${getIcon('copy', 'w-12 h-12')}</div>
-          <h4>Aucun Preset Trouvé</h4>
-          <p>Créez votre premier preset avec le formulaire à droite.</p>
+          <h4>${t('sdef.templates.emptyTitle')}</h4>
+          <p>${t('sdef.templates.emptyDesc')}</p>
         </div>
       `;
       return;
     }
-    listEl.innerHTML = templates.map(t => `
-      <div class="tpl-item" data-id="${t.id}">
+    listEl.innerHTML = templates.map(tpl => `
+      <div class="tpl-item" data-id="${escapeHtml(tpl.id)}">
         <div class="tpl-item-main">
-          <div class="tpl-item-icon">${getIcon(t.lucideIcon || 'star', 'w-4 h-4')}</div>
+          <div class="tpl-item-icon">${getIcon(tpl.lucideIcon || 'star', 'w-4 h-4')}</div>
           <div class="tpl-item-info">
-            <span class="tpl-item-name">${t.name}</span>
+            <span class="tpl-item-name">${escapeHtml(tpl.name)}</span>
           </div>
           <div class="tpl-item-actions">
-            <button class="tpl-btn-icon" data-export="${t.id}" title="Exporter">${getIcon('upload', 'w-3 h-3')}</button>
-            <button class="tpl-btn-icon tpl-btn-danger" data-delete="${t.id}" title="Supprimer">${getIcon('trash-2', 'w-3 h-3')}</button>
+            <button class="tpl-btn-icon" data-export="${escapeHtml(tpl.id)}" title="${t('sdef.templates.export')}">${getIcon('upload', 'w-3 h-3')}</button>
+            <button class="tpl-btn-icon tpl-btn-danger" data-delete="${escapeHtml(tpl.id)}" title="${t('common.delete')}">${getIcon('trash-2', 'w-3 h-3')}</button>
           </div>
         </div>
         <div class="tpl-item-apply">
-          <button class="tpl-btn-apply" data-apply-current="${t.id}" style="${!currentSdef ? 'display:none' : ''}">Actuel</button>
-          <button class="tpl-btn-apply primary" data-apply-all="${t.id}" style="${entriesCount <= 1 ? 'display:none' : ''}">Tous (${entriesCount})</button>
+          <button class="tpl-btn-apply" data-apply-current="${escapeHtml(tpl.id)}" style="${!currentSdef ? 'display:none' : ''}">${t('sdef.templates.applyCurrent')}</button>
+          <button class="tpl-btn-apply primary" data-apply-all="${escapeHtml(tpl.id)}" style="${entriesCount <= 1 ? 'display:none' : ''}">${t('sdef.templates.applyAll', { count: entriesCount })}</button>
         </div>
       </div>
     `).join('');
@@ -515,7 +515,7 @@ async function showTemplatesModal(container) {
     });
     listEl.querySelectorAll('[data-apply-all]').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (confirm(`Appliquer à l'ensemble des ${entriesCount} fichiers ?`)) {
+        if (confirm(t('sdef.templates.confirmAll', { count: entriesCount }))) {
           applyTemplate(templates.find(x => x.id === btn.dataset.applyAll), true);
         }
       });
@@ -534,7 +534,7 @@ async function showTemplatesModal(container) {
   };
 
   await showModal({
-    title: `${getIcon('copy', 'w-5 h-5')} Gestionnaire de Templates`,
+    title: `${getIcon('copy', 'w-5 h-5')} ${t('sdef.templates.title')}`,
     content: `
       <style>
         /* Targeted Override to enlarge the system modal while keeping its look */
@@ -596,47 +596,47 @@ async function showTemplatesModal(container) {
       <div class="tpl-root">
         <div class="tpl-left">
           <div class="tpl-l-header">
-            <h3>Bibliothèque</h3>
+            <h3>${t('sdef.templates.library')}</h3>
             <div style="font-size: 10px; background: var(--accent-blue); color: white; padding: 2px 6px; border-radius: 10px; font-weight: 800;">${templates.length}</div>
           </div>
           <div class="tpl-l-content" id="tpl-list"></div>
           <div class="tpl-l-footer">
             <div class="tpl-footer-row">
-              <button class="btn btn-secondary tpl-footer-btn flex-1" id="import-tpl">${getIcon('download', 'w-3 h-3')} Importer</button>
-              <button class="btn btn-secondary tpl-footer-btn flex-1" id="export-tpl">${getIcon('share-2', 'w-3 h-3')} Exporter</button>
+              <button class="btn btn-secondary tpl-footer-btn flex-1" id="import-tpl">${getIcon('download', 'w-3 h-3')} ${t('sdef.templates.import')}</button>
+              <button class="btn btn-secondary tpl-footer-btn flex-1" id="export-tpl">${getIcon('share-2', 'w-3 h-3')} ${t('sdef.templates.export')}</button>
             </div>
-            <button class="btn btn-danger tpl-footer-btn w-full" id="close-tpl-manager">${getIcon('x-circle', 'w-3.5 h-3.5')} Fermer le Gestionnaire</button>
+            <button class="btn btn-danger tpl-footer-btn w-full" id="close-tpl-manager">${getIcon('x-circle', 'w-3.5 h-3.5')} ${t('sdef.templates.close')}</button>
           </div>
         </div>
         
         <div class="tpl-right">
           <div class="tpl-r-header">
-            <h2>Nouveau Template</h2>
-            <p>Enregistrez les paramètres actuels comme preset réutilisable.</p>
+            <h2>${t('sdef.templates.newTitle')}</h2>
+            <p>${t('sdef.templates.newDesc')}</p>
           </div>
 
           <div class="tpl-r-form" style="display: flex; flex-direction: column; gap: 20px;">
             <div class="input-group">
-              <label class="input-label">NOM DU TEMPLATE</label>
-              <input type="text" id="tpl-name" class="input-field" placeholder="ex: Cinema Engine" style="height: 42px; background: var(--bg-surface);" />
+              <label class="input-label">${t('sdef.templates.name')}</label>
+              <input type="text" id="tpl-name" class="input-field" placeholder="${t('sdef.templates.namePlaceholder')}" style="height: 42px; background: var(--bg-surface);" />
             </div>
 
             <div class="input-group">
-              <label class="input-label">SOURCE (ASSET)</label>
+              <label class="input-label">${t('sdef.templates.source')}</label>
               <select id="tpl-source" class="input-field" style="height: 42px; background: var(--bg-surface);">
-                ${Object.keys(state.selectedAssets).map(p => `<option value="${p}" ${p === currentSdef ? 'selected' : ''}>${p.split('/').pop()}</option>`).join('')}
+                ${Object.keys(state.selectedAssets).map(p => `<option value="${escapeHtml(p)}" ${p === currentSdef ? 'selected' : ''}>${escapeHtml(p.split('/').pop())}</option>`).join('')}
               </select>
             </div>
 
             <div class="input-group">
-              <label class="input-label">ICÔNE VISUELLE</label>
+              <label class="input-label">${t('sdef.templates.icon')}</label>
               <div class="tpl-icon-grid" id="tpl-icons">
                 ${AVAILABLE_ICONS.map(icon => `<div class="tpl-icon-dot" data-icon="${icon}">${getIcon(icon, 'w-4 h-4')}</div>`).join('')}
               </div>
             </div>
 
             <button class="btn btn-primary w-full" id="tpl-save" style="height: 48px; font-weight: 800; font-size: 15px; margin-top: 10px;">
-              ${getIcon('plus-circle', 'w-5 h-5')} Créer le Preset
+              ${getIcon('plus-circle', 'w-5 h-5')} ${t('sdef.templates.create')}
             </button>
           </div>
         </div>
@@ -661,14 +661,14 @@ async function showTemplatesModal(container) {
       modalEl.querySelector('#tpl-save').addEventListener('click', () => {
         const name = modalEl.querySelector('#tpl-name').value;
         const source = modalEl.querySelector('#tpl-source').value;
-        if (!name) { showToast('Name required', 'warning'); return; }
+        if (!name) { showToast(t('sdef.templates.nameRequired'), 'warning'); return; }
 
         const content = state.unsavedSdefs[source] || getSdefContent(source);
         const params = parseSdef(content);
         delete params.wave;
 
         saveSdefTemplate({ id: 'tpl_' + Date.now(), name, lucideIcon: selectedIcon, params });
-        showToast('Template Saved', 'success');
+        showToast(t('sdef.templates.saved'), 'success');
         showTemplatesModal(container);
       });
 
@@ -681,7 +681,7 @@ async function showTemplatesModal(container) {
             const json = JSON.parse(await file.text());
             importSdefTemplates(Array.isArray(json) ? json : [json]);
             showTemplatesModal(container);
-          } catch { showToast('Import failed', 'error'); }
+          } catch { showToast(t('sdef.templates.importFailed'), 'error'); }
         };
         input.click();
       });
@@ -714,7 +714,7 @@ function applyTemplate(template, applyToAll = false) {
       updates[path] = generateSdef(newParams);
     }
     bulkSetSdefContent(updates);
-    showToast(`Applied to ${Object.keys(updates).length} assets`, 'success');
+    showToast(t('sdef.templates.appliedAll', { count: Object.keys(updates).length }), 'success');
   } else {
     const path = state.currentSdef;
     if (!path) return;
@@ -722,7 +722,7 @@ function applyTemplate(template, applyToAll = false) {
     currentParams = { ...template.params };
     if (currentWave) currentParams.wave = currentWave;
     updateUnsavedSdef(path, generateSdef(currentParams));
-    showToast(`Applied to current SDEF`, 'success');
+    showToast(t('sdef.templates.appliedCurrent'), 'success');
   }
 
   const mainEl = document.getElementById('editor-main');

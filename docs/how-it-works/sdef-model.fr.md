@@ -68,10 +68,12 @@ internes et jamais écrites.
 - `clé = valeur` est typé dans cet ordre : chaîne entre guillemets, `{…}` (éléments tous entre guillemets → liste de chaînes, sinon nombres), `true`/`false`, nombre (y compris `1.0`, `24000.0`, `1e3`), sinon texte brut (énumérations).
 
 !!! note "Limites de l'analyseur"
-    Ce n'est pas un analyseur Lua. Seuls les commentaires de ligne sont compris : pour un bloc
-    `--[[ … ]]`, la ligne `--[[` est ignorée mais les lignes à l'intérieur sont lues comme si elles
-    étaient actives. Les expressions, variables et instructions multiples sur une ligne ne sont pas
-    prises en charge non plus.
+    Ce n'est pas un analyseur Lua. Les commentaires sont d'abord retirés par `stripLuaComments`,
+    selon les règles de Lua : `-- ligne`, `--[[ bloc ]]` et `--[==[ bloc ]==]`, mais pas un `--`
+    placé dans une chaîne. Les blocs ne s'imbriquent pas, exactement comme en Lua : dans le
+    `example.sdef` de DCS, le `--[[` extérieur se ferme au premier `]]`, donc les lignes du cône et
+    du mode de lecture qui suivent y sont aussi du code actif. Les expressions, variables et
+    instructions multiples sur une ligne ne sont pas prises en charge.
 
 ## Le linter
 

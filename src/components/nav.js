@@ -69,7 +69,7 @@ export function renderNav(container) {
       </div>
       <button id="sidebar-update-btn" class="btn btn-secondary btn-sm" style="width: 100%; border-radius: 8px; font-size: 10px; padding: 6px; background: rgba(100,255,218,0.05); color: var(--accent-green); border: 1px solid rgba(100,255,218,0.2);">
         ${getIcon('refresh-cw', 'w-3 h-3 mr-2')}
-        Check for Updates
+        ${t('update.checkButton')}
       </button>
     </div>
   `;

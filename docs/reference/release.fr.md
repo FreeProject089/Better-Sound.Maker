@@ -11,7 +11,7 @@ Comment publier une nouvelle version. Le raisonnement derrière chaque étape es
 
 ## Étapes
 
-1. **Augmenter la version** dans `package.json`. Mettez aussi à jour `APP_VERSION` dans `src/utils/version.js` : l'application la compare à la version distante et s'en sert pour les notes de version, et le script n'y touche pas.
+1. **Augmenter la version** dans `package.json`. C'est le seul endroit : `APP_VERSION` (`src/utils/version.js`) y est lu au build, `tauri.conf.json` pointe dessus, et le script de release la recopie dans `installer.toml` et `Cargo.toml`.
 2. **Écrire les notes de version** dans `Update/.md/PATCH_NOTES_v<version>.md` (affichées une fois après la mise à jour).
 3. **Produire tous les fichiers :**
    ```powershell

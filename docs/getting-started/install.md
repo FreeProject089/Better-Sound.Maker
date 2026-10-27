@@ -31,7 +31,7 @@ official GitHub release page before you choose to run it.
 ## Updates
 
 You do not need to come back here for new versions. BSM checks for updates shortly after it
-starts, and the **Check for Updates** button in the sidebar checks on demand. It uses the route
+starts, and the **Check for updates** button in the sidebar checks on demand. It uses the route
 that matches how you installed it:
 
 1. **BetterInstaller**, if you installed with the BetterInstaller setup. The app closes, updates,

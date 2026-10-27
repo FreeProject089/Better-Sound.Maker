@@ -32,6 +32,11 @@ if (isTauri) {
         getAppPath: () => invoke('get_app_path'),
         getUserHome: () => invoke('get_user_home'),
         openExternal: (path) => invoke('open_path', { path }),
+        /** @param {Float32Array} planar channel after channel */
+        encodeOgg: (planar, channels, rate, quality = 0.5) =>
+            invoke('encode_ogg', new Uint8Array(planar.buffer, planar.byteOffset, planar.byteLength), {
+                headers: { 'x-channels': String(channels), 'x-rate': String(rate), 'x-quality': String(quality) },
+            }),
         biCheckUpdate: () => invoke('bi_check_update'),
         biApplyUpdate: () => invoke('bi_apply_update'),
         openUrl: (url) => tauriOpenUrl(url),

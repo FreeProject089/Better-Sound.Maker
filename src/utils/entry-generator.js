@@ -2,6 +2,23 @@
  * entry-generator.js — Generate entry.lua for DCS mods
  */
 
+/** Escape text for a double-quoted Lua string literal. */
+export function luaString(value) {
+    return String(value ?? '')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"')
+        .replace(/\r/g, '\\r')
+        .replace(/\n/g, '\\n')
+        .replace(/\t/g, '\\t')
+        // Other control characters as decimal escapes (\ddd)
+        .replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, (c) => '\\' + String(c.charCodeAt(0)).padStart(3, '0'));
+}
+
+/** Keep a value on one `--` comment line (a newline would turn the rest into code). */
+function luaComment(value) {
+    return String(value ?? '').replace(/[\r\n]+/g, ' ');
+}
+
 export function generateEntryLua(config) {
     const {
         modName = 'SoundMod',
@@ -15,26 +32,26 @@ export function generateEntryLua(config) {
         themeEnabled = false
     } = config;
 
-    const safeModName = modName.replace(/"/g, '\\"');
-    const safeAuthor = author.replace(/"/g, '\\"');
-    const safeDesc = description.replace(/"/g, '\\"');
-    const safeUrl = url.replace(/"/g, '\\"');
-    const safeCredits = credits.replace(/"/g, '\\"');
-    const safeDisplay = (displayName || modName).replace(/"/g, '\\"');
-    const safeShort = (shortName || modName.substring(0, 4).toUpperCase()).replace(/"/g, '\\"');
+    const safeModName = luaString(modName);
+    const safeAuthor = luaString(author);
+    const safeDesc = luaString(description);
+    const safeUrl = luaString(url);
+    const safeVersion = luaString(version);
+    const safeDisplay = luaString(displayName || modName);
+    const safeShort = luaString(shortName || modName.substring(0, 4).toUpperCase());
 
     let lua = `--------------------------------------------------------------------------------
 --  Generated with Better ModMaker
---  Mod: ${safeDisplay}
---  Version: ${version}
---  Author: ${safeCredits || safeAuthor}
+--  Mod: ${luaComment(displayName || modName)}
+--  Version: ${luaComment(version)}
+--  Author: ${luaComment(credits || author)}
 --------------------------------------------------------------------------------
 
 declare_plugin("${safeModName}",
     {
         installed   = true,
         dirName     = current_mod_path,
-        version     = "${version}",
+        version     = "${safeVersion}",
         state       = "installed",
         developer   = "${safeAuthor}",
         description = "${safeDesc}",`;
