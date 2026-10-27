@@ -303,11 +303,11 @@ function bindCollabEvents() {
         if (audioFile && waves.length > 0) {
           let buffer = null;
 
-          // Try reading from disk first (Electron)
-          if (assetData.audioPath && window.electronAPI) {
+          // Try reading from disk first (desktop)
+          if (assetData.audioPath && window.nativeAPI) {
             try {
-              buffer = await window.electronAPI.readFile(assetData.audioPath);
-            } catch (e) { console.warn('Electron read failed, falling back to memory', e); }
+              buffer = await window.nativeAPI.readFile(assetData.audioPath);
+            } catch (e) { console.warn('Native read failed, falling back to memory', e); }
           }
 
           // If not read from disk (or failed), try converting the in-memory File/Blob to buffer

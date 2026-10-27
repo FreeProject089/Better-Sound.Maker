@@ -743,7 +743,7 @@
         },
         "q10": {
             "title": "Puis-je charger un mod existant déjà construit ?",
-            "desc": "Oui ! Sur la page Projet, cliquez sur <strong>Charger Mod Existant</strong>. Vous pouvez charger depuis une archive <code>.zip</code> ou directement depuis un dossier décompressé (version Electron). L'app importera les fichiers SDEF et tentera de faire correspondre l'audio automatiquement."
+            "desc": "Oui ! Sur la page Projet, cliquez sur <strong>Charger Mod Existant</strong>. Vous pouvez charger depuis une archive <code>.zip</code> ou directement depuis un dossier décompressé (application desktop uniquement). L'app importera les fichiers SDEF et tentera de faire correspondre l'audio automatiquement."
         },
         "q11": {
             "title": "Puis-je personnaliser la détection des types de sons ?",

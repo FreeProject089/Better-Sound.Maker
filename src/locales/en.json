@@ -758,7 +758,7 @@
         },
         "q10": {
             "title": "Can I load an existing mod I already built?",
-            "desc": "Yes! On the Project page, click <strong>Load Existing Mod</strong>. You can load from a <code>.zip</code> archive or directly from an unzipped folder on disk (Electron only). The app will import the SDEF files and attempt to match the corresponding audio files automatically."
+            "desc": "Yes! On the Project page, click <strong>Load Existing Mod</strong>. You can load from a <code>.zip</code> archive or directly from an unzipped folder on disk (desktop app only). The app will import the SDEF files and attempt to match the corresponding audio files automatically."
         },
         "q11": {
             "title": "Can I customize how sound types are detected?",

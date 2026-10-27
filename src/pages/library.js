@@ -1145,17 +1145,17 @@ async function openScannerModal(isFirstLaunch = false) {
   let savedGamesPath = globalSettings.savedGamesPath || '';
 
   // Auto detect if empty
-  if (!dcsPath && window.electronAPI) {
+  if (!dcsPath && window.nativeAPI) {
     const dcsDefault = 'C:/Program Files/Eagle Dynamics/DCS World';
-    if (await window.electronAPI.exists(dcsDefault)) dcsPath = dcsDefault;
+    if (await window.nativeAPI.exists(dcsDefault)) dcsPath = dcsDefault;
   }
 
-  if (!savedGamesPath && window.electronAPI) {
-    const home = await window.electronAPI.getUserHome();
+  if (!savedGamesPath && window.nativeAPI) {
+    const home = await window.nativeAPI.getUserHome();
     const sgDefault = home ? `${home}/Saved Games/DCS` : '';
     // Let's also check DCS.openbeta as a fallback if plain DCS isn't there, 
     // even though user said no more openbeta, it doesn't hurt to check if 'DCS' doesn't exist.
-    if (sgDefault && await window.electronAPI.exists(sgDefault)) {
+    if (sgDefault && await window.nativeAPI.exists(sgDefault)) {
       savedGamesPath = sgDefault;
     }
   }
@@ -1199,13 +1199,13 @@ async function openScannerModal(isFirstLaunch = false) {
       { id: 'cancel', label: t('library.scanner.cancel'), class: 'btn-secondary' }
     ],
     onRender: (modalEl) => {
-      if (window.electronAPI) {
+      if (window.nativeAPI) {
         modalEl.querySelector('#browse-dcs-btn').addEventListener('click', async () => {
-          const res = await window.electronAPI.selectDirectory();
+          const res = await window.nativeAPI.selectDirectory();
           if (res) modalEl.querySelector('#scan-dcs-path').value = res;
         });
         modalEl.querySelector('#browse-sg-btn').addEventListener('click', async () => {
-          const res = await window.electronAPI.selectDirectory();
+          const res = await window.nativeAPI.selectDirectory();
           if (res) modalEl.querySelector('#scan-sg-path').value = res;
         });
       }
@@ -1240,11 +1240,11 @@ async function runDcsScanner(dcsPath, sgPath) {
     let totalAssetsCount = 0;
 
     // 1. Read base list
-    if (dcsPath && window.electronAPI) {
+    if (dcsPath && window.nativeAPI) {
       if (loaderSub) loaderSub.textContent = "Parsing base sdef list...";
       const basePath = dcsPath + '/Doc/Sounds/sdef_and_wave_list.txt';
-      if (await window.electronAPI.exists(basePath)) {
-        const text = await window.electronAPI.readTextFile(basePath);
+      if (await window.nativeAPI.exists(basePath)) {
+        const text = await window.nativeAPI.readTextFile(basePath);
         if (text) {
           const baseData = parseSdefList(text);
           combinedData.sections.push(...baseData.sections);
@@ -1257,12 +1257,12 @@ async function runDcsScanner(dcsPath, sgPath) {
     }
 
     // 2. Scan CoreMods
-    if (dcsPath && window.electronAPI) {
+    if (dcsPath && window.nativeAPI) {
       if (loaderSub) loaderSub.textContent = "Scanning CoreMods for sdefs...";
       showToast('Scanning CoreMods. This may take a while...', 'info');
       const coreModsPath = dcsPath + '/CoreMods';
-      if (await window.electronAPI.exists(coreModsPath)) {
-        const sdefs = await window.electronAPI.scanSdefs(coreModsPath);
+      if (await window.nativeAPI.exists(coreModsPath)) {
+        const sdefs = await window.nativeAPI.scanSdefs(coreModsPath);
 
         const coreSectionMap = {};
 
@@ -1322,11 +1322,11 @@ async function runDcsScanner(dcsPath, sgPath) {
     }
 
     // 3. Scan Saved Games Mods
-    if (sgPath && window.electronAPI) {
+    if (sgPath && window.nativeAPI) {
       if (loaderSub) loaderSub.textContent = "Scanning Saved Games Mods...";
       const sgModsPath = sgPath + '/Mods';
-      if (await window.electronAPI.exists(sgModsPath)) {
-        const sdefs = await window.electronAPI.scanSdefs(sgModsPath);
+      if (await window.nativeAPI.exists(sgModsPath)) {
+        const sdefs = await window.nativeAPI.scanSdefs(sgModsPath);
         const sgSection = { name: "SavedGames Mods", modPrefix: "SavedGames Mods", assets: [] };
 
         for (const sdef of sdefs) {

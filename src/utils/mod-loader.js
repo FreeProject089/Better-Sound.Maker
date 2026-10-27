@@ -87,11 +87,11 @@ function parseEntryLua(content) {
 }
 
 /**
- * Load a mod from an unzipped folder on disk (Electron Only).
+ * Load a mod from an unzipped folder on disk (desktop only).
  * @param {string} folderPath — absolute path to the mod root
  */
 export async function loadModFromFolder(folderPath) {
-    if (!window.electronAPI) throw new Error('Folder loading requires Electron');
+    if (!window.nativeAPI) throw new Error('Folder loading requires the desktop app');
 
     const result = {
         assets: {},
@@ -102,7 +102,7 @@ export async function loadModFromFolder(folderPath) {
     // Helper: recursively collect files with a given extension
     async function collectFiles(dir, ext, collected = []) {
         let entries;
-        try { entries = await window.electronAPI.readDir(dir); } catch { return collected; }
+        try { entries = await window.nativeAPI.readDir(dir); } catch { return collected; }
         for (const entry of entries) {
             const fullPath = `${dir}/${entry.name}`;
             if (entry.isDirectory) {
@@ -116,8 +116,8 @@ export async function loadModFromFolder(folderPath) {
 
     // 1. Parse entry.lua
     const entryPath = `${folderPath}/entry.lua`;
-    if (await window.electronAPI.exists(entryPath)) {
-        const content = await window.electronAPI.readTextFile(entryPath);
+    if (await window.nativeAPI.exists(entryPath)) {
+        const content = await window.nativeAPI.readTextFile(entryPath);
         if (content) result.config = parseEntryLua(content);
     }
 
@@ -143,7 +143,7 @@ export async function loadModFromFolder(folderPath) {
             // Fallback: just use the filename if structure is weird
             sdefPathKey = sdefPathKey.split('/').pop();
         }
-        const content = await window.electronAPI.readTextFile(sFilePath);
+        const content = await window.nativeAPI.readTextFile(sFilePath);
         if (!content) continue;
         const params = parseSdef(content);
 
@@ -167,7 +167,7 @@ export async function loadModFromFolder(folderPath) {
             });
             if (audioEntry) {
                 try {
-                    const buffer = await window.electronAPI.readFile(audioEntry);
+                    const buffer = await window.nativeAPI.readFile(audioEntry);
                     if (buffer) {
                         const fileName = audioEntry.split(/[/\\]/).pop();
                         const blob = new Blob([buffer], { type: fileName.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav' });

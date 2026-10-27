@@ -3,6 +3,7 @@
  * Better Sound.Maker
  */
 
+import './platform/native.js';
 import './style.css';
 import rawCfg from './Load.cfg?raw';
 import { renderNav } from './components/nav.js';
@@ -70,12 +71,12 @@ async function checkReleaseNotes() {
     const lastVersion = localStorage.getItem(LAST_VERSION_KEY);
 
     if (lastVersion !== CURRENT_VERSION) {
-        if (window.electronAPI) {
+        if (window.nativeAPI) {
             try {
-                const appPath = await window.electronAPI.getAppPath();
+                const appPath = await window.nativeAPI.getAppPath();
                 // Release notes are kept for v1.0.1+
                 const notePath = `${appPath}/Update/.md/PATCH_NOTES_v${CURRENT_VERSION}.md`;
-                const content = await window.electronAPI.readTextFile(notePath);
+                const content = await window.nativeAPI.readTextFile(notePath);
 
                 if (content) {
                     const { showModal } = await import('./utils/modal.js');
@@ -104,15 +105,15 @@ async function checkReleaseNotes() {
 async function showAllReleaseNotes() {
     try {
         const { showModal } = await import('./utils/modal.js');
-        const isElectron = !!window.electronAPI;
+        const isNative = !!window.nativeAPI;
         let mdFiles = [];
         let otherFiles = [];
         let appPath = '';
 
-        if (isElectron) {
-            appPath = await window.electronAPI.getAppPath();
-            mdFiles = await window.electronAPI.readDir(`${appPath}/Update/.md`).catch(() => []);
-            otherFiles = await window.electronAPI.readDir(`${appPath}/Update/Other`).catch(() => []);
+        if (isNative) {
+            appPath = await window.nativeAPI.getAppPath();
+            mdFiles = await window.nativeAPI.readDir(`${appPath}/Update/.md`).catch(() => []);
+            otherFiles = await window.nativeAPI.readDir(`${appPath}/Update/Other`).catch(() => []);
         } else {
             // Fallback for browser: hardcoded list of major versions
             mdFiles = ['PATCH_NOTES_v1.0.3.md', 'PATCH_NOTES_v1.0.4.md'];
@@ -170,8 +171,8 @@ async function showAllReleaseNotes() {
                     const path = btn.dataset.notePath;
                     try {
                         let content = '';
-                        if (isElectron) {
-                            content = await window.electronAPI.readTextFile(`${appPath}/${path}`);
+                        if (isNative) {
+                            content = await window.nativeAPI.readTextFile(`${appPath}/${path}`);
                         } else {
                             const resp = await fetch(`./${path}`);
                             content = await resp.text();
@@ -246,14 +247,14 @@ async function init() {
     // Auto-scan library if enabled
     setTimeout(async () => {
         const state = getState();
-        if (state.globalSettings?.autoScan && state.globalSettings.dcsPath && window.electronAPI) {
+        if (state.globalSettings?.autoScan && state.globalSettings.dcsPath && window.nativeAPI) {
             try {
                 // Determine sdef path
                 let dcsPath = state.globalSettings.dcsPath.replace(/\\/g, '/');
                 if (dcsPath.endsWith('/')) dcsPath = dcsPath.slice(0, -1);
                 const sdefPath = `${dcsPath}/Doc/Sounds/sdef_and_wave_list.txt`;
 
-                const text = await window.electronAPI.readTextFile(sdefPath);
+                const text = await window.nativeAPI.readTextFile(sdefPath);
                 if (text) {
                     const { parseSdefList } = await import('./data/sdef-parser.js');
                     const { setLibraryData, saveLibraryToStorage } = await import('./state/store.js');

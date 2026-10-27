@@ -23,7 +23,7 @@ export function renderSettings(container) {
       <div style="display: flex; gap: 8px; width: 100%;">
         <input type="text" id="settings-dcs-path" class="input-field" value="${settings.dcsPath || ''}" placeholder="C:\\Program Files\\Eagle Dynamics\\DCS World" style="flex: 1;" />
         
-        ${window.electronAPI ? `
+        ${window.nativeAPI ? `
           <button class="btn btn-secondary" id="settings-open-btn" style="flex-shrink: 0;" title="Open in Explorer">
             ${getIcon('external-link', 'w-4 h-4')}
           </button>
@@ -74,10 +74,10 @@ export function renderSettings(container) {
     </div>
   `;
 
-  // Native File Picker (Electron only)
+  // Native File Picker (desktop only)
   document.getElementById('settings-browse-btn')?.addEventListener('click', async () => {
-    if (window.electronAPI && window.electronAPI.selectDirectory) {
-      const paths = await window.electronAPI.selectDirectory();
+    if (window.nativeAPI && window.nativeAPI.selectDirectory) {
+      const paths = await window.nativeAPI.selectDirectory();
       if (paths && paths.length > 0) {
         const input = document.getElementById('settings-dcs-path');
         if (input) {
@@ -91,8 +91,8 @@ export function renderSettings(container) {
 
   document.getElementById('settings-open-btn')?.addEventListener('click', () => {
     const p = document.getElementById('settings-dcs-path')?.value.trim();
-    if (p && window.electronAPI && window.electronAPI.openExternal) {
-      window.electronAPI.openExternal(p);
+    if (p && window.nativeAPI && window.nativeAPI.openExternal) {
+      window.nativeAPI.openExternal(p);
     }
   });
 

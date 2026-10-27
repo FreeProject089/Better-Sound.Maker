@@ -5,18 +5,16 @@
   "description": "Better Sound.Maker — Create DCS World sound mods easily",
   "author": "FreeProject089",
   "type": "module",
-  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "electron:dev": "cross-env NODE_ENV=development electron .",
-    "electron:build": "vite build && electron-builder"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
-    "electron": "^40.5.0",
-    "electron-builder": "^26.8.1",
+    "@tauri-apps/cli": "^2.12.4",
     "eslint": "^10.0.2",
     "vite": "^6.1.0"
   },
@@ -26,44 +24,13 @@
   },
   "dependencies": {
     "@simonwep/pickr": "^1.9.1",
-    "electron-updater": "^6.8.3",
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-opener": "^2.7.2",
+    "@tauri-apps/plugin-process": "^2.4.0",
+    "@tauri-apps/plugin-updater": "^2.14.0",
     "idb-keyval": "^6.2.2",
     "jszip": "^3.10.1",
     "lucide": "^0.574.0",
     "wavesurfer.js": "^7.12.1"
-  },
-  "build": {
-    "appId": "com.bettersoundmaker.app",
-    "productName": "Better Sound.Maker",
-    "icon": "public/Bm.png",
-    "publish": [
-      {
-        "provider": "github",
-        "owner": "FreeProject089",
-        "repo": "Better-Sound.Maker",
-        "vPrefixedTagName": false
-      }
-    ],
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**",
-      "electron/**",
-      "Bm.png",
-      "public/**",
-      "Update/**",
-      "LICENSE"
-    ],
-    "win": {
-      "target": "nsis",
-      "artifactName": "Better.Sound.Maker.Setup.${version}.${ext}"
-    },
-    "mac": {
-      "target": "dmg"
-    },
-    "linux": {
-      "target": "AppImage"
-    }
   }
 }

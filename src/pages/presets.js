@@ -703,19 +703,19 @@ async function showCommunityPresets(container) {
     console.warn('Web fetch presets failed, falling back to local:', err);
   }
 
-  // 2. Fallback to Local Directory if no presets loaded yet AND we're in Electron
-  if (availablePresets.length === 0 && window.electronAPI) {
+  // 2. Fallback to Local Directory if no presets loaded yet AND we're in the desktop app
+  if (availablePresets.length === 0 && window.nativeAPI) {
     try {
-      const appPath = await window.electronAPI.getAppPath();
+      const appPath = await window.nativeAPI.getAppPath();
       const presetsDir = appPath.endsWith('app.asar')
         ? appPath.replace('app.asar', 'app.asar.unpacked/public/presets')
         : appPath + '/public/presets';
-      const files = await window.electronAPI.readDir(presetsDir);
+      const files = await window.nativeAPI.readDir(presetsDir);
 
       if (files && files.length) {
         for (const f of files) {
           if (f.startsWith('preset_')) {
-            const text = await window.electronAPI.readTextFile(presetsDir + '/' + f);
+            const text = await window.nativeAPI.readTextFile(presetsDir + '/' + f);
             if (text) {
               try {
                 const data = JSON.parse(text);

@@ -2,7 +2,7 @@
  * mod-builder.js — Build the complete mod folder structure
  *
  * Priority order:
- *   1. Electron  → window.electronAPI (native IPC, no origin restrictions)
+ *   1. Desktop   → window.nativeAPI (native IPC, no origin restrictions)
  *   2. Chrome    → showDirectoryPicker (write directly to disk)
  *   3. Firefox   → JSZip fallback (download .zip)
  *
@@ -31,8 +31,8 @@ import { generateEntryLua } from './entry-generator.js';
 import { generateSdef } from './sdef-generator.js';
 import { detectSoundType, getTypeDefaults } from './audio-analyzer.js';
 
-const isElectron = typeof window !== 'undefined' && typeof window.electronAPI !== 'undefined';
-const supportsDirectoryPicker = !isElectron && typeof window.showDirectoryPicker === 'function';
+const isNative = typeof window !== 'undefined' && typeof window.nativeAPI !== 'undefined';
+const supportsDirectoryPicker = !isNative && typeof window.showDirectoryPicker === 'function';
 
 /**
  * Build and export the mod.
@@ -54,8 +54,8 @@ export async function buildMod(onProgress, options = {}) {
     const report = (msg) => { step++; onProgress?.(step / totalSteps, msg); };
 
     try {
-        if (isElectron) {
-            return await buildToFolderElectron(modFolderName, config, selected, audioFormat, report);
+        if (isNative) {
+            return await buildToFolderNative(modFolderName, config, selected, audioFormat, report);
         } else if (supportsDirectoryPicker) {
             return await buildToFolder(modFolderName, config, selected, audioFormat, report);
         } else {
@@ -71,53 +71,53 @@ export async function buildMod(onProgress, options = {}) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Strategy 0 — Electron: native IPC
+   Strategy 0 — Desktop (Tauri): native commands
    ═══════════════════════════════════════════════════════════════════ */
 
-async function buildToFolderElectron(modFolderName, config, selected, audioFormat, report) {
-    const basePath = await window.electronAPI.selectDirectory();
+async function buildToFolderNative(modFolderName, config, selected, audioFormat, report) {
+    const basePath = await window.nativeAPI.selectDirectory();
     if (!basePath) return { success: false, error: 'Export cancelled by user' };
 
     const modPath = `${basePath}/${modFolderName}`;
-    await window.electronAPI.mkdir(modPath);
+    await window.nativeAPI.mkdir(modPath);
 
     report('Writing entry.lua…');
-    await window.electronAPI.writeFile(`${modPath}/entry.lua`, generateEntryLua(config));
+    await window.nativeAPI.writeFile(`${modPath}/entry.lua`, generateEntryLua(config));
 
     report('Creating Sounds/ directories…');
     const soundsPath = `${modPath}/Sounds`;
     const sdefPath = `${soundsPath}/sdef`;
     const effectsPath = `${soundsPath}/Effects`;
-    await window.electronAPI.mkdir(soundsPath);
-    await window.electronAPI.mkdir(sdefPath);
-    await window.electronAPI.mkdir(effectsPath);
+    await window.nativeAPI.mkdir(soundsPath);
+    await window.nativeAPI.mkdir(sdefPath);
+    await window.nativeAPI.mkdir(effectsPath);
 
     for (const [assetKey, assetData] of Object.entries(selected)) {
         report(`Processing: ${assetKey}`);
-        await processSdefToFolderElectron(sdefPath, effectsPath, assetKey, assetData, audioFormat);
+        await processSdefToFolderNative(sdefPath, effectsPath, assetKey, assetData, audioFormat);
     }
 
     if (config.themeEnabled) {
         report('Creating Theme/ directory…');
         const themePath = `${modPath}/Theme`;
         const mePath = `${themePath}/ME`;
-        await window.electronAPI.mkdir(themePath);
-        await window.electronAPI.mkdir(mePath);
-        await writeThemeToFolderElectron(themePath, mePath, report);
+        await window.nativeAPI.mkdir(themePath);
+        await window.nativeAPI.mkdir(mePath);
+        await writeThemeToFolderNative(themePath, mePath, report);
     }
 
     report('Build complete!');
     return { success: true, folderName: modFolderName };
 }
 
-async function processSdefToFolderElectron(sdefBasePath, effectsBasePath, assetKey, assetData, audioFormat) {
+async function processSdefToFolderNative(sdefBasePath, effectsBasePath, assetKey, assetData, audioFormat) {
     // Write sdef file
     const sdefContent = getSdefContent(assetKey, assetData);
     if (sdefContent) {
         const sdefFilePath = `${sdefBasePath}/Effects/${assetKey}`;
         const sdefDir = sdefFilePath.substring(0, sdefFilePath.lastIndexOf('/'));
-        await window.electronAPI.mkdir(sdefDir);
-        await window.electronAPI.writeFile(sdefFilePath, sdefContent);
+        await window.nativeAPI.mkdir(sdefDir);
+        await window.nativeAPI.writeFile(sdefFilePath, sdefContent);
     }
 
     // Write audio files
@@ -158,12 +158,12 @@ async function processSdefToFolderElectron(sdefBasePath, effectsBasePath, assetK
         const withoutExt = parts.join('/').replace(/\.[^.]+$/, '');
         const finalPath = `${effectsBasePath}/${withoutExt}.${currentExt}`;
         const finalDir = finalPath.substring(0, finalPath.lastIndexOf('/'));
-        await window.electronAPI.mkdir(finalDir);
-        await window.electronAPI.writeBuffer(finalPath, currentArrayBuf);
+        await window.nativeAPI.mkdir(finalDir);
+        await window.nativeAPI.writeBuffer(finalPath, currentArrayBuf);
     }
 }
 
-async function writeThemeToFolderElectron(themePath, mePath, report) {
+async function writeThemeToFolderNative(themePath, mePath, report) {
     const slots = {
         'icon.png': themePath,
         'MainMenulogo.png': mePath,
@@ -176,7 +176,7 @@ async function writeThemeToFolderElectron(themePath, mePath, report) {
         if (file) {
             report(`Writing theme: ${name}`);
             const buf = await file.arrayBuffer();
-            await window.electronAPI.writeBuffer(`${targetPath}/${name}`, buf);
+            await window.nativeAPI.writeBuffer(`${targetPath}/${name}`, buf);
         }
     }
 }

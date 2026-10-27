@@ -11,7 +11,7 @@ let SOUND_RULES = null;     // [{ match: RegExp, type: string }]
 
 /**
  * Load all *.json files from public/sound-types/ and merge them.
- * Files are fetched at runtime; the app must be served (Vite dev or Electron).
+ * Files are fetched at runtime; the app must be served (Vite dev or Tauri).
  * Callers should await ensureRulesLoaded() before using detectSoundType.
  */
 async function loadSoundTypeRules() {
