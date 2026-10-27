@@ -7,7 +7,7 @@ export default defineConfig({
     assetsInclude: ['**/*.md', 'LICENSE', 'src/Load.cfg', 'Update/**'],
     clearScreen: false,
     server: {
-        port: 5173,
+        port: 1430,
         strictPort: true,   // Tauri's devUrl expects this exact port
         open: !process.env.TAURI_ENV_PLATFORM
     },
