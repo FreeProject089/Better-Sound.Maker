@@ -207,8 +207,8 @@ async function init() {
     const cfg = {};
     rawCfg.split('\n').forEach(line => {
         if (line.includes('=')) {
-            const [k, v] = line.split('=');
-            cfg[k.trim()] = v.trim();
+            const i = line.indexOf('=');
+            cfg[line.slice(0, i).trim()] = line.slice(i + 1).trim();
         }
     });
     window.APP_CONFIG = cfg;

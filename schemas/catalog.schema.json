@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/FreeProject089/Better-Sound.Maker/schemas/catalog.schema.json",
+  "title": "Better Sound.Maker catalog",
+  "description": "Lists community presets and sound-type packs. Relative URLs resolve against this file's URL.",
+  "type": "object",
+  "required": ["schemaVersion", "presets"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "name": { "type": "string" },
+    "presets": { "type": "array", "items": { "$ref": "#/$defs/entry" } },
+    "soundTypes": { "type": "array", "items": { "$ref": "#/$defs/entry" } }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": ["url"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$", "description": "Unique id; defaults to the file name." },
+        "url": { "type": "string", "description": "Absolute or relative URL of the JSON file." }
+      }
+    }
+  }
+}

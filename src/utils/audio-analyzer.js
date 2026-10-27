@@ -4,13 +4,14 @@
  */
 
 import { getIcon } from './icons.js';
+import { normalizeSoundTypes } from '../catalog/schema.js';
 
 // ── Runtime-loaded sound-type rules ──────────────────────────────────────────
 let SOUND_TYPES = null;     // { id: { label, lucideIcon, description, ... } }
 let SOUND_RULES = null;     // [{ match: RegExp, type: string }]
 
 /**
- * Load all *.json files from public/sound-types/ and merge them.
+ * Load bundled packs (public/sound-types/), community packs, then local custom types.
  * Files are fetched at runtime; the app must be served (Vite dev or Tauri).
  * Callers should await ensureRulesLoaded() before using detectSoundType.
  */
@@ -18,41 +19,40 @@ async function loadSoundTypeRules() {
     SOUND_TYPES = {};
     SOUND_RULES = [];
 
+    const addPack = (raw, source) => {
+        const { value, errors } = normalizeSoundTypes(raw, SOUND_TYPES);
+        if (errors.length) console.warn(`[SoundTypes] ${source}:`, errors);
+        if (!value) return;
+        Object.assign(SOUND_TYPES, value.types);
+        for (const r of value.rules) SOUND_RULES.push({ match: new RegExp(r.match, 'i'), type: r.type });
+    };
+
+    // 1. Bundled packs listed in sound-types/index.json (default.json first)
+    let files = ['default.json'];
     try {
-        // Load the manifest (default + any user-added files)
-        // First try fetching an index, otherwise fall back to just default.json
-        let files = ['./sound-types/default.json'];
-
-        // Attempt to fetch additional files listed via a meta-index if present
-        try {
-            const idxRes = await fetch('./sound-types/index.json');
-            if (idxRes.ok) {
-                const idx = await idxRes.json();
-                if (Array.isArray(idx.files)) {
-                    files = idx.files.map(f => `./sound-types/${f}`);
-                }
-            }
-        } catch (_) { /* no index file, use defaults */ }
-
-        for (const url of files) {
-            try {
-                const res = await fetch(url + '?v=' + Date.now());
-                if (!res.ok) continue;
-                const data = await res.json();
-                // Merge types
-                if (data.types) Object.assign(SOUND_TYPES, data.types);
-                // Merge rules
-                if (Array.isArray(data.rules)) {
-                    for (const r of data.rules) {
-                        SOUND_RULES.push({ match: new RegExp(r.match, 'i'), type: r.type });
-                    }
-                }
-            } catch (e) {
-                console.warn('[SoundTypes] Failed to load', url, e);
-            }
+        const idxRes = await fetch('./sound-types/index.json');
+        if (idxRes.ok) {
+            const idx = await idxRes.json();
+            if (Array.isArray(idx.files) && idx.files.length) files = idx.files;
         }
+    } catch (_) { /* no index file, use defaults */ }
+
+    for (const file of files) {
+        try {
+            const res = await fetch(`./sound-types/${file}?v=${Date.now()}`);
+            if (res.ok) addPack(await res.json(), file);
+        } catch (e) {
+            console.warn('[SoundTypes] Failed to load', file, e);
+        }
+    }
+
+    // 2. Community packs from the catalog (already validated by the loader)
+    try {
+        const { loadCommunityCatalog } = await import('../catalog/catalog.js');
+        const catalog = await loadCommunityCatalog();
+        for (const pack of catalog.soundTypes) addPack(pack.data, `community:${pack.id}`);
     } catch (e) {
-        console.warn('[SoundTypes] Failed to load rule files, using hardcoded fallback', e);
+        console.warn('[SoundTypes] Community packs unavailable', e);
     }
 
     // Load custom types from localStorage

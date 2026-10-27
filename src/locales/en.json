@@ -59,7 +59,10 @@
         "autoScanKeepModsDesc": "If enabled, manually imported mod assets (.zip) will not be cleared when scanning your DCS directory.",
         "behavior": "Behavior & Scanning",
         "playWithSdefConfig": "Apply SDEF Params on Playback",
-        "playWithSdefConfigDesc": "Applies the gain, pitch, and loop mode from the current SDEF when previewing a sound in the Projects page."
+        "playWithSdefConfigDesc": "Applies the gain, pitch, and loop mode from the current SDEF when previewing a sound in the Projects page.",
+        "catalogUrl": "Community catalog",
+        "catalogUrlDesc": "URL of the catalog.json listing community presets and sound-type packs. Leave empty to use the official catalog.",
+        "catalogTest": "Test"
     },
     "presetsPage": {
         "title": "Presets & Templates",

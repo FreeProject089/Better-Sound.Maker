@@ -59,7 +59,10 @@
         "autoScanKeepModsDesc": "Si activé, les assets de mods importés manuellement (.zip) ne seront pas effacés lors du scan de votre dossier DCS.",
         "behavior": "Comportement & Scan",
         "playWithSdefConfig": "Appliquer Paramètres SDEF en Lecture",
-        "playWithSdefConfigDesc": "Applique le gain, le pitch et le mode de boucle du SDEF actuel lors de la lecture d'un son dans la page Projets."
+        "playWithSdefConfigDesc": "Applique le gain, le pitch et le mode de boucle du SDEF actuel lors de la lecture d'un son dans la page Projets.",
+        "catalogUrl": "Catalogue communautaire",
+        "catalogUrlDesc": "URL du catalog.json qui liste les presets et packs de types communautaires. Laisser vide pour utiliser le catalogue officiel.",
+        "catalogTest": "Tester"
     },
     "presetsPage": {
         "title": "Préréglages & Modèles",

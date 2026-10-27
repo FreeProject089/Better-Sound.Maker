@@ -11,6 +11,9 @@ import { showModal } from '../components/modal.js';
 import { pickJsonFile } from '../utils/file-picker.js';
 import { parseSdefList } from '../data/sdef-parser.js';
 import { APP_VERSION } from '../utils/version.js';
+import { escapeHtml } from '../utils/html.js';
+import { loadCommunityCatalog } from '../catalog/catalog.js';
+import { isPresetNewer, normalizePreset } from '../catalog/schema.js';
 
 import Pickr from '@simonwep/pickr';
 import '@simonwep/pickr/dist/themes/nano.min.css';
@@ -347,97 +350,29 @@ export async function renderPresets(container) {
 // ───────────────────────────────────────────────
 // BACKGROUND COMMUNITY UPDATE CHECK
 // ───────────────────────────────────────────────
-let gCommunityPresetsCache = null;
-let gCommunityPresetsTime = 0;
-
 async function checkUpdatesForLocalPresets(container) {
-  const state = getState();
-  const list = state.presets || [];
+  const list = getState().presets || [];
   if (list.length === 0) return;
 
-  // Disable if configured in cfg
-  if (window.APP_CONFIG?.DisableCommunityPresets === 'true') {
-    gCommunityPresetsCache = [];
-    gCommunityPresetsTime = Date.now();
-    return;
-  }
-
-  // Use cache if checked within 5 mins
-  if (!gCommunityPresetsCache || Date.now() - gCommunityPresetsTime > 5 * 60 * 1000) {
-    try {
-      const gResp = await fetch(`https://api.github.com/repos/BetterDCS/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
-      if (gResp.ok) {
-        gCommunityPresetsCache = await gResp.json();
-        gCommunityPresetsTime = Date.now();
-      } else {
-        // Repository or path not found, mock as empty array to stop further attempts in this session
-        gCommunityPresetsCache = [];
-        gCommunityPresetsTime = Date.now();
-        return;
-      }
-    } catch (e) {
-      gCommunityPresetsCache = [];
-      gCommunityPresetsTime = Date.now();
-      return;
-    }
-  }
-
-  if (!Array.isArray(gCommunityPresetsCache)) return;
-
+  const catalog = await loadCommunityCatalog();
   for (let i = 0; i < list.length; i++) {
     const preset = list[i];
+    const remote = catalog.presets.find(p => p.data.name === preset.name)?.data;
+    if (!remote || !isPresetNewer(preset, remote)) continue;
 
-    // Find if the Github cache has a file corresponding to this preset
-    const expectedName = `preset_${preset.name.replace(/\\s+/g, '_')}.json`;
-    const meta = gCommunityPresetsCache.find(f =>
-      f.name === expectedName ||
-      (f.name.startsWith('preset_') && f.name.replace('preset_', '').replace('.json', '') === preset.name)
-    );
+    const btnGroup = container.querySelector(`[data-apply-preset="${i}"]`)?.parentElement;
+    if (!btnGroup || btnGroup.querySelector('.local-update-btn')) continue;
 
-    if (meta && meta.download_url) {
-      // Avoid refetching if DOM already has the button
-      const btnGroup = container.querySelector(`[data-apply-preset="${i}"]`)?.parentElement;
-      if (!btnGroup || btnGroup.querySelector('.local-update-btn')) continue;
-
-      try {
-        const txtResp = await fetch(`${meta.download_url}?t=${Date.now()}`);
-        const text = await txtResp.text();
-        const remoteData = JSON.parse(text);
-
-        const localUpdateNum = preset.UpdateNumber || ((preset.version) ? 0 : 1);
-        const remoteUpdateNum = remoteData.UpdateNumber || 0;
-
-        let isUpdate = false;
-        if (remoteUpdateNum > localUpdateNum) {
-          isUpdate = true;
-        } else if (!remoteData.UpdateNumber && preset.version) {
-          const localV = preset.version.split('.').map(Number);
-          const remoteV = (remoteData.version || '0.0.0').split('.').map(Number);
-          for (let j = 0; j < Math.max(localV.length, remoteV.length); j++) {
-            const l = localV[j] || 0;
-            const r = remoteV[j] || 0;
-            if (r > l) { isUpdate = true; break; }
-            if (r < l) break;
-          }
-        }
-
-        if (isUpdate) {
-          const updateBtn = document.createElement('button');
-          updateBtn.className = 'btn btn-warning btn-sm local-update-btn';
-          updateBtn.innerHTML = `${getIcon('refresh-cw', 'w-4 h-4')} Update Available`;
-          updateBtn.onclick = () => {
-            // Push new data onto idx
-            import('../state/store.js').then(({ updatePreset }) => {
-              updatePreset(i, remoteData);
-              showToast(`Preset "${preset.name}" updated successfully!`, 'success');
-              renderPresets(container);
-            });
-          };
-          btnGroup.prepend(updateBtn);
-          renderIcons(container);
-        }
-      } catch (e) { }
-    }
+    const updateBtn = document.createElement('button');
+    updateBtn.className = 'btn btn-warning btn-sm local-update-btn';
+    updateBtn.innerHTML = `${getIcon('refresh-cw', 'w-4 h-4')} Update Available`;
+    updateBtn.onclick = () => {
+      updatePreset(i, remote);
+      showToast(`Preset "${preset.name}" updated successfully!`, 'success');
+      renderPresets(container);
+    };
+    btnGroup.prepend(updateBtn);
+    renderIcons(container);
   }
 }
 
@@ -594,12 +529,13 @@ async function importPresetFromFile(container) {
   try {
     const file = await pickJsonFile();
     const text = await file.text();
-    const preset = JSON.parse(text);
+    const { value: preset, errors } = normalizePreset(JSON.parse(text));
 
-    if (!preset.name || !Array.isArray(preset.assetPaths)) {
-      showToast('Invalid preset file format', 'error');
+    if (!preset) {
+      showToast(`Invalid preset file: ${errors.join(', ')}`, 'error');
       return;
     }
+    if (errors.length) console.warn('[Preset import] repaired:', errors);
 
     if (preset.customTypes) {
       const numTypes = Object.keys(preset.customTypes.types || {}).length;
@@ -653,91 +589,20 @@ async function importPresetFromFile(container) {
   }
 }
 
-async function showCommunityPresets(container) {
+async function showCommunityPresets(container, { force = false } = {}) {
   const state = getState();
   const presets = state.presets || [];
-  let availablePresets = [];
-
-  // 1. Try Github Fetch first
-  try {
-    const gResp = await fetch(`https://api.github.com/repos/BetterDCS/Better-Sound.Maker-Community-Presets/contents/?t=${Date.now()}`);
-    if (gResp.ok) {
-      const ghFiles = await gResp.json();
-      for (const meta of ghFiles) {
-        if (meta.name.startsWith('preset_') && meta.download_url) {
-          const txtResp = await fetch(`${meta.download_url}?t=${Date.now()}`);
-          const text = await txtResp.text();
-          try {
-            const data = JSON.parse(text);
-            if (data.name !== undefined && data.color !== undefined && data.version !== undefined && data.date !== undefined && Array.isArray(data.assetPaths)) {
-              const localPreset = presets.find(p => p.name === data.name);
-              const isImported = !!localPreset;
-              let isUpdateAvailable = false;
-
-              if (isImported) {
-                const localUpdateNum = localPreset.UpdateNumber || 0;
-                const remoteUpdateNum = data.UpdateNumber || 0;
-
-                if (remoteUpdateNum > localUpdateNum) {
-                  isUpdateAvailable = true;
-                } else if (localPreset.version !== undefined && !data.UpdateNumber) {
-                  // Fallback to basic semantic version check if no UpdateNumber is used
-                  const localV = localPreset.version.split('.').map(Number);
-                  const remoteV = (data.version || '0.0.0').split('.').map(Number);
-                  for (let i = 0; i < Math.max(localV.length, remoteV.length); i++) {
-                    const l = localV[i] || 0;
-                    const r = remoteV[i] || 0;
-                    if (r > l) { isUpdateAvailable = true; break; }
-                    if (r < l) break;
-                  }
-                }
-              }
-
-              availablePresets.push({ file: meta.name, data, isImported, isUpdateAvailable });
-            }
-          } catch (e) { }
-        }
-      }
-    }
-  } catch (err) {
-    console.warn('Web fetch presets failed, falling back to local:', err);
-  }
-
-  // 2. Fallback to Local Directory if no presets loaded yet AND we're in the desktop app
-  if (availablePresets.length === 0 && window.nativeAPI) {
-    try {
-      const appPath = await window.nativeAPI.getAppPath();
-      const presetsDir = appPath.endsWith('app.asar')
-        ? appPath.replace('app.asar', 'app.asar.unpacked/public/presets')
-        : appPath + '/public/presets';
-      const files = await window.nativeAPI.readDir(presetsDir);
-
-      if (files && files.length) {
-        for (const f of files) {
-          if (f.startsWith('preset_')) {
-            const text = await window.nativeAPI.readTextFile(presetsDir + '/' + f);
-            if (text) {
-              try {
-                const data = JSON.parse(text);
-                if (data.name !== undefined && data.color !== undefined && data.version !== undefined && data.date !== undefined && Array.isArray(data.assetPaths)) {
-                  // Only push if not already loaded by GitHub
-                  if (!availablePresets.some(ap => ap.data.name === data.name)) {
-                    const localPreset = presets.find(p => p.name === data.name);
-                    const isImported = !!localPreset;
-                    availablePresets.push({ file: f, data, isImported, isUpdateAvailable: false }); // Local doesn't have "updates" generally
-                  }
-                }
-              } catch (e) { }
-            }
-          }
-        }
-      }
-    } catch (e) {
-      showToast('Failed to load community presets.', 'error');
-      console.warn(e);
-      return;
-    }
-  }
+  const catalog = await loadCommunityCatalog({ force });
+  const availablePresets = catalog.presets.map(({ id, data }) => {
+    const localPreset = presets.find(p => p.name === data.name);
+    return {
+      file: id,
+      data,
+      isImported: !!localPreset,
+      isUpdateAvailable: !!localPreset && isPresetNewer(localPreset, data),
+    };
+  });
+  if (catalog.source === 'cache') showToast('Offline: showing the last downloaded community catalog.', 'warning');
 
   if (availablePresets.length === 0) {
     const emptyAction = await showModal({
@@ -750,7 +615,7 @@ async function showCommunityPresets(container) {
     });
     if (emptyAction === 'refresh') {
       showToast('Refreshing...', 'info');
-      showCommunityPresets(container);
+      showCommunityPresets(container, { force: true });
     }
     return;
   }
@@ -769,26 +634,26 @@ async function showCommunityPresets(container) {
               </div>
               <div style="padding-top: 4px;">
                 <div style="font-weight: 800; font-size: 17px; color: ${pColor}; margin-bottom: 4px; line-height: 1.2;">
-                  ${p.data.name}
+                  ${escapeHtml(p.data.name)}
                 </div>
                 <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
                   ${getIcon('file-audio', 'w-3.5 h-3.5')} <span>${p.data.assetPaths.length} Sounds</span>
                 </div>
-                ${p.data.version ? `<div style="font-size: 11px; color: var(--text-muted); opacity: 0.7; margin-top: 4px; display: flex; align-items: center; gap: 4px;">${getIcon('tag', 'w-3 h-3')} v${p.data.version}</div>` : ''}
+                ${p.data.version ? `<div style="font-size: 11px; color: var(--text-muted); opacity: 0.7; margin-top: 4px; display: flex; align-items: center; gap: 4px;">${getIcon('tag', 'w-3 h-3')} v${escapeHtml(p.data.version)}</div>` : ''}
               </div>
             </div>
             
             <div style="margin-top: 8px;">
               ${p.isImported
         ? (p.isUpdateAvailable
-          ? `<button class="btn btn-warning community-import-btn" style="width: 100%; border-radius: var(--radius-sm); height: 36px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px;" data-preset-name="${p.data.name.replace(/"/g, '&quot;')}">
+          ? `<button class="btn btn-warning community-import-btn" style="width: 100%; border-radius: var(--radius-sm); height: 36px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px;" data-preset-name="${escapeHtml(p.data.name)}">
                   ${getIcon('refresh-cw', 'w-4 h-4')} Update Available
                 </button>`
           : `<div style="width: 100%; border: 1px solid var(--border); text-align: center; background: rgba(16, 185, 129, 0.1); color: var(--accent-green); padding: 8px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px;">
                   ${getIcon('check', 'w-4 h-4')} Imported
                 </div>`
         )
-        : `<button class="btn btn-primary community-import-btn" style="width: 100%; border-radius: var(--radius-sm); height: 36px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px; background: ${pColor}; border: none; color: #fff;" data-preset-name="${p.data.name.replace(/"/g, '&quot;')}">
+        : `<button class="btn btn-primary community-import-btn" style="width: 100%; border-radius: var(--radius-sm); height: 36px; font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 6px; background: ${pColor}; border: none; color: #fff;" data-preset-name="${escapeHtml(p.data.name)}">
                      ${getIcon('download-cloud', 'w-4 h-4')} Install Preset
                    </button>`
       }
@@ -867,6 +732,6 @@ async function showCommunityPresets(container) {
   const finalAction = await actionPromise;
   if (finalAction === 'refresh') {
     showToast('Refreshing network data...', 'info');
-    showCommunityPresets(container);
+    showCommunityPresets(container, { force: true });
   }
 }

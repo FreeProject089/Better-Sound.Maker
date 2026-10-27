@@ -2,6 +2,8 @@ import { getState, setGlobalSettings } from '../state/store.js';
 import { t } from '../utils/i18n.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { showToast } from '../components/toast.js';
+import { escapeHtml } from '../utils/html.js';
+import { DEFAULT_CATALOG_URL, loadCommunityCatalog } from '../catalog/catalog.js';
 
 export function renderSettings(container) {
   const state = getState();
@@ -21,7 +23,7 @@ export function renderSettings(container) {
       <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">${t('settingsPage.dcsPathDesc')}</p>
       
       <div style="display: flex; gap: 8px; width: 100%;">
-        <input type="text" id="settings-dcs-path" class="input-field" value="${settings.dcsPath || ''}" placeholder="C:\\Program Files\\Eagle Dynamics\\DCS World" style="flex: 1;" />
+        <input type="text" id="settings-dcs-path" class="input-field" value="${escapeHtml(settings.dcsPath)}" placeholder="C:\\Program Files\\Eagle Dynamics\\DCS World" style="flex: 1;" />
         
         ${window.nativeAPI ? `
           <button class="btn btn-secondary" id="settings-open-btn" style="flex-shrink: 0;" title="Open in Explorer">
@@ -31,6 +33,20 @@ export function renderSettings(container) {
             ${getIcon('folder', 'w-4 h-4')} ${t('settingsPage.selectPath')}
           </button>
         ` : ''}
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 20px;">
+      <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        ${getIcon('globe', 'w-4 h-4 mr-2')}
+        ${t('settingsPage.catalogUrl') || 'Community catalog'}
+      </h2>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">${t('settingsPage.catalogUrlDesc') || 'URL of the catalog.json listing community presets and sound-type packs. Leave empty to use the official catalog.'}</p>
+      <div style="display: flex; gap: 8px; width: 100%;">
+        <input type="url" id="settings-catalog-url" class="input-field" value="${escapeHtml(settings.catalogUrl)}" placeholder="${escapeHtml(DEFAULT_CATALOG_URL)}" style="flex: 1;" />
+        <button class="btn btn-secondary" id="settings-catalog-test" style="flex-shrink: 0;">
+          ${getIcon('refresh-cw', 'w-4 h-4')} ${t('settingsPage.catalogTest') || 'Test'}
+        </button>
       </div>
     </div>
 
@@ -77,11 +93,11 @@ export function renderSettings(container) {
   // Native File Picker (desktop only)
   document.getElementById('settings-browse-btn')?.addEventListener('click', async () => {
     if (window.nativeAPI && window.nativeAPI.selectDirectory) {
-      const paths = await window.nativeAPI.selectDirectory();
-      if (paths && paths.length > 0) {
+      const picked = await window.nativeAPI.selectDirectory();
+      if (picked) {
         const input = document.getElementById('settings-dcs-path');
         if (input) {
-          input.value = paths[0];
+          input.value = picked;
           // Trigger input event to ensure any listeners are notified
           input.dispatchEvent(new Event('input', { bubbles: true }));
         }
@@ -96,15 +112,39 @@ export function renderSettings(container) {
     }
   });
 
+  document.getElementById('settings-catalog-test').addEventListener('click', async () => {
+    const catalogUrl = readCatalogUrl();
+    if (catalogUrl === null) return;
+    setGlobalSettings({ catalogUrl });
+    const res = await loadCommunityCatalog({ force: true });
+    if (res.source === 'remote') {
+      showToast(`Catalog OK: ${res.presets.length} presets, ${res.soundTypes.length} sound-type packs`, 'success');
+    } else {
+      showToast(`Catalog unreachable (using ${res.source} copy): ${res.errors[0] || ''}`, 'error');
+    }
+  });
+
   document.getElementById('save-settings-btn').addEventListener('click', () => {
+    const catalogUrl = readCatalogUrl();
+    if (catalogUrl === null) return;
     const dcsPath = document.getElementById('settings-dcs-path').value.trim();
     const autoScan = document.getElementById('settings-auto-scan').checked;
     const autoScanKeepMods = document.getElementById('settings-auto-scan-keep-mods').checked;
     const playWithSdefConfig = document.getElementById('settings-play-sdef').checked;
 
-    setGlobalSettings({ dcsPath, autoScan, autoScanKeepMods, playWithSdefConfig });
+    setGlobalSettings({ dcsPath, autoScan, autoScanKeepMods, playWithSdefConfig, catalogUrl });
     showToast('Settings saved successfully', 'success');
   });
 
   renderIcons(container);
+}
+
+/** Returns the trimmed catalog URL ('' = default), or null after warning when invalid. */
+function readCatalogUrl() {
+  const value = document.getElementById('settings-catalog-url').value.trim();
+  if (value && !/^https?:\/\/\S+$/i.test(value)) {
+    showToast('Catalog URL must start with http:// or https://', 'error');
+    return null;
+  }
+  return value;
 }

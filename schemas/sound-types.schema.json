@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/FreeProject089/Better-Sound.Maker/schemas/sound-types.schema.json",
+  "title": "Better Sound.Maker sound-type pack",
+  "description": "Types define categories; rules map SDEF paths (case-insensitive regex) to a type. First matching rule wins.",
+  "type": "object",
+  "properties": {
+    "$schema": { "type": "string" },
+    "_info": { "type": "object" },
+    "types": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label"],
+        "properties": {
+          "label": { "type": "string" },
+          "lucideIcon": { "type": "string", "description": "Icon name from lucide.dev" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["match", "type"],
+        "properties": {
+          "match": { "type": "string", "description": "JavaScript regex, tested case-insensitively against the SDEF path." },
+          "type": { "type": "string" }
+        }
+      }
+    }
+  }
+}
