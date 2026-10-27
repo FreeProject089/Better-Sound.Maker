@@ -36,7 +36,7 @@ async function checkBetterInstallerUpdate(quiet) {
         return true;
     }
     showModal({
-        title: `🚀 ${t('update.title')}`,
+        title: t('update.title'), icon: 'download-cloud', tone: 'success',
         content: `
             <div style="text-align:center; padding: 10px 0;">
                 <p>${t('update.ready')}</p>
@@ -83,7 +83,7 @@ async function checkNativeUpdate(quiet) {
             return true;
         }
         showModal({
-            title: `🚀 ${t('update.title')}`,
+            title: t('update.title'), icon: 'download-cloud', tone: 'success',
             content: `
                 <div style="text-align:center; padding: 10px 0;">
                     <p>${t('update.ready')}</p>
@@ -179,7 +179,7 @@ export async function checkUpdate(quiet = true) {
 function handleUpdate(remoteVersion, quiet) {
     if (remoteVersion !== APP_VERSION) {
         showModal({
-            title: `🚀 ${t('update.title')}`,
+            title: t('update.title'), icon: 'download-cloud', tone: 'success',
             content: `
                 <div style="text-align:center; padding: 10px 0;">
                     <p>${t('update.ready')}</p>

@@ -479,17 +479,17 @@ async function exportPreset(idx) {
   }, 50);
 
   const action = await showModal({
-    title: t('presetsPage.exportConfirmTitle') || `Export Preset: ${preset.name}`,
+    title: t('presetsPage.exportConfirmTitle', { name: escapeHtml(preset.name) }),
     content: `
       <p style="margin-bottom: 12px; color: var(--text-muted); font-size: 13px;">
-        ${t('presetsPage.exportConfirmDesc') || 'Confirm the version and update number before exporting.'}
+        ${t('presetsPage.exportConfirmDesc')}
       </p>
       <div class="input-group">
         <label class="input-label">${t('project.version') || 'Version'} (e.g. 1.0.2)</label>
         <input type="text" id="export-version" class="input-field" value="${versionVal}" />
       </div>
       <div class="input-group" style="margin-top: 12px;">
-        <label class="input-label">${t('presetsPage.updateNumberLabel') || 'Update Number'} (increment for updates)</label>
+        <label class="input-label">${t('presetsPage.updateNumberLabel')}</label>
         <input type="number" id="export-updatenum" class="input-field" value="${updateNumVal}" min="1" />
       </div>
       ${customTypesHTML}

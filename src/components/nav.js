@@ -67,10 +67,15 @@ export function renderNav(container) {
         <span>DCS 2.9 & More</span>
         <div id="sidebar-version-tag" class="version-badge-clickable" style="padding: 2px 8px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-subtle); border-radius: 10px; opacity: 0.8; cursor: pointer; transition: all 0.2s ease;">v${APP_VERSION}</div>
       </div>
-      <button id="sidebar-update-btn" class="btn btn-secondary btn-sm" style="width: 100%; border-radius: 8px; font-size: 10px; padding: 6px; background: rgba(100,255,218,0.05); color: var(--accent-green); border: 1px solid rgba(100,255,218,0.2);">
-        ${getIcon('refresh-cw', 'w-3 h-3 mr-2')}
-        ${t('update.checkButton')}
-      </button>
+      <div class="sidebar-footer-actions">
+        <button id="sidebar-update-btn" class="btn btn-secondary btn-sm sidebar-update-btn">
+          ${getIcon('refresh-cw', 'w-3.5 h-3.5')}
+          ${t('update.checkButton')}
+        </button>
+        <button id="sidebar-crash-btn" class="btn btn-secondary btn-sm btn-icon" title="${t('crash.title')} (Ctrl+Shift+L)" aria-label="${t('crash.title')}">
+          ${getIcon('bug', 'w-3.5 h-3.5')}
+        </button>
+      </div>
     </div>
   `;
 
@@ -102,6 +107,11 @@ export function renderNav(container) {
       });
     });
   }
+
+  container.querySelector('#sidebar-crash-btn')?.addEventListener('click', async () => {
+    const { openCrashLogDialog } = await import('./crash-dialog.js');
+    openCrashLogDialog();
+  });
 
   const updateBtn = container.querySelector('#sidebar-update-btn');
   if (updateBtn) {

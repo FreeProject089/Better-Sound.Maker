@@ -23,7 +23,8 @@
         "notes": "Notes",
         "pageNotFound": "Page not found",
         "close": "Close",
-        "ready": "Ready !"
+        "ready": "Ready !",
+        "loading": "Loading Better Sound.Maker..."
     },
     "nav": {
         "library": "Assets Library",
@@ -94,7 +95,10 @@
             "content": "Are you sure you want to delete this preset?"
         },
         "communityBtn": "Community Presets",
-        "communityModalTitle": "Community Presets"
+        "communityModalTitle": "Community Presets",
+        "exportConfirmTitle": "Export preset: {name}",
+        "exportConfirmDesc": "Confirm the version and update number before exporting.",
+        "updateNumberLabel": "Update number (increase it for every update)"
     },
     "customTypesPage": {
         "title": "Sound Type Manager",
@@ -831,5 +835,25 @@
         "manualDesktop": "Download the new installer from the releases page.",
         "manualWeb": "The online version will refresh with new features.",
         "checkButton": "Check for updates"
+    },
+    "crash": {
+        "title": "Generate a crash log",
+        "subtitle": "One file with everything needed to debug a problem",
+        "descDesktop": "Better Sound.Maker writes a report with the app and system details, your settings, recent errors with their stacks, earlier Rust crashes and the last console lines. It is saved in the app's logs folder.",
+        "descWeb": "Better Sound.Maker builds a report with the app and browser details, your settings, recent errors with their stacks and the last console lines, and downloads it as a .log file.",
+        "noteLabel": "What were you doing? (optional)",
+        "notePlaceholder": "e.g. I clicked Build with 40 sounds selected and the app froze",
+        "privacy": "No secret is written: tokens are masked, storage is listed by name and size only, and your user folder is shortened to ~.",
+        "generate": "Generate crash log",
+        "copy": "Copy",
+        "copied": "Crash log copied to the clipboard",
+        "copyFailed": "Could not copy to the clipboard",
+        "openFolder": "Open logs folder",
+        "savedTo": "Crash log saved: {path}",
+        "downloaded": "Crash log downloaded",
+        "autoSaved": "An error occurred. A crash log was saved automatically.",
+        "errorOccurred": "An error occurred. You can generate a crash log to report it.",
+        "settingsTitle": "Diagnostics",
+        "settingsDesc": "Something went wrong? Generate a crash log and attach it to your bug report. Errors are also saved automatically in the desktop app."
     }
 }

@@ -4,7 +4,11 @@
  */
 
 import './platform/native.js';
+import { installCrashLog, breadcrumb } from './utils/crash-log.js';
+
+installCrashLog();
 import './style.css';
+import './styles/shell.css';
 import rawCfg from './Load.cfg?raw';
 import { renderNav } from './components/nav.js';
 import { renderLibrary } from './pages/library.js';
@@ -202,6 +206,15 @@ async function showAllReleaseNotes() {
 }
 
 // Initialize app
+// Ctrl+Shift+L anywhere: generate a crash log
+document.addEventListener('keydown', async (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        const { openCrashLogDialog } = await import('./components/crash-dialog.js');
+        openCrashLogDialog();
+    }
+});
+
 async function init() {
     // Parse Load.cfg immediately
     const cfg = {};
@@ -430,6 +443,8 @@ async function renderCurrentPage() {
     const state = getState();
     const page = state.currentPage || 'library';
     const container = document.getElementById('page-container');
+    window.__bsmCurrentPage = page;
+    breadcrumb(`page: ${page}`);
 
     if (!container) return;
 

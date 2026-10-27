@@ -260,6 +260,148 @@ fn open_path(app: AppHandle, path: String) -> CmdResult<()> {
     app.opener().open_path(path, None::<&str>).map_err(err)
 }
 
+/* ── Diagnostics: crash logs ─────────────────────────────────────── */
+
+/// Where crash logs and panic reports go: the OS app-log folder
+/// (%LOCALAPPDATA%\com.bettersoundmaker.app\logs on Windows).
+fn logs_dir(app: &AppHandle) -> CmdResult<PathBuf> {
+    let dir = app.path().app_log_dir().map_err(err)?;
+    fs::create_dir_all(&dir).map_err(err)?;
+    Ok(dir)
+}
+
+fn timestamp() -> String {
+    let secs = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    // UTC yyyymmdd-hhmmss without a date crate (civil-from-days, Howard Hinnant)
+    let (days, rem) = (secs / 86_400, secs % 86_400);
+    let z = days as i64 + 719_468;
+    let era = z.div_euclid(146_097);
+    let doe = z.rem_euclid(146_097);
+    let yoe = (doe - doe / 1460 + doe / 36_524 - doe / 146_096) / 365;
+    let doy = doe - (365 * yoe + yoe / 4 - yoe / 100);
+    let mp = (5 * doy + 2) / 153;
+    let d = doy - (153 * mp + 2) / 5 + 1;
+    let m = if mp < 10 { mp + 3 } else { mp - 9 };
+    let y = yoe + era * 400 + i64::from(m <= 2);
+    format!("{y:04}{m:02}{d:02}-{:02}{:02}{:02}", rem / 3600, rem % 3600 / 60, rem % 60)
+}
+
+/// Write a Rust panic (message, location, backtrace) next to the crash logs
+/// before the process dies, so the next start can include it in a report.
+fn install_panic_hook(dir: PathBuf) {
+    let default = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        let report = format!(
+            "Better Sound.Maker {} — Rust panic\nTime (UTC): {}\nOS: {} {}\n\n{info}\n\nBacktrace:\n{}\n",
+            env!("CARGO_PKG_VERSION"),
+            timestamp(),
+            std::env::consts::OS,
+            std::env::consts::ARCH,
+            std::backtrace::Backtrace::force_capture(),
+        );
+        let _ = fs::create_dir_all(&dir);
+        let _ = fs::write(dir.join(format!("panic-{}.log", timestamp())), report);
+        default(info);
+    }));
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AppInfo {
+    version: &'static str,
+    tauri_version: &'static str,
+    os: &'static str,
+    os_family: &'static str,
+    arch: &'static str,
+    exe_path: String,
+    install_kind: &'static str,
+    logs_dir: String,
+    data_dir: String,
+    debug_build: bool,
+}
+
+#[tauri::command]
+fn app_info(app: AppHandle) -> AppInfo {
+    let path_str = |p: Result<PathBuf, tauri::Error>| {
+        p.map(|p| p.to_string_lossy().replace('\\', "/")).unwrap_or_default()
+    };
+    AppInfo {
+        version: env!("CARGO_PKG_VERSION"),
+        tauri_version: tauri::VERSION,
+        os: std::env::consts::OS,
+        os_family: std::env::consts::FAMILY,
+        arch: std::env::consts::ARCH,
+        exe_path: std::env::current_exe()
+            .map(|p| p.to_string_lossy().replace('\\', "/"))
+            .unwrap_or_default(),
+        install_kind: if better_installer_exe().is_some() {
+            "BetterInstaller"
+        } else if cfg!(debug_assertions) {
+            "development"
+        } else {
+            "NSIS/MSI or portable"
+        },
+        logs_dir: path_str(app.path().app_log_dir()),
+        data_dir: path_str(app.path().app_data_dir()),
+        debug_build: cfg!(debug_assertions),
+    }
+}
+
+/// Save a crash report written by the frontend; returns its full path.
+#[tauri::command]
+fn write_crash_log(app: AppHandle, content: String) -> CmdResult<String> {
+    let path = logs_dir(&app)?.join(format!("crash-{}.log", timestamp()));
+    fs::write(&path, content).map_err(err)?;
+    prune_logs(&app, 30);
+    Ok(path.to_string_lossy().replace('\\', "/"))
+}
+
+/// Panic reports left by earlier runs, newest first (name + content).
+#[tauri::command]
+fn read_panic_logs(app: AppHandle) -> Vec<(String, String)> {
+    let Ok(dir) = logs_dir(&app) else { return Vec::new() };
+    let mut logs: Vec<_> = fs::read_dir(dir)
+        .map(|it| it.filter_map(|e| e.ok()).map(|e| e.path()).collect())
+        .unwrap_or_else(|_| Vec::new());
+    logs.retain(|p| {
+        p.file_name()
+            .and_then(|n| n.to_str())
+            .is_some_and(|n| n.starts_with("panic-") && n.ends_with(".log"))
+    });
+    logs.sort();
+    logs.reverse();
+    logs.into_iter()
+        .take(3)
+        .filter_map(|p| {
+            let name = p.file_name()?.to_string_lossy().into_owned();
+            Some((name, fs::read_to_string(&p).ok()?))
+        })
+        .collect()
+}
+
+#[tauri::command]
+fn open_logs_dir(app: AppHandle) -> CmdResult<()> {
+    let dir = logs_dir(&app)?;
+    app.opener().open_path(dir.to_string_lossy(), None::<&str>).map_err(err)
+}
+
+/// Keep only the newest `keep` crash/panic logs.
+fn prune_logs(app: &AppHandle, keep: usize) {
+    let Ok(dir) = logs_dir(app) else { return };
+    let mut logs: Vec<PathBuf> = fs::read_dir(dir)
+        .map(|it| it.filter_map(|e| e.ok()).map(|e| e.path()).collect())
+        .unwrap_or_default();
+    logs.retain(|p| p.extension().is_some_and(|e| e == "log"));
+    logs.sort_by_key(|p| p.file_name().map(|n| n.to_owned()));
+    let excess = logs.len().saturating_sub(keep);
+    for p in logs.into_iter().take(excess) {
+        let _ = fs::remove_file(p);
+    }
+}
+
 /* ── BetterInstaller updater ─────────────────────────────────────── */
 
 const APP_ID: &str = "com.bettersoundmaker.app";
@@ -329,6 +471,12 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .setup(|app| {
+            if let Ok(dir) = app.path().app_log_dir() {
+                install_panic_hook(dir);
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             select_directory,
             write_file,
@@ -344,6 +492,10 @@ pub fn run() {
             open_path,
             bi_check_update,
             encode_ogg,
+            app_info,
+            write_crash_log,
+            read_panic_logs,
+            open_logs_dir,
             bi_apply_update,
         ])
         .run(tauri::generate_context!())
@@ -367,6 +519,14 @@ mod tests {
         assert_eq!(&ogg[..4], b"OggS");
         assert!(ogg.windows(6).any(|w| w == b"vorbis"));
         assert!(ogg.len() < tone.len() * 2 * 2, "should be smaller than 16-bit PCM");
+    }
+
+    #[test]
+    fn timestamp_is_sortable_utc() {
+        let ts = timestamp();
+        assert_eq!(ts.len(), 15);
+        assert!(ts.starts_with("20"));
+        assert_eq!(&ts[8..9], "-");
     }
 
     #[test]

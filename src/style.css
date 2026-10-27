@@ -300,9 +300,8 @@ body {
 }
 
 .lucide-icon {
-  width: 18px;
-  height: 18px;
-  stroke-width: 2px;
+  flex-shrink: 0;
+  vertical-align: -0.15em;
 }
 
 .nav-badge {
@@ -1007,38 +1006,7 @@ input[type="checkbox"]:hover {
   }
 }
 
-/* --- Modal --- */
-#modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
-  z-index: 9000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#modal-overlay.hidden {
-  display: none;
-}
-
-.modal {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xl);
-  padding: 28px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: var(--shadow-lg);
-  animation: modalIn 0.3s ease;
-}
-
-.modal-lg {
-  max-width: 880px;
-}
+/* --- Modal: see src/styles/shell.css --- */
 
 .release-notes-item {
   display: flex !important;
@@ -1125,50 +1093,6 @@ input[type="checkbox"]:hover {
   flex: 1;
   height: 1px;
   background: linear-gradient(90deg, var(--border-subtle), transparent);
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.modal-title {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 4px;
-}
-
-.modal-close:hover {
-  color: var(--text-primary);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 24px;
 }
 
 /* --- Progress Bar --- */
@@ -3317,133 +3241,6 @@ body.onboarding-active #sidebar {
   gap: 16px;
   pointer-events: auto;
   transition: all 0.3s ease;
-}
-
-/* --- Modal System --- */
-#modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 20000;
-  padding: 20px;
-  transition: all 0.3s ease;
-}
-
-#modal-overlay.hidden {
-  opacity: 0;
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.modal-content {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 600px;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-lg);
-  animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modalPop {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(30px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.modal-header {
-  padding: 18px 24px;
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.modal-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 28px;
-  cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
-  line-height: 1;
-}
-
-.modal-close:hover {
-  color: var(--text-primary);
-  transform: rotate(90deg);
-}
-
-.modal-body {
-  padding: 24px;
-  overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-.modal-body h1,
-.modal-body h2,
-.modal-body h3 {
-  color: var(--text-primary);
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-
-.modal-body h1:first-child,
-.modal-body h2:first-child,
-.modal-body h3:first-child {
-  margin-top: 0;
-}
-
-.modal-body ul,
-.modal-body ol {
-  margin-bottom: 16px;
-  padding-left: 20px;
-}
-
-.modal-body li {
-  margin-bottom: 8px;
-}
-
-.modal-body code {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
-
-.modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  background: rgba(0, 0, 0, 0.15);
 }
 
 .color-swatch-picker {

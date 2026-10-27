@@ -37,6 +37,10 @@ if (isTauri) {
             invoke('encode_ogg', new Uint8Array(planar.buffer, planar.byteOffset, planar.byteLength), {
                 headers: { 'x-channels': String(channels), 'x-rate': String(rate), 'x-quality': String(quality) },
             }),
+        appInfo: () => invoke('app_info'),
+        writeCrashLog: (content) => invoke('write_crash_log', { content }),
+        readPanicLogs: () => invoke('read_panic_logs'),
+        openLogsDir: () => invoke('open_logs_dir'),
         biCheckUpdate: () => invoke('bi_check_update'),
         biApplyUpdate: () => invoke('bi_apply_update'),
         openUrl: (url) => tauriOpenUrl(url),

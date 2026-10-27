@@ -23,7 +23,8 @@
         "notes": "Notes",
         "pageNotFound": "Page non trouvée",
         "close": "Fermer",
-        "ready": "Prêt !"
+        "ready": "Prêt !",
+        "loading": "Chargement de Better Sound.Maker..."
     },
     "nav": {
         "projects": "Projets",
@@ -94,7 +95,10 @@
             "content": "Êtes-vous sûr de vouloir supprimer ce préréglage ?"
         },
         "communityBtn": "Presets Communautaires",
-        "communityModalTitle": "Presets Communautaires"
+        "communityModalTitle": "Presets Communautaires",
+        "exportConfirmTitle": "Exporter le preset : {name}",
+        "exportConfirmDesc": "Vérifiez la version et le numéro de mise à jour avant d'exporter.",
+        "updateNumberLabel": "Numéro de mise à jour (à augmenter à chaque mise à jour)"
     },
     "customTypesPage": {
         "title": "Gestionnaire des Types de Sons",
@@ -816,5 +820,25 @@
         "manualDesktop": "Téléchargez le nouvel installeur sur la page des versions.",
         "manualWeb": "La version en ligne va se recharger avec les nouveautés.",
         "checkButton": "Vérifier les mises à jour"
+    },
+    "crash": {
+        "title": "Générer un crash log",
+        "subtitle": "Un seul fichier avec tout ce qu'il faut pour déboguer un problème",
+        "descDesktop": "Better Sound.Maker écrit un rapport avec les infos de l'application et du système, vos paramètres, les erreurs récentes avec leur pile d'appels, les plantages Rust précédents et les dernières lignes de la console. Il est enregistré dans le dossier de logs de l'application.",
+        "descWeb": "Better Sound.Maker prépare un rapport avec les infos de l'application et du navigateur, vos paramètres, les erreurs récentes avec leur pile d'appels et les dernières lignes de la console, puis le télécharge en fichier .log.",
+        "noteLabel": "Que faisiez-vous ? (facultatif)",
+        "notePlaceholder": "ex : j'ai cliqué sur Construire avec 40 sons sélectionnés et l'app a figé",
+        "privacy": "Aucun secret n'est écrit : les jetons sont masqués, le stockage est listé par nom et taille seulement, et votre dossier utilisateur est raccourci en ~.",
+        "generate": "Générer le crash log",
+        "copy": "Copier",
+        "copied": "Crash log copié dans le presse-papiers",
+        "copyFailed": "Impossible de copier dans le presse-papiers",
+        "openFolder": "Ouvrir le dossier des logs",
+        "savedTo": "Crash log enregistré : {path}",
+        "downloaded": "Crash log téléchargé",
+        "autoSaved": "Une erreur est survenue. Un crash log a été enregistré automatiquement.",
+        "errorOccurred": "Une erreur est survenue. Vous pouvez générer un crash log pour la signaler.",
+        "settingsTitle": "Diagnostic",
+        "settingsDesc": "Un problème ? Générez un crash log et joignez-le à votre rapport de bug. Dans l'application de bureau, les erreurs sont aussi enregistrées automatiquement."
     }
 }

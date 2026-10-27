@@ -83,6 +83,19 @@ export function renderSettings(container) {
       </div>
     </div>
 
+    <div class="card" style="margin-bottom: 20px;">
+      <h2 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+        ${getIcon('bug', 'w-4 h-4 mr-2')}
+        ${t('crash.settingsTitle')}
+      </h2>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">${t('crash.settingsDesc')}</p>
+      <div class="flex-gap">
+        <button class="btn btn-secondary" id="settings-crash-log">${getIcon('file-down', 'w-4 h-4')} ${t('crash.generate')}</button>
+        ${window.nativeAPI ? `<button class="btn btn-ghost" id="settings-logs-folder">${getIcon('folder-open', 'w-4 h-4')} ${t('crash.openFolder')}</button>` : ''}
+        <span style="font-size: 11px; color: var(--text-muted); margin-left: auto;"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd></span>
+      </div>
+    </div>
+
     <div class="flex-gap" style="margin-top: 20px;">
       <button class="btn btn-primary" id="save-settings-btn" style="display: flex; align-items: center; gap: 8px;">
         ${getIcon('save', 'w-4 h-4')} <span>${t('common.save') || 'Save'}</span>
@@ -123,6 +136,12 @@ export function renderSettings(container) {
       showToast(`Catalog unreachable (using ${res.source} copy): ${res.errors[0] || ''}`, 'error');
     }
   });
+
+  document.getElementById('settings-crash-log').addEventListener('click', async () => {
+    const { openCrashLogDialog } = await import('../components/crash-dialog.js');
+    openCrashLogDialog();
+  });
+  document.getElementById('settings-logs-folder')?.addEventListener('click', () => window.nativeAPI.openLogsDir());
 
   document.getElementById('save-settings-btn').addEventListener('click', () => {
     const catalogUrl = readCatalogUrl();
