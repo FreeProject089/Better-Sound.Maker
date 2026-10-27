@@ -376,3 +376,20 @@ kbd {
 /* Native checkboxes / radios / ranges in the accent colour */
 input[type="checkbox"], input[type="radio"] { accent-color: var(--accent-blue); width: 16px; height: 16px; cursor: pointer; }
 input[type="range"] { accent-color: var(--accent-blue); }
+
+/* ── Command palette (Ctrl+K) ── */
+#cmdk { position: fixed; inset: 0; z-index: 26000; display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh; background: rgb(0 0 0 / 0.5); backdrop-filter: blur(4px); animation: modal-fade 0.12s ease-out; }
+.cmdk-box { width: min(620px, calc(100vw - 32px)); max-height: 64vh; display: flex; flex-direction: column; background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: 16px; box-shadow: var(--shadow-modal); overflow: hidden; animation: modal-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.cmdk-input { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); }
+.cmdk-input input { flex: 1; border: 0; outline: 0; background: transparent; color: var(--text-primary); font: 15px var(--font-sans); }
+.cmdk-list { overflow: auto; padding: 6px; }
+.cmdk-group { padding: 10px 10px 4px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); }
+.cmdk-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 9px; background: transparent; color: var(--text-secondary); text-align: left; cursor: pointer; }
+.cmdk-item.on { background: var(--accent-dim); color: var(--text-primary); }
+.cmdk-icon { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--surface-3); }
+.cmdk-item.on .cmdk-icon { background: var(--accent-blue); color: #fff; }
+.cmdk-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cmdk-text b { font-size: 13.5px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmdk-text small { font-size: 11.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmdk-empty { padding: 28px; text-align: center; color: var(--text-muted); }
+.cmdk-foot { padding: 8px 16px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--text-muted); }

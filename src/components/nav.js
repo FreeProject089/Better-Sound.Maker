@@ -8,7 +8,7 @@ import { getAvailableLanguages, getCurrentLanguage, changeLanguage, t } from '..
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { APP_VERSION } from '../utils/version.js';
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { id: 'library', icon: 'library', label: 'nav.library', section: 'nav.section.workspace' },
   { id: 'project', icon: 'folder', label: 'nav.projects', section: 'nav.section.workspace', badge: true },
   { id: 'sdef-editor', icon: 'sliders', label: 'nav.sdef', section: 'nav.section.workspace' },

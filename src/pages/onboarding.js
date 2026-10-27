@@ -1,370 +1,339 @@
 /**
- * onboarding.js — Duolingo-style first-run tutorial
- * Better Sound.Maker
+ * onboarding.js — Tasky's guided tour
  *
- * Shows a mascot character with speech bubble that walks the user
- * through each page of the app. Supports skip and "don't show again".
+ * A spotlight tour: each step opens the page it talks about, cuts a hole in
+ * the dim around the element it points at (sidebar item or a part of the
+ * page) and Tasky explains it in a bubble placed next to it.
+ *
+ * Chapters: welcome + language → the 4-step workflow (Library, Project,
+ * SDEF editor, Build) → the extras → a "you're ready" checklist.
+ * Keys: → / Enter next, ← back, Esc closes. Progress is remembered, so a tour
+ * closed half-way resumes there from Help → Tutorial.
+ *
+ * Exports kept for main.js / nav.js: initOnboarding, startOnboarding, restartTutorial.
  */
 
-import { changeLanguage, getAvailableLanguages, t } from '../utils/i18n.js';
+import { changeLanguage, getAvailableLanguages, getCurrentLanguage } from '../utils/i18n.js';
+import { getState, navigate } from '../state/store.js';
+import { getIcon } from '../utils/icons.js';
+import './onboarding.css';
 
-const ONBOARDING_KEY = 'bsm-onboarding-done';
+const DONE_KEY = 'bsm-onboarding-done';
+const STEP_KEY = 'bsm-onboarding-step';
 
-// Image assets (assumed to be in public or root served by Vite)
-const IMG_TASKY = './Tasky.webp';
-const IMG_TASKY_EYES = './Tasky_yeux1.webp';
-const IMG_TASKY_HAPPY = './Tasky_Happy.webp';
+const TASKY = { idle: './Tasky.webp', blink: './Tasky_yeux1.webp', happy: './Tasky_Happy.webp' };
+
+/* Tour text lives here (EN/FR) so a step's words sit next to its target. */
+const TEXT = {
+    en: {
+        next: 'Next', back: 'Back', skip: 'Skip tour', finish: "Let's go!", start: 'Start the tour',
+        of: '{n} of {total}', keys: '← → to move · Esc to close',
+        chapters: { welcome: 'Welcome', workflow: 'The workflow', extras: 'Going further', done: 'Ready' },
+    },
+    fr: {
+        next: 'Suivant', back: 'Retour', skip: 'Passer le tuto', finish: "C'est parti !", start: 'Commencer la visite',
+        of: '{n} sur {total}', keys: '← → pour naviguer · Échap pour fermer',
+        chapters: { welcome: 'Bienvenue', workflow: 'Le parcours', extras: 'Aller plus loin', done: 'Prêt' },
+    },
+};
 
 const STEPS = [
     {
-        page: 'language-select', // Special step
-        title: '🌍 Welcome / Bienvenue',
-        text: 'Please select your language to get started.<br>Veuillez choisir votre langue pour commencer.',
-        // textKey: 'tutorial.language', // Special handling in render causing formatted HTML, keep raw for now or handle in render
-        image: IMG_TASKY
+        id: 'language', chapter: 'welcome', mood: 'happy', center: true,
+        title: { en: 'Hi, I\'m Tasky!', fr: 'Salut, moi c\'est Tasky !' },
+        body: {
+            en: 'I\'ll show you around <b>Better Sound.Maker</b> in under two minutes. First, pick your language:',
+            fr: 'Je vais vous faire visiter <b>Better Sound.Maker</b> en moins de deux minutes. D\'abord, choisissez votre langue :',
+        },
+        language: true,
     },
     {
-        page: 'library',
-        title: '📁 Assets Library',
-        titleKey: 'nav.library',
-        text: 'Browse DCS sound assets using the folder tree. Check assets you want to replace. Use the <strong>Reload</strong> button (top-right) to rescan your DCS installation and pick up new modules or mods. The first time, you will be asked to enter your DCS install path.',
-        textKey: 'tutorial.library',
-        image: IMG_TASKY_EYES
+        id: 'idea', chapter: 'welcome', mood: 'idle', center: true,
+        title: { en: 'How a DCS sound mod works', fr: 'Comment marche un mod son DCS' },
+        body: {
+            en: 'DCS never plays an audio file directly: it plays an <b>SDEF</b>, a small file that says which audio to use and how (volume, distance, loop…). A sound mod ships SDEFs with the <b>same names</b> as the game\'s, plus your audio. BSM builds all of that for you.',
+            fr: 'DCS ne joue jamais un fichier audio directement : il joue un <b>SDEF</b>, un petit fichier qui dit quel audio utiliser et comment (volume, distance, boucle…). Un mod son contient des SDEF aux <b>mêmes noms</b> que ceux du jeu, plus votre audio. BSM fabrique tout ça pour vous.',
+        },
+        flow: true,
     },
     {
-        page: 'project',
-        title: '📂 Your Project',
-        titleKey: 'nav.projects',
-        text: 'Here you configure your mod details — name, aircraft, version. All selected assets appear here so you can review them.',
-        textKey: 'tutorial.project',
-        image: IMG_TASKY
+        id: 'library', chapter: 'workflow', page: 'library', target: '[data-page="library"]', mood: 'blink',
+        title: { en: '1 · Find the sounds', fr: '1 · Trouver les sons' },
+        body: {
+            en: 'The <b>Assets Library</b> lists every DCS sound. Browse the folder tree or search, then tick the sounds you want to replace. The first time, BSM asks for your DCS folder to scan it.',
+            fr: 'La <b>Bibliothèque</b> liste tous les sons de DCS. Parcourez l\'arborescence ou cherchez, puis cochez les sons à remplacer. La première fois, BSM demande votre dossier DCS pour l\'analyser.',
+        },
+        tip: { en: 'Tip: Reload Library rescans after a DCS update.', fr: 'Astuce : « Recharger la bibliothèque » relance l\'analyse après une mise à jour de DCS.' },
     },
     {
-        page: 'sdef-editor',
-        title: '🎛️ SDEF Editor',
-        titleKey: 'nav.sdef',
-        text: 'Each sound asset needs an .sdef file. The visual editor lets you tweak volume, looping, distance, pitch and more — no code needed!',
-        textKey: 'tutorial.sdef',
-        image: IMG_TASKY_EYES
+        id: 'project', chapter: 'workflow', page: 'project', target: '[data-page="project"]', mood: 'idle',
+        title: { en: '2 · Add your audio', fr: '2 · Ajouter votre audio' },
+        body: {
+            en: 'In <b>Projects</b>, every ticked sound gets a drop zone. Drag a <code>.wav</code> or <code>.ogg</code> onto it and press Play to listen. Mono is best for sounds placed in 3D.',
+            fr: 'Dans <b>Projets</b>, chaque son coché a sa zone de dépôt. Glissez-y un <code>.wav</code> ou un <code>.ogg</code> et appuyez sur Lecture pour écouter. Le mono est préférable pour les sons placés en 3D.',
+        },
     },
     {
-        page: 'theme',
-        title: '🎨 Theme',
-        titleKey: 'nav.theme',
-        text: 'Customise the look of the app. Change the background image and accent colors to make it feel like yours.',
-        textKey: 'tutorial.theme',
-        image: IMG_TASKY
+        id: 'sdef', chapter: 'workflow', page: 'sdef-editor', target: '[data-page="sdef-editor"]', mood: 'blink',
+        title: { en: '3 · Tune it (optional)', fr: '3 · L\'ajuster (facultatif)' },
+        body: {
+            en: 'The <b>SDEF editor</b> changes volume, pitch, distance, cone and loop without code. A live checker flags mistakes, and a curve shows how loud the sound is at each distance.',
+            fr: 'L\'<b>éditeur SDEF</b> règle volume, hauteur, distance, cône et boucle sans code. Un vérificateur signale les erreurs en direct, et une courbe montre le volume selon la distance.',
+        },
+        tip: { en: 'Templates let you apply the same settings to many sounds.', fr: 'Les templates appliquent les mêmes réglages à plusieurs sons.' },
     },
     {
-        page: 'presets',
-        title: '💾 Presets',
-        titleKey: 'nav.presets',
-        text: 'Save and load your asset selections as presets. Great for reusing selections of sounds across different mods.',
-        textKey: 'tutorial.presets',
-        image: IMG_TASKY
+        id: 'build', chapter: 'workflow', page: 'build', target: '[data-page="build"]', mood: 'happy',
+        title: { en: '4 · Build the mod', fr: '4 · Construire le mod' },
+        body: {
+            en: 'The <b>Mod Generator</b> writes the finished mod folder: <code>entry.lua</code>, SDEFs and audio (kept, WAV or real OGG). Drop it in <code>Saved Games\\DCS\\Mods\\resource</code> and fly.',
+            fr: 'Le <b>Générateur de mod</b> écrit le dossier final : <code>entry.lua</code>, SDEF et audio (tel quel, WAV ou vrai OGG). Déposez-le dans <code>Saved Games\\DCS\\Mods\\resource</code> et volez.',
+        },
     },
     {
-        page: 'custom-types',
-        title: '🏷️ Sound Type Manager',
-        titleKey: 'nav.soundTypes',
-        text: 'Manage how sounds are categorized with Custom Sound Types. You can set Regex rules to auto-assign custom icons based on the sound\'s file path!',
-        textKey: 'tutorial.soundTypes',
-        image: IMG_TASKY_EYES
+        id: 'presets', chapter: 'extras', page: 'presets', target: '[data-page="presets"]', mood: 'idle',
+        title: { en: 'Presets & community', fr: 'Presets et communauté' },
+        body: {
+            en: 'Save a selection of sounds as a <b>preset</b>, share it, or install ready-made ones from the <b>community catalog</b>. You\'re told when one you installed gets an update.',
+            fr: 'Enregistrez une sélection de sons en <b>preset</b>, partagez-la, ou installez-en depuis le <b>catalogue communautaire</b>. Vous êtes prévenu quand un preset installé est mis à jour.',
+        },
     },
     {
-        page: 'collaboration',
-        title: '🤝 Collaboration',
-        titleKey: 'nav.collab',
-        text: 'Connect to a GitHub repo to sync your project with teammates. Push your mod build, leave notes, and restore earlier versions.',
-        textKey: 'tutorial.collab',
-        image: IMG_TASKY
+        id: 'types', chapter: 'extras', page: 'custom-types', target: '[data-page="custom-types"]', mood: 'blink',
+        title: { en: 'Sound types', fr: 'Types de sons' },
+        body: {
+            en: 'BSM labels sounds (engine, switch, weapon…) from their path. Add your own types and rules here; each type also brings good default SDEF values.',
+            fr: 'BSM étiquette les sons (moteur, interrupteur, arme…) d\'après leur chemin. Ajoutez vos propres types et règles ici ; chaque type apporte aussi de bonnes valeurs SDEF par défaut.',
+        },
     },
     {
-        page: 'build',
-        title: '🚀 Build Mod',
-        titleKey: 'nav.builder',
-        text: 'When you\'re ready, hit Build to generate the complete mod folder — entry.lua, .sdef files, and your audio — ready to drop into DCS Mods.',
-        textKey: 'tutorial.build',
-        image: IMG_TASKY_EYES
+        id: 'collab', chapter: 'extras', page: 'collaboration', target: '[data-page="collaboration"]', mood: 'idle',
+        title: { en: 'Work as a team', fr: 'Travailler à plusieurs' },
+        body: {
+            en: '<b>Collaboration</b> syncs a project through a GitHub repository: push, pull and restore earlier versions.',
+            fr: '<b>Collaboration</b> synchronise un projet via un dépôt GitHub : envoyer, récupérer et restaurer des versions précédentes.',
+        },
     },
     {
-        page: 'settings',
-        title: '⚙️ Settings',
-        titleKey: 'nav.settings',
-        text: 'Set your DCS install path and Saved Games folder here. The app uses these to auto-scan your modules. You can also enable or disable features via the <code>Load.cfg</code> file — for example, <code>TypeDetection</code> toggles smart sound-type labels in the library.',
-        textKey: 'tutorial.settings',
-        image: IMG_TASKY
+        id: 'help', chapter: 'extras', page: 'settings', target: '#sidebar-crash-btn', mood: 'blink',
+        title: { en: 'If something goes wrong', fr: 'Si quelque chose ne va pas' },
+        body: {
+            en: 'This bug button (or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>) makes a <b>crash log</b> to attach to a bug report. The <b>Documentation</b> and <b>F.A.Q</b> are in the Help section.',
+            fr: 'Ce bouton bug (ou <kbd>Ctrl</kbd>+<kbd>Maj</kbd>+<kbd>L</kbd>) crée un <b>crash log</b> à joindre à un rapport de bug. La <b>Documentation</b> et la <b>F.A.Q</b> sont dans la section Aide.',
+        },
     },
     {
-        page: 'docs',
-        title: '📖 Documentation',
-        titleKey: 'nav.docs',
-        text: 'Everything you need to know about DCS sound modding: file formats, parameters, tips and examples.',
-        textKey: 'tutorial.docs',
-        image: IMG_TASKY
-    },
-    {
-        page: 'docs', // Will navigate to docs page (we can leave it so it stays there)
-        title: '📋 sdef_and_wave_list.txt',
-        titleKey: 'tutorial.sdeflistTitle',
-        text: 'The full index of sound events is located in your DCS folder at <code>\\DCS World\\Doc\\Sounds\\sdef_and_wave_list.txt</code>. Open the "Sdef List" tab to learn more.',
-        textKey: 'tutorial.sdeflist',
-        image: IMG_TASKY_EYES
-    },
-    {
-        page: 'credits',
-        title: '⭐ Credits',
-        text: 'Info about the app, the developer, and useful community links. You\'re all set — happy modding! 🎧',
-        textKey: 'tutorial.credits',
-        image: IMG_TASKY_HAPPY,
-        isLast: true,
+        id: 'done', chapter: 'done', mood: 'happy', center: true, page: 'library',
+        title: { en: 'You\'re ready!', fr: 'Vous êtes prêt !' },
+        body: {
+            en: 'Your first mod in four moves:',
+            fr: 'Votre premier mod en quatre étapes :',
+        },
+        checklist: {
+            en: ['Set your DCS folder (Library or Settings)', 'Tick a few sounds', 'Drop your audio in Projects', 'Build and copy to Mods\\resource'],
+            fr: ['Indiquer votre dossier DCS (Bibliothèque ou Paramètres)', 'Cocher quelques sons', 'Déposer votre audio dans Projets', 'Construire et copier dans Mods\\resource'],
+        },
+        tip: { en: 'Replay this tour any time from Help → Tutorial.', fr: 'Relancez cette visite quand vous voulez depuis Aide → Relancer Tuto.' },
     },
 ];
 
-let currentStep = 0;
-let overlayEl = null;
-let spotlightEl = null;
+let root = null;
+let index = 0;
+let blinkTimer = null;
 
-export function startOnboarding() {
-    localStorage.removeItem(ONBOARDING_KEY);
-    if (document.getElementById('onboarding-overlay')) document.getElementById('onboarding-overlay').remove();
-    if (document.getElementById('onboarding-mascot-wrap')) document.getElementById('onboarding-mascot-wrap').remove();
-    currentStep = 0;
-    initOnboarding();
-}
+const lang = () => (getCurrentLanguage() === 'fr' ? 'fr' : 'en');
+const L = (obj) => (obj ? obj[lang()] ?? obj.en : '');
+const ui = () => TEXT[lang()];
+
+/* ── Public API ───────────────────────────────────────────────────── */
 
 export function initOnboarding() {
-    // Don't show if already dismissed
-    if (localStorage.getItem(ONBOARDING_KEY) === 'true') return;
-
-    // Create overlay
-    overlayEl = document.createElement('div');
-    overlayEl.id = 'onboarding-overlay';
-    overlayEl.innerHTML = `
-    <div class="onboarding-backdrop" id="onboarding-backdrop"></div>
-    <div class="onboarding-spotlight" id="onboarding-spotlight"></div>
-  `;
-    document.body.appendChild(overlayEl);
-
-    // Create mascot+bubble container
-    const mascotWrapEl = document.createElement('div');
-    mascotWrapEl.className = 'onboarding-mascot-wrap';
-    mascotWrapEl.id = 'onboarding-mascot-wrap';
-    mascotWrapEl.innerHTML = `
-        <div class="mascot-image-container">
-            <img id="onboarding-mascot-img" src="${IMG_TASKY}" alt="Tasky" class="onboarding-mascot-img" />
-        </div>
-        <div class="onboarding-bubble" id="onboarding-bubble">
-            <!-- Content injected via JS -->
-        </div>
-    `;
-    document.body.appendChild(mascotWrapEl);
-
-    spotlightEl = document.getElementById('onboarding-spotlight');
-
-    // Activate
-    overlayEl.classList.add('active');
-
-    showStep(0);
+    if (localStorage.getItem(DONE_KEY) === 'true') return;
+    // Let the intro finish first
+    setTimeout(() => open(Number(localStorage.getItem(STEP_KEY)) || 0), 900);
 }
 
-function showStep(idx) {
-    currentStep = idx;
-    const step = STEPS[idx];
-
-    // Special handling for language selection step
-    if (step.page === 'language-select') {
-        renderBubble(step, idx);
-        // Center spotlight or hide it
-        spotlightEl.style.opacity = '0';
-        return;
-    }
-
-    // Navigate to the highlighted page
-    import('../state/store.js').then(({ navigate }) => {
-        navigate(step.page);
-    });
-
-    // Wait a tick for nav item to render, then spotlight it
-    requestAnimationFrame(() => {
-        setTimeout(() => {
-            const navItem = document.querySelector(`.nav-item[data-page="${step.page}"]`);
-
-            // USER REQUEST: Hide backdrop on Step 1 (Library) so they can interact
-            // Step 0 = Lang, Step 1 = Library
-            // USER REQUEST: Hide backdrop on Step 1+ (Library, etc) so they can interact
-            const backdropEl = document.getElementById('onboarding-backdrop');
-            if (backdropEl) {
-                if (idx >= 1) {
-                    backdropEl.style.display = 'none'; // Allow interaction
-                    spotlightEl.style.display = 'none'; // Hide spotlight too as it might block or look weird
-                } else {
-                    backdropEl.style.display = 'block';
-                    spotlightEl.style.display = 'block';
-                }
-            }
-
-            if (navItem && spotlightEl && idx < 1) { // Only spotlight on step 0 if needed (or if we revert backdrop logic)
-                // ... unused logic for now if spotlight is hidden >= 1 ...
-            }
-
-            // Still scroll to item
-            if (navItem) {
-                navItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            renderBubble(step, idx);
-        }, 300); // Slight delay for scroll
-    });
-}
-
-function renderBubble(step, idx) {
-    const mascotWrapEl = document.getElementById('onboarding-mascot-wrap');
-    const bubbleEl = document.getElementById('onboarding-bubble');
-    const imgEl = document.getElementById('onboarding-mascot-img');
-
-    if (!mascotWrapEl || !bubbleEl) return;
-
-    // Update Image
-    if (imgEl && step.image) {
-        imgEl.src = step.image;
-        // Add animation class to pop
-        imgEl.classList.remove('pop-anim');
-        void imgEl.offsetWidth; // trigger reflow
-        imgEl.classList.add('pop-anim');
-    }
-
-    // Position
-    const isMobile = window.innerWidth <= 768;
-    const bottom = isMobile ? 80 : 32;
-    const left = isMobile ? 12 : 280;
-
-    // For language select, center it
-    if (step.page === 'language-select') {
-        mascotWrapEl.style.cssText = `
-            bottom: 50%;
-            left: 50%;
-            transform: translate(-50%, 50%);
-            z-index: 10002;
-         `;
-    } else {
-        mascotWrapEl.style.cssText = `
-            bottom: ${bottom}px;
-            left: ${left}px;
-         `;
-    }
-
-    const isLast = step.isLast || idx === STEPS.length - 1;
-
-    // Content
-    let contentHtml = '';
-
-    if (step.page === 'language-select') {
-        const languages = getAvailableLanguages();
-        const enObj = languages.find(l => l.code === 'en') || { flag: '🇺🇸', name: 'English' };
-        const frObj = languages.find(l => l.code === 'fr') || { flag: '🇫🇷', name: 'Français' };
-
-        contentHtml = `
-            <div class="onboarding-bubble-title">${step.title}</div>
-            <div class="onboarding-bubble-text">${step.text}</div>
-            <div class="onboarding-lang-buttons" style="display:flex; gap:12px; justify-content:center; margin-top:20px;">
-                <button class="btn btn-primary" id="lang-en" style="display:flex; align-items:center; gap:8px; padding:10px 20px;">
-                    ${enObj.flag} <span>${enObj.name}</span>
-                </button>
-                <button class="btn btn-primary" id="lang-fr" style="display:flex; align-items:center; gap:8px; padding:10px 20px;">
-                    ${frObj.flag} <span>${frObj.name}</span>
-                </button>
-            </div>
-         `;
-    } else {
-        const title = step.titleKey && t(step.titleKey) !== step.titleKey ? t(step.titleKey) : step.title;
-        const dotsHtml = STEPS.map((_, i) =>
-            `<div class="onboarding-dot ${i === idx ? 'active' : ''}"></div>`
-        ).join('');
-
-        contentHtml = `
-            <div class="onboarding-bubble-header">
-                <span class="onboarding-mascot-name">Tasky</span>
-                <div class="onboarding-bubble-dots">${dotsHtml}</div>
-            </div>
-            <div class="onboarding-bubble-step">Step ${idx} / ${STEPS.length - 1}</div>
-            <div class="onboarding-bubble-title">${title}</div>
-            <div class="onboarding-bubble-text" id="onboarding-text-content"></div>
-            <div class="onboarding-bubble-actions">
-                ${idx > 1 ? `<button class="onboarding-btn-prev" id="onboarding-prev" style="background:transparent; border:1px solid var(--border-default); color:var(--text-secondary); padding:6px 12px; border-radius:6px; cursor:pointer;">←</button>` : ''}
-                <button class="onboarding-btn-next" id="onboarding-next">
-                ${isLast ? "🎉 " + t('common.finish') : t('common.next') + ' →'}
-                </button>
-                <button class="onboarding-btn-skip" id="onboarding-skip">${t('tutorial.skip') || 'Skip'}</button>
-            </div>
-         `;
-    }
-
-    bubbleEl.innerHTML = contentHtml;
-
-    // Typewriter effect for text
-    const textTarget = document.getElementById('onboarding-text-content');
-    if (textTarget) {
-        const text = step.textKey && t(step.textKey) !== step.textKey ? t(step.textKey) : step.text;
-        let i = 0;
-        const speed = 10; // Fast
-        textTarget.innerHTML = '';
-
-        function type() {
-            if (i < text.length) {
-                // Handle basic HTML if present (like <br>)
-                if (text.substr(i, 4) === '<br>') {
-                    textTarget.innerHTML += '<br>';
-                    i += 4;
-                } else {
-                    textTarget.innerHTML += text.charAt(i);
-                    i++;
-                }
-                setTimeout(type, speed);
-            }
-        }
-        type();
-    }
-
-    if (step.page === 'language-select') {
-        document.getElementById('lang-en')?.addEventListener('click', () => {
-            changeLanguage('en');
-            showStep(idx + 1);
-        });
-        document.getElementById('lang-fr')?.addEventListener('click', () => {
-            changeLanguage('fr');
-            showStep(idx + 1);
-        });
-    } else {
-        document.getElementById('onboarding-next')?.addEventListener('click', () => {
-            if (isLast) {
-                closeOnboarding(true); // Mark done
-            } else {
-                showStep(idx + 1);
-            }
-        });
-
-        document.getElementById('onboarding-prev')?.addEventListener('click', () => {
-            showStep(idx - 1);
-        });
-
-        document.getElementById('onboarding-skip')?.addEventListener('click', () => {
-            closeOnboarding(true); // Mark done even if skipped!
-        });
-    }
-}
-
-function closeOnboarding(markDone) {
-    overlayEl?.remove();
-    document.getElementById('onboarding-mascot-wrap')?.remove();
-    overlayEl = null;
-
-    if (markDone) {
-        localStorage.setItem(ONBOARDING_KEY, 'true');
-    }
+export function startOnboarding() {
+    localStorage.removeItem(DONE_KEY);
+    open(0);
 }
 
 export function restartTutorial() {
-    localStorage.removeItem(ONBOARDING_KEY);
-    initOnboarding();
+    startOnboarding();
+}
+
+/* ── Tour ─────────────────────────────────────────────────────────── */
+
+function open(start) {
+    close(false);
+    index = Math.min(Math.max(start, 0), STEPS.length - 1);
+    root = document.createElement('div');
+    root.id = 'tour';
+    root.innerHTML = `
+      <div class="tour-dim"></div>
+      <div class="tour-spot"></div>
+      <div class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tour-title"></div>`;
+    document.body.appendChild(root);
+    document.body.classList.add('tour-active');
+    addEventListener('keydown', onKey, true);
+    addEventListener('resize', place);
+    show(index);
+    startBlinking();
+}
+
+function close(markDone = true) {
+    if (!root) return;
+    removeEventListener('keydown', onKey, true);
+    removeEventListener('resize', place);
+    clearInterval(blinkTimer);
+    document.body.classList.remove('tour-active');
+    root.classList.add('is-leaving');
+    const el = root;
+    root = null;
+    setTimeout(() => el.remove(), 220);
+    if (markDone) {
+        localStorage.setItem(DONE_KEY, 'true');
+        localStorage.removeItem(STEP_KEY);
+    }
+}
+
+function go(delta) {
+    const next = index + delta;
+    if (next < 0) return;
+    if (next >= STEPS.length) { close(true); return; }
+    show(next);
+}
+
+async function show(i) {
+    index = i;
+    localStorage.setItem(STEP_KEY, String(i));
+    const step = STEPS[i];
+
+    if (step.page && getState().currentPage !== step.page) {
+        navigate(step.page);
+        await new Promise(r => setTimeout(r, 260));
+    }
+    // A first-run scanner or other dialog would sit on top of the tour
+    if (!step.center) document.getElementById('modal-overlay')?.classList.add('tour-behind');
+
+    render(step);
+    requestAnimationFrame(place);
+}
+
+function render(step) {
+    const card = root.querySelector('.tour-card');
+    const total = STEPS.length;
+    const chapters = ['welcome', 'workflow', 'extras', 'done'];
+
+    card.className = `tour-card ${step.center ? 'is-center' : ''}`;
+    card.innerHTML = `
+      <div class="tour-head">
+        <div class="tour-tasky tour-tasky--${step.mood || 'idle'}">
+          <img src="${step.mood === 'happy' ? TASKY.happy : TASKY.idle}" alt="" draggable="false" />
+        </div>
+        <div class="tour-heading">
+          <div class="tour-chapter">${chapters.map(c => `<span class="${c === step.chapter ? 'on' : ''}">${ui().chapters[c]}</span>`).join('<i></i>')}</div>
+          <h3 id="tour-title">${L(step.title)}</h3>
+        </div>
+        <button type="button" class="tour-x" data-tour="skip" aria-label="${ui().skip}">${getIcon('x', 'w-4 h-4')}</button>
+      </div>
+      <div class="tour-body">
+        <p>${L(step.body)}</p>
+        ${step.language ? languagePicker() : ''}
+        ${step.flow ? flowDiagram() : ''}
+        ${step.checklist ? `<ul class="tour-check">${L(step.checklist).map(x => `<li>${getIcon('check-circle-2', 'w-4 h-4')}<span>${x}</span></li>`).join('')}</ul>` : ''}
+        ${step.tip ? `<div class="tour-tip">${getIcon('lightbulb', 'w-4 h-4')}<span>${L(step.tip)}</span></div>` : ''}
+      </div>
+      <div class="tour-foot">
+        <div class="tour-progress" aria-label="${ui().of.replace('{n}', index + 1).replace('{total}', total)}">
+          ${STEPS.map((_, k) => `<span class="${k < index ? 'past' : k === index ? 'now' : ''}"></span>`).join('')}
+        </div>
+        <div class="tour-actions">
+          ${index > 0 ? `<button type="button" class="btn btn-ghost btn-sm" data-tour="back">${getIcon('arrow-left', 'w-3.5 h-3.5')} ${ui().back}</button>` : `<button type="button" class="btn btn-ghost btn-sm" data-tour="skip">${ui().skip}</button>`}
+          <button type="button" class="btn btn-primary btn-sm" data-tour="next">${index === STEPS.length - 1 ? ui().finish : index === 0 ? ui().start : ui().next} ${getIcon(index === STEPS.length - 1 ? 'rocket' : 'arrow-right', 'w-3.5 h-3.5')}</button>
+        </div>
+      </div>
+      <div class="tour-keys">${ui().keys}</div>`;
+
+    card.querySelector('[data-tour="next"]').addEventListener('click', () => go(1));
+    card.querySelector('[data-tour="back"]')?.addEventListener('click', () => go(-1));
+    card.querySelectorAll('[data-tour="skip"]').forEach(b => b.addEventListener('click', () => close(true)));
+    card.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', async () => {
+        await changeLanguage(b.dataset.lang);
+        render(step);
+        place();
+    }));
+    card.querySelector('[data-tour="next"]').focus({ preventScroll: true });
+}
+
+function languagePicker() {
+    return `<div class="tour-langs">${getAvailableLanguages().map(l => `
+      <button type="button" class="tour-lang ${l.code === getCurrentLanguage() ? 'on' : ''}" data-lang="${l.code}">
+        <span class="tour-flag">${l.flag}</span><span>${l.name}</span>
+      </button>`).join('')}</div>`;
+}
+
+function flowDiagram() {
+    const box = (icon, label) => `<div class="tour-flow-box">${getIcon(icon, 'w-5 h-5')}<span>${label}</span></div>`;
+    const arrow = `<div class="tour-flow-arrow">${getIcon('chevron-right', 'w-4 h-4')}</div>`;
+    const fr = lang() === 'fr';
+    return `<div class="tour-flow">${[
+        box('folder-search', fr ? 'Sons DCS' : 'DCS sounds'),
+        box('file-audio', fr ? 'Votre audio' : 'Your audio'),
+        box('sliders-horizontal', 'SDEF'),
+        box('package', fr ? 'Mod prêt' : 'Ready mod'),
+    ].join(arrow)}</div>`;
+}
+
+/* ── Placement ────────────────────────────────────────────────────── */
+
+function place() {
+    if (!root) return;
+    const step = STEPS[index];
+    const spot = root.querySelector('.tour-spot');
+    const card = root.querySelector('.tour-card');
+    const target = step.target && !step.center ? document.querySelector(step.target) : null;
+
+    if (!target) {
+        spot.classList.add('is-hidden');
+        card.style.left = '';
+        card.style.top = '';
+        return;
+    }
+    target.scrollIntoView?.({ block: 'nearest' });
+    const r = target.getBoundingClientRect();
+    const pad = 6;
+    spot.classList.remove('is-hidden');
+    Object.assign(spot.style, {
+        left: `${r.left - pad}px`, top: `${r.top - pad}px`,
+        width: `${r.width + pad * 2}px`, height: `${r.height + pad * 2}px`,
+    });
+
+    // Card to the right of the target, kept on screen
+    const cw = card.offsetWidth || 420;
+    const ch = card.offsetHeight || 300;
+    let left = r.right + 22;
+    if (left + cw > innerWidth - 16) left = Math.max(16, r.left - cw - 22);
+    let top = r.top + r.height / 2 - ch / 2;
+    top = Math.min(Math.max(16, top), innerHeight - ch - 16);
+    card.style.left = `${left}px`;
+    card.style.top = `${top}px`;
+}
+
+function onKey(e) {
+    if (!root) return;
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+    else if (e.key === 'ArrowRight' || (e.key === 'Enter' && !e.target.closest?.('button'))) { e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+}
+
+// Tasky blinks now and then
+function startBlinking() {
+    clearInterval(blinkTimer);
+    blinkTimer = setInterval(() => {
+        const img = root?.querySelector('.tour-tasky:not(.tour-tasky--happy) img');
+        if (!img) return;
+        img.src = TASKY.blink;
+        setTimeout(() => { if (img.isConnected) img.src = TASKY.idle; }, 160);
+    }, 3200);
 }

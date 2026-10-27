@@ -4,6 +4,7 @@
  */
 
 import './platform/native.js';
+import './intro/intro.js';
 import { installCrashLog, breadcrumb } from './utils/crash-log.js';
 
 installCrashLog();
@@ -206,8 +207,14 @@ async function showAllReleaseNotes() {
 }
 
 // Initialize app
-// Ctrl+Shift+L anywhere: generate a crash log
+// Ctrl+K: command palette · Ctrl+Shift+L: generate a crash log
 document.addEventListener('keydown', async (e) => {
+    if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const { toggleCommandPalette } = await import('./components/command-palette.js');
+        toggleCommandPalette();
+        return;
+    }
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') {
         e.preventDefault();
         const { openCrashLogDialog } = await import('./components/crash-dialog.js');
@@ -226,23 +233,16 @@ async function init() {
     });
     window.APP_CONFIG = cfg;
 
-    // Start Loader Image swapping
-    let spinImg = document.getElementById('loader-img-spin');
-    let useYeux = false;
-    const spinInterval = setInterval(() => {
-        if (spinImg) {
-            useYeux = !useYeux;
-            spinImg.src = useYeux ? '/Tasky_yeux1.webp' : '/Tasky.webp';
-        }
-    }, 400); // Swap every 400ms
+    const versionEl = document.getElementById('bi-version');
+    if (versionEl) versionEl.textContent = `v${APP_VERSION}`;
 
     // Init i18n first
     const { initI18n, t } = await import('./utils/i18n.js');
     await initI18n();
     window.i18n_t = t;
 
-    const loaderText = document.getElementById('loader-text');
-    if (loaderText) loaderText.textContent = t('common.loading') || 'Loading Better Sound.Maker...';
+
+    window.__bsmIntro?.status(t('common.loading'));
 
     // Render sidebar
     const sidebar = document.getElementById('sidebar');
@@ -317,25 +317,9 @@ async function init() {
     // Initial render
     await renderCurrentPage();
 
-    // Loader Finish Sequence
-    clearInterval(spinInterval);
-    if (spinImg) spinImg.style.display = 'none';
-    const happyImg = document.getElementById('loader-img-happy');
-    if (happyImg) happyImg.style.opacity = '1';
-    if (loaderText) {
-        loaderText.textContent = t('common.ready') || 'Ready!';
-        loaderText.style.animation = 'none';
-        loaderText.style.opacity = '1';
-    }
-
-    // Hide loader after a moment of happiness
-    setTimeout(() => {
-        const loader = document.getElementById('global-loader');
-        if (loader) {
-            loader.classList.add('hidden');
-            setTimeout(() => loader.remove(), 500); // remove after fade
-        }
-    }, 1200);
+    // Intro: Tasky turns happy, then the splash fades
+    window.__bsmIntro?.status(t('common.ready'), '');
+    window.__bsmIntro?.ready();
 
     // Initialise Debug Panel
     initDebugPanel();
