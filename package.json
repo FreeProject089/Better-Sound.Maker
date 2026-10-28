@@ -1,7 +1,7 @@
 {
   "name": "better-sound-maker",
   "private": true,
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "Better Sound.Maker — Create DCS World sound mods easily",
   "author": "FreeProject089",
   "type": "module",
