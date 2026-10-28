@@ -42,3 +42,6 @@ Assets/
 .agent/
 .antigravity/
 site/
+
+# The docs site needs its assets (the Assets/ rule above matches them on Windows)
+!docs/assets/
