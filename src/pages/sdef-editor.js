@@ -836,6 +836,16 @@ function bindWavePanel() {
   const host = document.getElementById('wave-panel-host');
   const sdef = getState().currentSdef;
   if (!host || !sdef) return;
+  // Readable DCS originals are indexed once; redraw when the index arrives so A/B shows up
+  import('../utils/dcs-originals.js').then(m => {
+    if (m.originalsReady()) return;
+    m.loadOriginals().then(idx => {
+      if (!idx || getState().currentSdef !== sdef || !document.getElementById('wave-panel-host')) return;
+      collectVisualParams();
+      host.innerHTML = renderWavePanel(sdef, currentParams.wave || []);
+      bindWavePanel();
+    });
+  });
   attachWavePanel(host, sdef, () => { collectVisualParams(); return currentParams; }, () => {
     collectVisualParams();
     updateUnsavedSdef(sdef, generateSdef(currentParams));

@@ -303,6 +303,41 @@ async fn detect_dcs_installs() -> Vec<DcsInstall> {
     found
 }
 
+/* ── Readable DCS audio index ────────────────────────────────────── */
+
+/// Every audio file DCS ships as a plain file: `<root>/{CoreMods,Mods}/<cat>/<module>/Sounds/Effects/**`.
+/// Key: path under Effects, lowercase, forward slashes, without extension
+/// (that's how `wave` names it). Value: absolute path. Sounds inside the
+/// packed Sounds.edce are not listed: they are not readable.
+#[tauri::command]
+async fn index_dcs_waves(dcs_path: String) -> std::collections::HashMap<String, String> {
+    let mut out = std::collections::HashMap::new();
+    let root = PathBuf::from(&dcs_path);
+    for top in ["CoreMods", "Mods"] {
+        let Ok(categories) = fs::read_dir(root.join(top)) else { continue };
+        for cat in categories.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()) {
+            let Ok(modules) = fs::read_dir(cat.path()) else { continue };
+            for module in modules.filter_map(|e| e.ok()) {
+                let effects = module.path().join("Sounds").join("Effects");
+                if !effects.is_dir() {
+                    continue;
+                }
+                for e in walkdir::WalkDir::new(&effects).into_iter().filter_map(|e| e.ok()) {
+                    let p = e.path();
+                    let ext = p.extension().and_then(|x| x.to_str()).map(str::to_ascii_lowercase);
+                    if !matches!(ext.as_deref(), Some("wav" | "ogg")) {
+                        continue;
+                    }
+                    let Ok(rel) = p.strip_prefix(&effects) else { continue };
+                    let key = rel.with_extension("").to_string_lossy().replace('\\', "/").to_lowercase();
+                    out.entry(key).or_insert_with(|| p.to_string_lossy().replace('\\', "/"));
+                }
+            }
+        }
+    }
+    out
+}
+
 /* ── Original DCS audio (A/B comparison) ─────────────────────────── */
 
 /// Find the game's own audio for a `wave` path. Module sounds are plain files
@@ -573,6 +608,7 @@ pub fn run() {
             encode_ogg,
             find_dcs_wave,
             detect_dcs_installs,
+            index_dcs_waves,
             app_info,
             write_crash_log,
             read_panic_logs,
@@ -621,6 +657,15 @@ mod tests {
             "Effects/Aircrafts/Engines/F14_Afterburner_Start_Int_01".into(),
         ));
         assert!(hit.is_some_and(|p| p.ends_with(".wav")), "AJS37 sound should resolve in {}", first.path);
+    }
+
+    #[test]
+    fn indexes_readable_dcs_waves() {
+        let installs = tauri::async_runtime::block_on(detect_dcs_installs());
+        let Some(first) = installs.first() else { return };
+        let idx = tauri::async_runtime::block_on(index_dcs_waves(first.path.clone()));
+        eprintln!("readable DCS waves: {}", idx.len());
+        assert!(idx.contains_key("aircrafts/engines/f14_afterburner_start_int_01"));
     }
 
     #[test]

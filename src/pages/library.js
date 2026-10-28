@@ -17,6 +17,7 @@ import { guessLoopType, detectSoundType, SOUND_TYPES, analyzeAudioFile, ensureRu
 import { pickTextFile, pickJsonFile } from '../utils/file-picker.js';
 import { showModal } from '../components/modal.js';
 import { escapeHtml } from '../utils/html.js';
+import { originalForWaves, loadOriginals, originalsReady } from '../utils/dcs-originals.js';
 
 let allAssets = [];
 // currentPath is an array of folder segments (e.g. ['Aircrafts', 'AH-64D'])
@@ -41,6 +42,7 @@ let listContainer = null;
 let selectedDetailAsset = null;
 
 export async function renderLibrary(container) {
+  if (!originalsReady()) loadOriginals().then(idx => { if (idx && document.querySelector('.asset-row')) renderLibrary(container); });
   await ensureRulesLoaded();
   container.innerHTML = `
     <div class="page-header" style="margin-bottom:16px;">
@@ -800,6 +802,7 @@ function renderVirtualList(reset = false) {
     const soundType = detectSoundType(asset.sdefPath);
     const typeInfo = SOUND_TYPES[soundType] || SOUND_TYPES.generic;
     const loopType = guessLoopType(asset.sdefPath);
+    const abReady = originalForWaves(asset.waves || []);
     const loopTag = loopType === 'loop'
       ? `<span class="play-tag play-tag--loop" title="Loop">${getIcon('repeat', 'w-3 h-3')}Loop</span>`
       : loopType === 'one-shot'
@@ -846,7 +849,7 @@ function renderVirtualList(reset = false) {
         <div>
           <span class="tag" title="${escapeHtml(typeInfo.description)}" style="font-size:10px; display:inline-flex; align-items:center; gap:4px;">${typeIconHtml} ${escapeHtml(typeInfo.label)}</span>
         </div>
-        <div>${loopTag}</div>
+        <div class="lib-loopcell">${loopTag}${abReady ? `<span class="ab-mark" title="A/B: original readable in your DCS">${getIcon('headphones', 'w-3 h-3')}</span>` : ''}</div>
         <div>${noteSnippet}</div>
       </div>
     `;

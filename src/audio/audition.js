@@ -115,11 +115,9 @@ export async function openAudition({ sdefPath, params = {}, file, wave, original
         if (!window.nativeAPI) { st.textContent = t.web; ov.querySelector('#au-b-pick').hidden = false; return; }
         const showPick = (msg) => { st.textContent = msg; ov.querySelector('#au-b-pick').hidden = false; };
         if (!dcs) { showPick(t.noDcs); return; }
-        let path = null;
-        for (const w of (originals.length ? originals : [wave]).filter(Boolean)) {
-            path = await window.nativeAPI.findDcsWave(dcs, w).catch(() => null);
-            if (path) break;
-        }
+        const { loadOriginals, originalForWaves } = await import('../utils/dcs-originals.js');
+        await loadOriginals();
+        const path = originalForWaves((originals.length ? originals : [wave]).filter(Boolean));
         if (!path) { showPick(t.notFound); return; }
         const bytes = await window.nativeAPI.readFile(path);
         await setB(new File([bytes], path.split('/').pop()), ov);

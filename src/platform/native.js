@@ -39,6 +39,7 @@ if (isTauri) {
             }),
         findDcsWave: (dcsPath, wave) => invoke('find_dcs_wave', { dcsPath, wave }),
         detectDcsInstalls: () => invoke('detect_dcs_installs'),
+        indexDcsWaves: (dcsPath) => invoke('index_dcs_waves', { dcsPath }),
         appInfo: () => invoke('app_info'),
         writeCrashLog: (content) => invoke('write_crash_log', { content }),
         readPanicLogs: () => invoke('read_panic_logs'),

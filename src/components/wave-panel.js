@@ -19,10 +19,11 @@ import { getIcon } from '../utils/icons.js';
 import { escapeHtml } from '../utils/html.js';
 import { showToast } from './toast.js';
 import '../audio/audio.css';
+import { originalForWaves } from '../utils/dcs-originals.js';
 
 const T = {
-    en: { none: 'Original DCS audio (not replaced)', add: 'Add', addPh: 'Effects/Folder/sound (path relative to Sounds/)', drop: 'Drop audio files here to add samples, or click to browse', play: 'Play', listen: 'Listen at distance / compare A-B', edit: 'Edit audio (trim, fades, loop…)', attach: 'Attach audio', up: 'Move up', down: 'Move down', remove: 'Remove', hint: 'Several samples: DCS picks one at random (listmode RANDOM), plays them in order (SEQUENCE) or plays the first then loops the others (ASR).', onlyAudio: 'Only .wav and .ogg files' },
-    fr: { none: 'Audio d\'origine DCS (non remplacé)', add: 'Ajouter', addPh: 'Effects/Dossier/son (chemin relatif à Sounds/)', drop: 'Déposez des fichiers audio ici pour ajouter des échantillons, ou cliquez pour parcourir', play: 'Lire', listen: 'Écouter à distance / comparer A-B', edit: 'Modifier l\'audio (découpe, fondus, boucle…)', attach: 'Associer un audio', up: 'Monter', down: 'Descendre', remove: 'Retirer', hint: 'Plusieurs échantillons : DCS en choisit un au hasard (listmode RANDOM), les joue dans l\'ordre (SEQUENCE) ou joue le premier puis boucle les autres (ASR).', onlyAudio: 'Fichiers .wav et .ogg uniquement' },
+    en: { none: 'Original DCS audio (not replaced)', add: 'Add', addPh: 'Effects/Folder/sound (path relative to Sounds/)', drop: 'Drop audio files here to add samples, or click to browse', play: 'Play', listen: 'Listen at distance / compare A-B', edit: 'Edit audio (trim, fades, loop…)', attach: 'Attach audio', up: 'Move up', down: 'Move down', remove: 'Remove', noOriginal: 'The original is packed in DCS (Sounds.edce) and can\'t be read: listen at distance only, or drop a reference file as B.', distOnly: 'Listen', hint: 'Several samples: DCS picks one at random (listmode RANDOM), plays them in order (SEQUENCE) or plays the first then loops the others (ASR).', onlyAudio: 'Only .wav and .ogg files' },
+    fr: { none: 'Audio d\'origine DCS (non remplacé)', add: 'Ajouter', addPh: 'Effects/Dossier/son (chemin relatif à Sounds/)', drop: 'Déposez des fichiers audio ici pour ajouter des échantillons, ou cliquez pour parcourir', play: 'Lire', listen: 'Écouter à distance / comparer A-B', edit: 'Modifier l\'audio (découpe, fondus, boucle…)', attach: 'Associer un audio', up: 'Monter', down: 'Descendre', remove: 'Retirer', noOriginal: 'L\'original est compressé dans DCS (Sounds.edce) et illisible : écoute à distance seulement, ou déposez un fichier de référence en B.', distOnly: 'Écouter', hint: 'Plusieurs échantillons : DCS en choisit un au hasard (listmode RANDOM), les joue dans l\'ordre (SEQUENCE) ou joue le premier puis boucle les autres (ASR).', onlyAudio: 'Fichiers .wav et .ogg uniquement' },
 };
 const t = () => T[getCurrentLanguage() === 'fr' ? 'fr' : 'en'];
 
@@ -46,7 +47,9 @@ export function renderWavePanel(sdefPath, waves) {
                 <span class="wv-file">${file ? `${getIcon('file-audio', 'w-3 h-3')} ${escapeHtml(file.name)}` : u.none}</span></div>
               <div class="wv-acts">
                 ${file ? `<button class="btn btn-ghost btn-sm btn-icon" data-act="play" title="${u.play}">${getIcon('play', 'w-3.5 h-3.5')}</button>
-                  <button class="btn btn-secondary btn-sm wv-ab" data-act="listen" title="${u.listen}">${getIcon('headphones', 'w-3.5 h-3.5')} A/B</button>
+                  ${originalForWaves(originalWaves(sdefPath, i, w))
+                    ? `<button class="btn btn-secondary btn-sm wv-ab" data-act="listen" title="${u.listen}">${getIcon('headphones', 'w-3.5 h-3.5')} A/B</button>`
+                    : `<button class="btn btn-ghost btn-sm wv-ab is-off" data-act="listen" title="${u.noOriginal}">${getIcon('headphones', 'w-3.5 h-3.5')} ${u.distOnly}</button>`}
                   <button class="btn btn-ghost btn-sm btn-icon" data-act="edit" title="${u.edit}">${getIcon('scissors', 'w-3.5 h-3.5')}</button>` : ''}
                 <button class="btn btn-ghost btn-sm btn-icon" data-act="attach" title="${u.attach}">${getIcon('upload', 'w-3.5 h-3.5')}</button>
                 ${i > 0 ? `<button class="btn btn-ghost btn-sm btn-icon" data-act="up" title="${u.up}">${getIcon('chevron-up', 'w-3.5 h-3.5')}</button>` : ''}
