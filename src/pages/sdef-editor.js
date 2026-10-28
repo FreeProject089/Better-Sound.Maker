@@ -10,11 +10,14 @@ import {
   bulkSetSdefContent
 } from '../state/store.js';
 import { SDEF_PARAMS, generateSdef, parseSdef } from '../utils/sdef-generator.js';
+import { lintSdef, attenuationRadii, gainAtDistance } from '../utils/sdef-lint.js';
+import { escapeHtml } from '../utils/html.js';
+import { renderWavePanel, attachWavePanel } from '../components/wave-panel.js';
 import { showToast } from '../components/toast.js';
 import { showModal } from '../components/modal.js';
 import { detectSoundType, getTypeDefaults, SOUND_TYPES, getTypeIconHtml } from '../utils/audio-analyzer.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
-import { t, updateTranslations } from '../utils/i18n.js';
+import { t, updateTranslations, getCurrentLanguage } from '../utils/i18n.js';
 
 let currentMode = 'visual'; // 'visual' or 'raw'
 let currentParams = {};
@@ -322,21 +325,14 @@ function renderEditorContent() {
 
     for (const param of params) {
       if (param.key === 'wave') {
-        const waves = currentParams.wave || [];
-        const waveStr = Array.isArray(waves) ? waves.join('\n') : waves;
-
+        const waves = Array.isArray(currentParams.wave) ? currentParams.wave : currentParams.wave ? [currentParams.wave] : [];
         fieldsHtml += `
-          <div class="sdef-param-row sdef-param-row--tall">
+          <div class="sdef-param-row sdef-param-row--tall" data-param-row="wave">
             <div class="sdef-param-meta">
               <div class="sdef-param-name">${param.key}</div>
               <div class="sdef-param-desc">${param.desc}</div>
             </div>
-            <div class="sdef-param-control">
-              <textarea class="input-field" data-param="wave" rows="3"
-                placeholder="Effects/path/to/sound (one per line for multiple)"
-                style="font-size: 12px; min-height: 72px; font-family: var(--font-mono);">${waveStr}</textarea>
-              <div class="sdef-param-hint">One path per line for random sample selection</div>
-            </div>
+            <div class="sdef-param-control" id="wave-panel-host">${renderWavePanel(currentSdef || '', waves)}</div>
           </div>
         `;
         continue;
@@ -348,7 +344,7 @@ function renderEditorContent() {
       if (param.type === 'boolean') {
         inputHtml = `
           <label class="toggle">
-            <input type="checkbox" data-param="${param.key}" ${val === true ? 'checked' : ''} />
+            <input type="checkbox" data-param="${param.key}" ${(val === '' ? param.default : val) === true ? 'checked' : ''} />
             <span class="toggle-slider"></span>
           </label>
         `;
@@ -373,6 +369,15 @@ function renderEditorContent() {
             </div>
           </div>
         `;
+      } else if (param.type === 'tristate') {
+        const cur = val === true ? 'true' : val === false ? 'false' : '';
+        inputHtml = `
+          <select class="input-field" data-param="${param.key}">
+            <option value="" ${cur === '' ? 'selected' : ''}>${t('sdef.unset') || '— unset —'}</option>
+            <option value="true" ${cur === 'true' ? 'selected' : ''}>true</option>
+            <option value="false" ${cur === 'false' ? 'selected' : ''}>false</option>
+          </select>
+        `;
       } else if (param.type === 'enum') {
         inputHtml = `
           <select class="input-field" data-param="${param.key}">
@@ -383,18 +388,18 @@ function renderEditorContent() {
         inputHtml = `
           <div class="sdef-stepper">
             <button class="sdef-stepper-btn" data-stepper-dec="${param.key}">${getIcon('minus', 'w-3 h-3')}</button>
-            <input class="sdef-stepper-input sdef-num-input" type="number" step="any" data-param="${param.key}" value="${val}" placeholder="${param.default}" />
+            <input class="sdef-stepper-input sdef-num-input" type="number" step="${param.step || 'any'}" data-param="${param.key}" value="${escapeHtml(val)}" placeholder="${param.default}" />
             <button class="sdef-stepper-btn" data-stepper-inc="${param.key}">${getIcon('plus', 'w-3 h-3')}</button>
           </div>
         `;
       } else {
-        inputHtml = `<input class="input-field" type="text" data-param="${param.key}" value="${val}" placeholder="${param.default}" />`;
+        inputHtml = `<input class="input-field" type="text" data-param="${param.key}" value="${escapeHtml(val)}" placeholder="${param.default}" />`;
       }
 
       fieldsHtml += `
-        <div class="sdef-param-row">
+        <div class="sdef-param-row" data-param-row="${param.key}">
           <div class="sdef-param-meta">
-            <div class="sdef-param-name">${param.key}</div>
+            <div class="sdef-param-name">${param.key}${param.undocumented ? ` <span class="sdef-badge" title="${escapeHtml(t('sdef.undocumentedHint') || "Not in ED's example.sdef, but used in official DCS files")}">ED</span>` : ''}</div>
             <div class="sdef-param-desc">${param.desc}</div>
           </div>
           <div class="sdef-param-control">${inputHtml}</div>
@@ -415,6 +420,7 @@ function renderEditorContent() {
         </div>
         <div class="sdef-group-content">
            ${fieldsHtml}
+           ${groupKey === 'radius' ? '<div class="sdef-curve" id="sdef-curve"></div>' : ''}
         </div>
       </div>
     `;
@@ -427,8 +433,8 @@ function renderEditorContent() {
   return `
     <div class="sdef-editor-topbar">
       <div class="sdef-editor-filepath">
-        ${folderPath ? `<span class="sdef-editor-folder">${folderPath} /</span>` : ''}
-        <span class="sdef-editor-filename">${nameOnly}</span>
+        ${folderPath ? `<span class="sdef-editor-folder">${escapeHtml(folderPath)} /</span>` : ''}
+        <span class="sdef-editor-filename">${escapeHtml(nameOnly)}</span>
       </div>
       <div class="flex-gap">
         ${hasAudio ? `
@@ -446,11 +452,12 @@ function renderEditorContent() {
         </button>
       </div>
     </div>
+    <div id="sdef-lint" class="sdef-lint"></div>
     <div id="visual-editor" class="${currentMode !== 'visual' ? 'hidden' : ''}">
       ${visualHtml}
     </div>
     <div id="raw-editor-container" class="${currentMode !== 'raw' ? 'hidden' : ''}">
-      <textarea class="raw-editor" id="raw-editor-textarea">${rawContent}</textarea>
+      <textarea class="raw-editor" id="raw-editor-textarea" spellcheck="false">${escapeHtml(rawContent)}</textarea>
     </div>
   `;
 }
@@ -461,231 +468,10 @@ function attachEditorHandlers(container) {
   container.querySelector('#global-templates-btn')?.addEventListener('click', () => showTemplatesModal(container));
 }
 
-async function showTemplatesModal(container) {
-  const state = getState();
-  const templates = state.sdefTemplates || [];
-  const entriesCount = Object.keys(state.selectedAssets).length;
-  const currentSdef = state.currentSdef;
-
-  const renderTemplateList = (listEl) => {
-    if (templates.length === 0) {
-      listEl.innerHTML = `
-        <div class="tpl-empty">
-          <div class="tpl-empty-icon">${getIcon('copy', 'w-12 h-12')}</div>
-          <h4>Aucun Preset Trouvé</h4>
-          <p>Créez votre premier preset avec le formulaire à droite.</p>
-        </div>
-      `;
-      return;
-    }
-    listEl.innerHTML = templates.map(t => `
-      <div class="tpl-item" data-id="${t.id}">
-        <div class="tpl-item-main">
-          <div class="tpl-item-icon">${getIcon(t.lucideIcon || 'star', 'w-4 h-4')}</div>
-          <div class="tpl-item-info">
-            <span class="tpl-item-name">${t.name}</span>
-          </div>
-          <div class="tpl-item-actions">
-            <button class="tpl-btn-icon" data-export="${t.id}" title="Exporter">${getIcon('upload', 'w-3 h-3')}</button>
-            <button class="tpl-btn-icon tpl-btn-danger" data-delete="${t.id}" title="Supprimer">${getIcon('trash-2', 'w-3 h-3')}</button>
-          </div>
-        </div>
-        <div class="tpl-item-apply">
-          <button class="tpl-btn-apply" data-apply-current="${t.id}" style="${!currentSdef ? 'display:none' : ''}">Actuel</button>
-          <button class="tpl-btn-apply primary" data-apply-all="${t.id}" style="${entriesCount <= 1 ? 'display:none' : ''}">Tous (${entriesCount})</button>
-        </div>
-      </div>
-    `).join('');
-
-    listEl.querySelectorAll('[data-apply-current]').forEach(btn => {
-      btn.addEventListener('click', () => applyTemplate(templates.find(x => x.id === btn.dataset.applyCurrent), false));
-    });
-    listEl.querySelectorAll('[data-apply-all]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (confirm(`Appliquer à l'ensemble des ${entriesCount} fichiers ?`)) {
-          applyTemplate(templates.find(x => x.id === btn.dataset.applyAll), true);
-        }
-      });
-    });
-    listEl.querySelectorAll('.tpl-btn-icon').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (btn.dataset.export) exportSingleSdefTemplate(btn.dataset.export);
-        else if (btn.dataset.delete) {
-          deleteSdefTemplate(btn.dataset.delete);
-          showTemplatesModal(container);
-        }
-      });
-    });
-    renderIcons(listEl);
-  };
-
-  await showModal({
-    title: `${getIcon('copy', 'w-5 h-5')} Gestionnaire de Templates`,
-    content: `
-      <style>
-        /* Targeted Override to enlarge the system modal while keeping its look */
-        #modal-overlay:has(.tpl-root) .modal {
-          max-width: 880px;
-          padding: 0;
-          overflow: hidden;
-        }
-
-        /* Hide the default modal footer/actions bar for this view */
-        #modal-overlay:has(.tpl-root) .modal-actions,
-        #modal-overlay:has(.tpl-root) .modal-footer {
-          display: none !important;
-        }
-
-        .tpl-root { display: flex; gap: 0; width: 820px; height: 580px; background: transparent; overflow: hidden; }
-        
-        .tpl-left { width: 340px; display: flex; flex-direction: column; border-right: 1px solid var(--border); background: rgba(0,0,0,0.1); }
-        .tpl-l-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .tpl-l-header h3 { margin: 0; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
-        .tpl-l-content { flex: 1; overflow-y: auto; padding: 15px; }
-        .tpl-l-footer { padding: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.05); }
-
-        .tpl-right { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 25px; background: linear-gradient(135deg, rgba(59,130,246,0.05) 0%, transparent 100%); }
-        .tpl-r-header h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--accent-blue); }
-        .tpl-r-header p { margin: 5px 0 0 0; font-size: 12px; color: var(--text-muted); }
-
-        .tpl-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; transition: all 0.2s; }
-        .tpl-item:hover { border-color: var(--accent-blue); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .tpl-item-main { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .tpl-item-icon { width: 32px; height: 32px; background: rgba(59,130,246,0.1); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2); }
-        .tpl-item-info { flex: 1; }
-        .tpl-item-name { font-weight: 700; font-size: 13px; color: var(--text-primary); }
-        .tpl-item-actions { display: flex; gap: 5px; }
-        
-        .tpl-item-apply { display: flex; gap: 8px; }
-        .tpl-btn-apply { flex: 1; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-primary); font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
-        .tpl-btn-apply:hover { background: rgba(255,255,255,0.1); border-color: var(--text-muted); }
-        .tpl-btn-apply.primary { background: var(--accent-blue); border-color: var(--accent-blue); color: white; }
-        .tpl-btn-apply.primary:hover { filter: brightness(1.1); }
-
-        .tpl-btn-icon { width: 28px; height: 28px; border-radius: 6px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-        .tpl-btn-icon:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-        .tpl-btn-danger:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
-
-        .tpl-empty { text-align: center; padding: 40px 20px; color: var(--text-muted); }
-        .tpl-empty-icon { margin-bottom: 15px; opacity: 0.2; display: flex; justify-content: center; }
-        .tpl-empty h4 { margin: 0 0 5px 0; font-size: 14px; color: var(--text-primary); }
-        .tpl-empty p { margin: 0; font-size: 12px; }
-
-        .tpl-icon-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; border: 1px solid var(--border); max-height: 140px; overflow-y: auto; }
-        .tpl-icon-dot { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
-        .tpl-icon-dot:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-        .tpl-icon-dot.selected { background: var(--accent-blue); color: white; }
-
-        .tpl-footer-btn { height: 32px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; font-weight: 700; }
-        .tpl-footer-row { display: flex; gap: 8px; }
-      </style>
-      <div class="tpl-root">
-        <div class="tpl-left">
-          <div class="tpl-l-header">
-            <h3>Bibliothèque</h3>
-            <div style="font-size: 10px; background: var(--accent-blue); color: white; padding: 2px 6px; border-radius: 10px; font-weight: 800;">${templates.length}</div>
-          </div>
-          <div class="tpl-l-content" id="tpl-list"></div>
-          <div class="tpl-l-footer">
-            <div class="tpl-footer-row">
-              <button class="btn btn-secondary tpl-footer-btn flex-1" id="import-tpl">${getIcon('download', 'w-3 h-3')} Importer</button>
-              <button class="btn btn-secondary tpl-footer-btn flex-1" id="export-tpl">${getIcon('share-2', 'w-3 h-3')} Exporter</button>
-            </div>
-            <button class="btn btn-danger tpl-footer-btn w-full" id="close-tpl-manager">${getIcon('x-circle', 'w-3.5 h-3.5')} Fermer le Gestionnaire</button>
-          </div>
-        </div>
-        
-        <div class="tpl-right">
-          <div class="tpl-r-header">
-            <h2>Nouveau Template</h2>
-            <p>Enregistrez les paramètres actuels comme preset réutilisable.</p>
-          </div>
-
-          <div class="tpl-r-form" style="display: flex; flex-direction: column; gap: 20px;">
-            <div class="input-group">
-              <label class="input-label">NOM DU TEMPLATE</label>
-              <input type="text" id="tpl-name" class="input-field" placeholder="ex: Cinema Engine" style="height: 42px; background: var(--bg-surface);" />
-            </div>
-
-            <div class="input-group">
-              <label class="input-label">SOURCE (ASSET)</label>
-              <select id="tpl-source" class="input-field" style="height: 42px; background: var(--bg-surface);">
-                ${Object.keys(state.selectedAssets).map(p => `<option value="${p}" ${p === currentSdef ? 'selected' : ''}>${p.split('/').pop()}</option>`).join('')}
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label class="input-label">ICÔNE VISUELLE</label>
-              <div class="tpl-icon-grid" id="tpl-icons">
-                ${AVAILABLE_ICONS.map(icon => `<div class="tpl-icon-dot" data-icon="${icon}">${getIcon(icon, 'w-4 h-4')}</div>`).join('')}
-              </div>
-            </div>
-
-            <button class="btn btn-primary w-full" id="tpl-save" style="height: 48px; font-weight: 800; font-size: 15px; margin-top: 10px;">
-              ${getIcon('plus-circle', 'w-5 h-5')} Créer le Preset
-            </button>
-          </div>
-        </div>
-      </div>
-    `,
-    actions: [],
-    onRender: (modalEl) => {
-      const listEl = modalEl.querySelector('#tpl-list');
-      renderTemplateList(listEl);
-
-      let selectedIcon = 'star';
-      const iconDots = modalEl.querySelectorAll('.tpl-icon-dot');
-      iconDots[0].classList.add('selected');
-      iconDots.forEach(dot => {
-        dot.addEventListener('click', () => {
-          iconDots.forEach(d => d.classList.remove('selected'));
-          dot.classList.add('selected');
-          selectedIcon = dot.dataset.icon;
-        });
-      });
-
-      modalEl.querySelector('#tpl-save').addEventListener('click', () => {
-        const name = modalEl.querySelector('#tpl-name').value;
-        const source = modalEl.querySelector('#tpl-source').value;
-        if (!name) { showToast('Name required', 'warning'); return; }
-
-        const content = state.unsavedSdefs[source] || getSdefContent(source);
-        const params = parseSdef(content);
-        delete params.wave;
-
-        saveSdefTemplate({ id: 'tpl_' + Date.now(), name, lucideIcon: selectedIcon, params });
-        showToast('Template Saved', 'success');
-        showTemplatesModal(container);
-      });
-
-      modalEl.querySelector('#import-tpl').addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file'; input.accept = '.json';
-        input.onchange = async (e) => {
-          try {
-            const file = e.target.files[0]; if (!file) return;
-            const json = JSON.parse(await file.text());
-            importSdefTemplates(Array.isArray(json) ? json : [json]);
-            showTemplatesModal(container);
-          } catch { showToast('Import failed', 'error'); }
-        };
-        input.click();
-      });
-
-      modalEl.querySelector('#export-tpl').addEventListener('click', exportSdefTemplates);
-
-      modalEl.querySelector('#close-tpl-manager').addEventListener('click', () => {
-        const overlay = document.getElementById('modal-overlay');
-        if (overlay) {
-          overlay.classList.add('hidden');
-          overlay.innerHTML = '';
-        }
-      });
-    }
-  });
+async function showTemplatesModal() {
+  const { openTemplateManager } = await import('../components/template-manager.js');
+  openTemplateManager(applyTemplate);
 }
-
 
 function applyTemplate(template, applyToAll = false) {
   const state = getState();
@@ -693,7 +479,9 @@ function applyTemplate(template, applyToAll = false) {
   if (applyToAll) {
     const assets = state.selectedAssets;
     const updates = {};
-    for (const path of Object.keys(assets)) {
+    // applyToAll: true = every SDEF, a string = every SDEF under that folder
+    const paths = Object.keys(assets).filter(p => applyToAll === true || p.startsWith(applyToAll + '/'));
+    for (const path of paths) {
       const existingContent = state.unsavedSdefs[path] || getSdefContent(path);
       const existingParams = parseSdef(existingContent);
       const newParams = { ...template.params };
@@ -701,7 +489,7 @@ function applyTemplate(template, applyToAll = false) {
       updates[path] = generateSdef(newParams);
     }
     bulkSetSdefContent(updates);
-    showToast(`Applied to ${Object.keys(updates).length} assets`, 'success');
+    showToast(t('sdef.templates.appliedAll', { count: Object.keys(updates).length }), 'success');
   } else {
     const path = state.currentSdef;
     if (!path) return;
@@ -709,7 +497,7 @@ function applyTemplate(template, applyToAll = false) {
     currentParams = { ...template.params };
     if (currentWave) currentParams.wave = currentWave;
     updateUnsavedSdef(path, generateSdef(currentParams));
-    showToast(`Applied to current SDEF`, 'success');
+    showToast(t('sdef.templates.appliedCurrent'), 'success');
   }
 
   const mainEl = document.getElementById('editor-main');
@@ -780,6 +568,7 @@ function attachEditorContentHandlers() {
     rawTextarea.addEventListener('input', (e) => {
       const state = getState();
       if (state.currentSdef) updateUnsavedSdef(state.currentSdef, e.target.value);
+      refreshInsights(parseSdef(e.target.value));
     });
   }
 
@@ -790,6 +579,7 @@ function attachEditorContentHandlers() {
         collectVisualParams();
         updateUnsavedSdef(state.currentSdef, generateSdef(currentParams));
       }
+      refreshInsights(currentParams);
     };
     el.addEventListener('input', handleUpdate);
     el.addEventListener('change', handleUpdate);
@@ -842,6 +632,12 @@ function attachEditorContentHandlers() {
     renderSdefFileList();
     showToast(t('sdef.saved'), 'success');
   });
+
+  bindWavePanel();
+
+  refreshInsights(currentMode === 'raw'
+    ? parseSdef(document.getElementById('raw-editor-textarea')?.value || '')
+    : currentParams);
 
   // Play
   document.getElementById('play-sdef-sound')?.addEventListener('click', (e) => {
@@ -936,6 +732,9 @@ function collectVisualParams() {
       } else {
         delete currentParams[key];
       }
+    } else if (paramDef.type === 'tristate') {
+      if (el.value === '') delete currentParams[key];
+      else currentParams[key] = el.value === 'true';
     } else if (paramDef.type === 'enum') {
       currentParams[key] = el.value;
     } else {
@@ -945,5 +744,113 @@ function collectVisualParams() {
         delete currentParams[key];
       }
     }
+  });
+}
+
+/* ── Insights: lint panel + attenuation curve ─────────────────────── */
+
+const LINT_ICONS = { error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+
+function refreshInsights(params) {
+  const findings = lintSdef(params || {});
+
+  const panel = document.getElementById('sdef-lint');
+  if (panel) {
+    const counts = { error: 0, warning: 0, info: 0 };
+    findings.forEach(f => counts[f.level]++);
+    const summary = `${counts.error} error(s), ${counts.warning} warning(s), ${counts.info} note(s)`;
+    panel.innerHTML = findings.length === 0
+      ? `<div class="sdef-lint-ok">${getIcon('check-circle', 'w-4 h-4')} ${t('sdef.lint.ok') || 'No problems found'}</div>`
+      : `<details class="sdef-lint-box" ${counts.error ? 'open' : ''}>
+          <summary>${getIcon(counts.error ? 'x-circle' : 'alert-triangle', 'w-4 h-4')} ${summary}</summary>
+          <ul>${findings.map(f => `
+            <li class="sdef-lint-item sdef-lint-${f.level}" ${f.key ? `data-lint-key="${escapeHtml(f.key)}"` : ''}>
+              ${getIcon(LINT_ICONS[f.level], 'w-3.5 h-3.5')} <span>${escapeHtml(f.message)}</span>
+            </li>`).join('')}</ul>
+        </details>`;
+    renderIcons(panel);
+    panel.querySelectorAll('[data-lint-key]').forEach(li => li.addEventListener('click', () => {
+      const row = document.querySelector(`[data-param-row="${CSS.escape(li.dataset.lintKey)}"]`);
+      if (!row || currentMode !== 'visual') return;
+      row.closest('.sdef-param-group')?.classList.remove('collapsed');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.querySelector('input, select, textarea')?.focus();
+    }));
+  }
+
+  document.querySelectorAll('[data-param-row]').forEach(row => {
+    const levels = findings.filter(f => f.key === row.dataset.paramRow).map(f => f.level);
+    row.classList.toggle('sdef-row-error', levels.includes('error'));
+    row.classList.toggle('sdef-row-warning', !levels.includes('error') && levels.includes('warning'));
+  });
+
+  const curve = document.getElementById('sdef-curve');
+  if (curve) curve.innerHTML = renderAttenuationCurve(params || {});
+}
+
+/** SVG of relative gain vs distance on a log-scaled distance axis. */
+function renderAttenuationCurve(params) {
+  const r = attenuationRadii(params);
+  const gain = typeof params.gain === 'number' ? params.gain : 1;
+  const W = 520, H = 160, PAD_L = 34, PAD_B = 32, PAD_T = 10, PAD_R = 10;
+  const maxD = Math.max(r.outer * 1.1, 1);
+  const lx = (d) => Math.log10(1 + d);
+  const x = (d) => PAD_L + (lx(d) / lx(maxD)) * (W - PAD_L - PAD_R);
+  const y = (g) => PAD_T + (1 - g) * (H - PAD_T - PAD_B);
+
+  const pts = [];
+  for (let i = 0; i <= 200; i++) {
+    const d = Math.pow(10, (i / 200) * lx(maxD)) - 1;
+    pts.push(`${x(d).toFixed(1)},${y(gainAtDistance(d, r)).toFixed(1)}`);
+  }
+
+  const marks = [['silent', r.silent], ['peak', r.peak], ['inner', r.inner], ['outer', r.outer]]
+    .filter(([, d], i, arr) => d > 0 && arr.findIndex(([, d2]) => d2 === d) === i);
+  const fmtD = (d) => d >= 1000 ? `${+(d / 1000).toFixed(1)} km` : `${+d.toFixed(1)} m`;
+
+  return `
+    <div class="sdef-curve-title">${t('sdef.curve.title') || 'Distance attenuation'}
+      <span>${t('sdef.curve.hint') || 'Relative gain by distance (log scale), multiplied by gain'} = ${escapeHtml(gain)}</span></div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Distance attenuation curve">
+      <line class="axis" x1="${PAD_L}" y1="${y(0)}" x2="${W - PAD_R}" y2="${y(0)}" />
+      <line class="axis" x1="${PAD_L}" y1="${y(0)}" x2="${PAD_L}" y2="${y(1)}" />
+      <text class="lbl" x="${PAD_L - 6}" y="${y(1) + 4}" text-anchor="end">1</text>
+      <text class="lbl" x="${PAD_L - 6}" y="${y(0.85) + 4}" text-anchor="end">.85</text>
+      <text class="lbl" x="${PAD_L - 6}" y="${y(0) + 4}" text-anchor="end">0</text>
+      ${marks.map(([name, d], i) => {
+        // Alternate label rows when marks are close; keep edge labels inside the box
+        const close = i > 0 && x(d) - x(marks[i - 1][1]) < 70;
+        const row = close && i % 2 ? H - 4 : H - 16;
+        const anchor = x(d) > W - 50 ? 'end' : x(d) < PAD_L + 30 ? 'start' : 'middle';
+        return `
+        <line class="mark" x1="${x(d)}" y1="${y(0)}" x2="${x(d)}" y2="${y(1)}" />
+        <text class="lbl" x="${x(d)}" y="${row}" text-anchor="${anchor}">${name} ${fmtD(d)}</text>`;
+      }).join('')}
+      <polyline class="curve" points="${pts.join(' ')}" />
+    </svg>`;
+}
+
+/* ── Sound samples panel ──────────────────────────────────────────── */
+
+function bindWavePanel() {
+  const host = document.getElementById('wave-panel-host');
+  const sdef = getState().currentSdef;
+  if (!host || !sdef) return;
+  // Readable DCS originals are indexed once; redraw when the index arrives so A/B shows up
+  import('../utils/dcs-originals.js').then(m => {
+    if (m.originalsReady()) return;
+    m.loadOriginals().then(idx => {
+      if (!idx || getState().currentSdef !== sdef || !document.getElementById('wave-panel-host')) return;
+      collectVisualParams();
+      host.innerHTML = renderWavePanel(sdef, currentParams.wave || []);
+      bindWavePanel();
+    });
+  });
+  attachWavePanel(host, sdef, () => { collectVisualParams(); return currentParams; }, () => {
+    collectVisualParams();
+    updateUnsavedSdef(sdef, generateSdef(currentParams));
+    refreshInsights(currentParams);
+    host.innerHTML = renderWavePanel(sdef, currentParams.wave || []);
+    bindWavePanel();
   });
 }

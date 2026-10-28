@@ -23,7 +23,8 @@
         "notes": "Notes",
         "pageNotFound": "Page non trouvée",
         "close": "Fermer",
-        "ready": "Prêt !"
+        "ready": "Prêt !",
+        "loading": "Chargement de Better Sound.Maker..."
     },
     "nav": {
         "projects": "Projets",
@@ -59,7 +60,10 @@
         "autoScanKeepModsDesc": "Si activé, les assets de mods importés manuellement (.zip) ne seront pas effacés lors du scan de votre dossier DCS.",
         "behavior": "Comportement & Scan",
         "playWithSdefConfig": "Appliquer Paramètres SDEF en Lecture",
-        "playWithSdefConfigDesc": "Applique le gain, le pitch et le mode de boucle du SDEF actuel lors de la lecture d'un son dans la page Projets."
+        "playWithSdefConfigDesc": "Applique le gain, le pitch et le mode de boucle du SDEF actuel lors de la lecture d'un son dans la page Projets.",
+        "catalogUrl": "Catalogue communautaire",
+        "catalogUrlDesc": "URL du catalog.json qui liste les presets et packs de types communautaires. Laisser vide pour utiliser le catalogue officiel.",
+        "catalogTest": "Tester"
     },
     "presetsPage": {
         "title": "Préréglages & Modèles",
@@ -91,7 +95,10 @@
             "content": "Êtes-vous sûr de vouloir supprimer ce préréglage ?"
         },
         "communityBtn": "Presets Communautaires",
-        "communityModalTitle": "Presets Communautaires"
+        "communityModalTitle": "Presets Communautaires",
+        "exportConfirmTitle": "Exporter le preset : {name}",
+        "exportConfirmDesc": "Vérifiez la version et le numéro de mise à jour avant d'exporter.",
+        "updateNumberLabel": "Numéro de mise à jour (à augmenter à chaque mise à jour)"
     },
     "customTypesPage": {
         "title": "Gestionnaire des Types de Sons",
@@ -303,6 +310,39 @@
             "auto_width": "Largeur Auto",
             "nodoppler": "Désactiver Doppler",
             "distance_filter_offset": "Offset Filtre Distance"
+        },
+        "unset": "— non défini —",
+        "undocumentedHint": "Absent du example.sdef d’ED, mais utilisé dans les fichiers officiels de DCS",
+        "lint": {
+            "ok": "Aucun problème détecté"
+        },
+        "curve": {
+            "title": "Atténuation selon la distance",
+            "hint": "Gain relatif selon la distance (échelle log), multiplié par gain"
+        },
+        "templates": {
+            "title": "Gestionnaire de templates",
+            "library": "Bibliothèque",
+            "import": "Importer",
+            "export": "Exporter",
+            "close": "Fermer le gestionnaire",
+            "newTitle": "Nouveau template",
+            "newDesc": "Enregistrez les paramètres actuels comme template réutilisable.",
+            "name": "NOM DU TEMPLATE",
+            "namePlaceholder": "ex : Cinema Engine",
+            "source": "SOURCE (ASSET)",
+            "icon": "ICÔNE",
+            "create": "Créer le template",
+            "emptyTitle": "Aucun template",
+            "emptyDesc": "Créez votre premier template avec le formulaire à droite.",
+            "applyCurrent": "Actuel",
+            "applyAll": "Tous ({count})",
+            "confirmAll": "Appliquer ce template aux {count} fichiers ?",
+            "nameRequired": "Nom obligatoire",
+            "saved": "Template enregistré",
+            "importFailed": "Échec de l'import",
+            "appliedAll": "Appliqué à {count} assets",
+            "appliedCurrent": "Appliqué au SDEF actuel"
         }
     },
     "themePage": {
@@ -391,7 +431,8 @@
             "desc": "Le fichier <code>sdef_and_wave_list.txt</code> contient la liste complète et exhaustive de tous les événements sonores de DCS World.",
             "location": "Emplacement du fichier",
             "tip": "Il se trouve dans le répertoire d'installation de DCS World, généralement dans Program Files ou vos Parties Enregistrées."
-        }
+        },
+        "fullDocs": "Documentation complète (site web)"
     },
     "docs_content": {
         "defaults": {
@@ -743,7 +784,7 @@
         },
         "q10": {
             "title": "Puis-je charger un mod existant déjà construit ?",
-            "desc": "Oui ! Sur la page Projet, cliquez sur <strong>Charger Mod Existant</strong>. Vous pouvez charger depuis une archive <code>.zip</code> ou directement depuis un dossier décompressé (version Electron). L'app importera les fichiers SDEF et tentera de faire correspondre l'audio automatiquement."
+            "desc": "Oui ! Sur la page Projet, cliquez sur <strong>Charger Mod Existant</strong>. Vous pouvez charger depuis une archive <code>.zip</code> ou directement depuis un dossier décompressé (application desktop uniquement). L'app importera les fichiers SDEF et tentera de faire correspondre l'audio automatiquement."
         },
         "q11": {
             "title": "Puis-je personnaliser la détection des types de sons ?",
@@ -761,5 +802,43 @@
             "title": "DCS dit que le dossier Saved Games doit être propre. Pourquoi ?",
             "desc": "Eagle Dynamics recommande de ne pas modifier le dossier racine de DCS. Les mods doivent être placés dans <code>Saved Games\\DCS\\Mods\\resource\\</code> pour éviter les conflits, surtout après les mises à jour."
         }
+    },
+    "update": {
+        "checking": "Recherche de mises à jour...",
+        "upToDate": "Vous avez la dernière version !",
+        "title": "Mise à jour disponible !",
+        "ready": "Une nouvelle version de <strong>Better Sound.Maker</strong> est prête !",
+        "biRestart": "L'application va se fermer, se mettre à jour, puis redémarrer.",
+        "nativeRestart": "L'application redémarrera une fois la mise à jour installée.",
+        "now": "Mettre à jour",
+        "later": "Plus tard",
+        "downloading": "Téléchargement de la mise à jour...",
+        "biFailed": "Échec de la mise à jour, essai avec l'updater standard...",
+        "failed": "Échec de la mise à jour, ouverture de la page des versions.",
+        "unreachable": "Impossible de joindre le serveur de mise à jour.",
+        "checkFailed": "Échec de la vérification",
+        "manualDesktop": "Téléchargez le nouvel installeur sur la page des versions.",
+        "manualWeb": "La version en ligne va se recharger avec les nouveautés.",
+        "checkButton": "Vérifier les mises à jour"
+    },
+    "crash": {
+        "title": "Générer un crash log",
+        "subtitle": "Un seul fichier avec tout ce qu'il faut pour déboguer un problème",
+        "descDesktop": "Better Sound.Maker écrit un rapport avec les infos de l'application et du système, vos paramètres, les erreurs récentes avec leur pile d'appels, les plantages Rust précédents et les dernières lignes de la console. Il est enregistré dans le dossier de logs de l'application.",
+        "descWeb": "Better Sound.Maker prépare un rapport avec les infos de l'application et du navigateur, vos paramètres, les erreurs récentes avec leur pile d'appels et les dernières lignes de la console, puis le télécharge en fichier .log.",
+        "noteLabel": "Que faisiez-vous ? (facultatif)",
+        "notePlaceholder": "ex : j'ai cliqué sur Construire avec 40 sons sélectionnés et l'app a figé",
+        "privacy": "Aucun secret n'est écrit : les jetons sont masqués, le stockage est listé par nom et taille seulement, et votre dossier utilisateur est raccourci en ~.",
+        "generate": "Générer le crash log",
+        "copy": "Copier",
+        "copied": "Crash log copié dans le presse-papiers",
+        "copyFailed": "Impossible de copier dans le presse-papiers",
+        "openFolder": "Ouvrir le dossier des logs",
+        "savedTo": "Crash log enregistré : {path}",
+        "downloaded": "Crash log téléchargé",
+        "autoSaved": "Une erreur est survenue. Un crash log a été enregistré automatiquement.",
+        "errorOccurred": "Une erreur est survenue. Vous pouvez générer un crash log pour la signaler.",
+        "settingsTitle": "Diagnostic",
+        "settingsDesc": "Un problème ? Générez un crash log et joignez-le à votre rapport de bug. Dans l'application de bureau, les erreurs sont aussi enregistrées automatiquement."
     }
 }

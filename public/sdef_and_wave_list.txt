@@ -1,3 +1,5 @@
+
+
 DCS World:
 ==========
 
@@ -1220,6 +1222,8 @@ Aircrafts/Engines/BladeLimBlow.sdef
 	wave:
 		Effects/Aircrafts/Engines/BladeLimBlow
 Aircrafts/Engines/BMW-801D/Engine.sdef
+	wave:
+		Effects/Aircrafts/Engines/BMW-801D/Prop0
 Aircrafts/Engines/BMW-801D/EngSpatial.sdef
 	wave:
 		Effects/Aircrafts/Engines/PackardMerlinProp/EngSpatial
@@ -1285,6 +1289,9 @@ Aircrafts/Engines/BMW-801D/Prop1.sdef
 Aircrafts/Engines/BMW-801D/Prop2.sdef
 	wave:
 		Effects/Aircrafts/Engines/BMW-801D/Prop2
+Aircrafts/Engines/BMW-801D/Prop2Back.sdef
+	wave:
+		Effects/Aircrafts/Engines/BMW-801D/Prop2
 Aircrafts/Engines/BMW-801D/Prop3.sdef
 	wave:
 		Effects/Aircrafts/Engines/BMW-801D/Prop3
@@ -1296,7 +1303,7 @@ Aircrafts/Engines/BMW-801D/Prop4.sdef
 		Effects/Aircrafts/Engines/BMW-801D/Prop4
 Aircrafts/Engines/BMW-801D/Prop4Back.sdef
 	wave:
-		Effects/Aircrafts/Engines/BMW-801D/Prop4
+		Effects/Aircrafts/Engines/BMW-801D/Prop4Back
 Aircrafts/Engines/BMW-801D/Prop4Side.sdef
 	wave:
 		Effects/Aircrafts/Engines/BMW-801D/Prop4Side
@@ -3471,12 +3478,15 @@ Aircrafts/FW-190A8/CanopyOpenStart.sdef
 Aircrafts/FW-190A8/Distant_Back.sdef
 	wave:
 		Effects/Aircrafts/FW-190A8/Distant_Back
+Aircrafts/FW-190A8/Distant_Back2.sdef
+	wave:
+		Effects/Aircrafts/FW-190A8/Distant_Back2
 Aircrafts/FW-190A8/Distant_Flyby_Noise_B.sdef
 	wave:
 		Effects/Aircrafts/FW-190A8/Distant_Flyby_Noise
 Aircrafts/FW-190A8/Distant_Flyby_Noise_S.sdef
 	wave:
-		Effects/Aircrafts/FW-190A8/Distant_Flyby_Noise
+		Effects/Aircrafts/FW-190A8/Distant_Flyby_Noise_S
 Aircrafts/FW-190A8/Distant_Front.sdef
 	wave:
 		Effects/Aircrafts/FW-190A8/Distant_Front
@@ -6670,6 +6680,7 @@ GroundSlide.sdef
 HeavyRain.sdef
 	wave:
 		Effects/HeavyRain
+LoudspeakerMessages/Loudspeaker.sdef
 me_music.sdef
 me_preview.sdef
 me_sounds.sdef
@@ -10240,6 +10251,34 @@ Aircrafts/CH-47/Distant_Flyby_S.sdef
 Aircrafts/CH-47/Distant_Rotor.sdef
 	wave:
 		Effects/Aircrafts/CH-47/Distant_Rotor
+Aircrafts/CH-47/EAPS_AxialFan.sdef
+Aircrafts/CH-47/EAPS_AxialFan_End.sdef
+Aircrafts/CH-47/EAPS_AxialFan_End_L.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_AxialFan_End
+Aircrafts/CH-47/EAPS_AxialFan_End_R.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_AxialFan_End
+Aircrafts/CH-47/EAPS_AxialFan_L.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_AxialFan
+Aircrafts/CH-47/EAPS_AxialFan_R.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_AxialFan
+Aircrafts/CH-47/EAPS_Jackscrew.sdef
+Aircrafts/CH-47/EAPS_Jackscrew_End.sdef
+Aircrafts/CH-47/EAPS_Jackscrew_End_L.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_Jackscrew_End
+Aircrafts/CH-47/EAPS_Jackscrew_End_R.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_Jackscrew_End
+Aircrafts/CH-47/EAPS_Jackscrew_L.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_Jackscrew
+Aircrafts/CH-47/EAPS_Jackscrew_R.sdef
+	wave:
+		Effects/Aircrafts/CH-47/EAPS_Jackscrew
 Aircrafts/CH-47/EngineL.sdef
 	wave:
 		Effects/Aircrafts/CH-47/EngineL
@@ -10303,6 +10342,148 @@ Aircrafts/CH-47/TroopWarningAlarm.sdef
 Aircrafts/CH-47/TroopWarningAlarm_End.sdef
 	wave:
 		Effects/Aircrafts/CH-47/TroopWarningAlarm_End
+
+
+CoreMods/aircraft/F-100D:
+=========================
+
+Aircrafts/Engines/J57/f-100d-cart-engine-end.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-cart-engine-end
+Aircrafts/Engines/J57/f-100d-cart-engine-loop.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-cart-engine-loop
+Aircrafts/Engines/J57/f-100d-cart-engine-start.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-cart-engine-start
+Aircrafts/Engines/J57/f-100d-cart-supply-end.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-cart-supply-end
+Aircrafts/Engines/J57/f-100d-cart-supply-loop.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-cart-supply-loop
+Aircrafts/Engines/J57/f-100d-cart-supply-start.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-cart-supply-start
+Aircrafts/Engines/J57/f-100d-compressor-stall.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-01
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-02
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-03
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-05
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-07
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-09
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-10
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-11
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-12
+Aircrafts/Engines/J57/f-100d-engines-ab-ignite.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-ab-ignite
+Aircrafts/Engines/J57/f-100d-engines-ab-loop.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-ab-loop
+Aircrafts/Engines/J57/f-100d-engines-ab-start.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-ab-start
+Aircrafts/Engines/J57/f-100d-engines-ab.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-ab
+Aircrafts/Engines/J57/f-100d-engines-op-intake.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-intake
+Aircrafts/Engines/J57/f-100d-engines-op-thruster.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-thruster
+Aircrafts/Engines/J57/f-100d-engines-op-tone-hi-far.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-tone-hi
+Aircrafts/Engines/J57/f-100d-engines-op-tone-hi.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-tone-hi
+Aircrafts/Engines/J57/f-100d-engines-op-tone-lo-far.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-tone-lo
+Aircrafts/Engines/J57/f-100d-engines-op-tone-lo.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-tone-lo
+Aircrafts/Engines/J57/f-100d-engines-rip.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-rip
+Aircrafts/Engines/J57/f-100d-engines-roar.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-roar
+Aircrafts/F-100D/M39/f-100d-m39-bottom-left-end-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-left-end
+Aircrafts/F-100D/M39/f-100d-m39-bottom-left-end.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-left-end
+Aircrafts/F-100D/M39/f-100d-m39-bottom-left-loop-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-left-loop
+Aircrafts/F-100D/M39/f-100d-m39-bottom-left-loop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-left-loop
+Aircrafts/F-100D/M39/f-100d-m39-bottom-left-start-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-left-start
+Aircrafts/F-100D/M39/f-100d-m39-bottom-left-start.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-left-start
+Aircrafts/F-100D/M39/f-100d-m39-bottom-right-end-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-right-end
+Aircrafts/F-100D/M39/f-100d-m39-bottom-right-end.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-right-end
+Aircrafts/F-100D/M39/f-100d-m39-bottom-right-loop-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-right-loop
+Aircrafts/F-100D/M39/f-100d-m39-bottom-right-loop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-right-loop
+Aircrafts/F-100D/M39/f-100d-m39-bottom-right-start-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-right-start
+Aircrafts/F-100D/M39/f-100d-m39-bottom-right-start.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-bottom-right-start
+Aircrafts/F-100D/M39/f-100d-m39-up-left-end-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-left-end
+Aircrafts/F-100D/M39/f-100d-m39-up-left-end.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-left-end
+Aircrafts/F-100D/M39/f-100d-m39-up-left-loop-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-left-loop
+Aircrafts/F-100D/M39/f-100d-m39-up-left-loop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-left-loop
+Aircrafts/F-100D/M39/f-100d-m39-up-left-start-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-left-start
+Aircrafts/F-100D/M39/f-100d-m39-up-left-start.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-left-start
+Aircrafts/F-100D/M39/f-100d-m39-up-right-end-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-right-end
+Aircrafts/F-100D/M39/f-100d-m39-up-right-end.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-right-end
+Aircrafts/F-100D/M39/f-100d-m39-up-right-loop-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-right-loop
+Aircrafts/F-100D/M39/f-100d-m39-up-right-loop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-right-loop
+Aircrafts/F-100D/M39/f-100d-m39-up-right-start-internal.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-right-start
+Aircrafts/F-100D/M39/f-100d-m39-up-right-start.sdef
+	wave:
+		Effects/Aircrafts/F-100D/M39/f-100d-m39-up-right-start
 
 
 CoreMods/aircraft/F-15E:
@@ -10464,6 +10645,94 @@ Aircrafts/Ka-50/DoorNew/DoorClose.sdef
 Aircrafts/Ka-50/DoorNew/DoorOpen.sdef
 	wave:
 		Effects/Aircrafts/Ka-50/DoorNew/DoorOpen
+
+
+CoreMods/aircraft/La-7:
+=======================
+
+Aircrafts/La-7/Cannon.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cannon
+Aircrafts/La-7/CannonEnd.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cannon_End
+Aircrafts/La-7/Crackling.sdef
+	wave:
+		Effects/Aircrafts/La-7/Crackling
+Aircrafts/La-7/Engine.sdef
+	wave:
+		Effects/Aircrafts/La-7/Engine
+Aircrafts/La-7/EngSpatial.sdef
+	wave:
+		Effects/Aircrafts/La-7/EngSpatial
+Aircrafts/La-7/ExB.sdef
+Aircrafts/La-7/ExB1.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExB1
+Aircrafts/La-7/ExB2.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExB2
+Aircrafts/La-7/ExB3.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExB3
+Aircrafts/La-7/ExF.sdef
+Aircrafts/La-7/ExF1.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExF1
+Aircrafts/La-7/ExF2.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExF2
+Aircrafts/La-7/ExF3.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExF3
+Aircrafts/La-7/ExhaustStart.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExhaustStart
+Aircrafts/La-7/ExR.sdef
+Aircrafts/La-7/ExR1.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExR1
+Aircrafts/La-7/ExR2.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExR2
+Aircrafts/La-7/ExR3.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExR2
+Aircrafts/La-7/ExS.sdef
+Aircrafts/La-7/ExS1.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExS1
+Aircrafts/La-7/ExS2.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExS2
+Aircrafts/La-7/ExS3.sdef
+	wave:
+		Effects/Aircrafts/La-7/ExS3
+Aircrafts/La-7/PlaneWind.sdef
+	wave:
+		Effects/Aircrafts/La-7/PlaneWind
+Aircrafts/La-7/PlaneWingTurbulence.sdef
+	wave:
+		Effects/Aircrafts/La-7/PlaneWingTurbulence
+Aircrafts/La-7/Prop.sdef
+Aircrafts/La-7/Prop1.sdef
+	wave:
+		Effects/Aircrafts/La-7/Prop1
+Aircrafts/La-7/Prop2.sdef
+	wave:
+		Effects/Aircrafts/La-7/Prop2
+Aircrafts/La-7/Prop3.sdef
+	wave:
+		Effects/Aircrafts/La-7/Prop3
+Aircrafts/La-7/Shutdown.sdef
+	wave:
+		Effects/Aircrafts/La-7/Shutdown
+Aircrafts/La-7/Starter.sdef
+	wave:
+		Effects/Aircrafts/La-7/Starter
+Aircrafts/La-7/StarterClutch.sdef
+	wave:
+		Effects/Aircrafts/La-7/StarterClutch
 
 
 CoreMods/aircraft/MiG-29-Fulcrum:
@@ -10657,6 +10926,14 @@ CoreMods/tech/ColdWarAssetsPack:
 CoreMods/tech/Currenthill Assets Pack:
 ======================================
 
+Weapons/PlaneCannon.sdef
+	wave:
+		Effects/Weapons/Automatic/2A42
+Weapons/PlaneCannonEnd.sdef
+	wave:
+		Effects/Weapons/Automatic/Gun2A42_1_End
+		Effects/Weapons/Automatic/Gun2A42_2_End
+		Effects/Weapons/Automatic/Gun2A42_3_End
 
 
 CoreMods/tech/HeavyMetalCore:
@@ -13351,6 +13628,1068 @@ Weapons/Snare.sdef
 		Effects/Weapons/Snare
 
 
+Mods/aircraft/F-100D:
+=====================
+
+Aircrafts/Engines/J57/f-100d-compressor-stall-internal.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-01-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-02-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-03-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-05-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-07-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-09-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-10-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-11-internal
+		Effects/Aircrafts/Engines/J57/f-100d-compressor-stall-12-internal
+Aircrafts/Engines/J57/f-100d-engines-ab-ignite-internal.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-ab-ignite
+Aircrafts/Engines/J57/f-100d-engines-ab-internal.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-ab-internal
+Aircrafts/Engines/J57/f-100d-engines-op-tone-hi-internal.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-tone-hi-internal
+Aircrafts/Engines/J57/f-100d-engines-op-tone-lo-internal.sdef
+	wave:
+		Effects/Aircrafts/Engines/J57/f-100d-engines-op-tone-lo-internal
+Aircrafts/F-100D/Cockpit/1000HzTone.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/1000HzTone
+Aircrafts/F-100D/Cockpit/900HzTone.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/900HzTone
+Aircrafts/F-100D/Cockpit/Button/ButtonDown.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Button/ButtonDown1
+		Effects/Aircrafts/F-100D/Cockpit/Button/ButtonDown2
+Aircrafts/F-100D/Cockpit/Button/ButtonUp.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Button/ButtonUp1
+		Effects/Aircrafts/F-100D/Cockpit/Button/ButtonUp2
+Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-motor.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-motor
+Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-seal-close.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-seal-close-1
+		Effects/Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-seal-close-2
+		Effects/Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-seal-close-3
+Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-seal-open.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Canopy/f-100d-canopy-seal-open
+Aircrafts/F-100D/Cockpit/Comp.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Comp_01
+		Effects/Aircrafts/F-100D/Cockpit/Comp_02
+		Effects/Aircrafts/F-100D/Cockpit/Comp_03
+		Effects/Aircrafts/F-100D/Cockpit/Comp_04
+Aircrafts/F-100D/Cockpit/Cover/RedCoverClose.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Cover/RedCoverClose
+Aircrafts/F-100D/Cockpit/Cover/RedCoverOpen.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Cover/RedCoverOpen
+Aircrafts/F-100D/Cockpit/Effects/f-100d-brake-pump.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-brake-pump
+Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-rattle-hi.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-rattle-hi
+Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-rattle-lo.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-rattle-lo
+Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-structural-damage.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-structural-damage
+Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-weapon-release.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-weapon-release
+Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-wind-hi.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-wind-hi
+Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-wind-lo.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-cockpit-wind-lo
+Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-flaps.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-flaps
+Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-gear-c.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-gear-c
+Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-gear-l.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-gear-l
+Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-gear-r.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-gear-r
+Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-speedbrake.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-hydraulics-speedbrake
+Aircrafts/F-100D/Cockpit/Effects/f-100d-instrument-inverter.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-instrument-inverter
+Aircrafts/F-100D/Cockpit/Effects/f-100d-instrument-vibrator.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Effects/f-100d-instrument-vibrator-loop
+Aircrafts/F-100D/Cockpit/GearWarning.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GearWarning
+Aircrafts/F-100D/Cockpit/GroundCrew/crew_01.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/crew_01
+Aircrafts/F-100D/Cockpit/GroundCrew/crew_02.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/crew_02
+Aircrafts/F-100D/Cockpit/GroundCrew/crew_03.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/crew_03
+Aircrafts/F-100D/Cockpit/GroundCrew/crew_04.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/crew_04
+Aircrafts/F-100D/Cockpit/GroundCrew/crew_05.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/crew_05
+Aircrafts/F-100D/Cockpit/GroundCrew/crew_06.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/crew_06
+Aircrafts/F-100D/Cockpit/GroundCrew/pilot_01.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/pilot_01
+Aircrafts/F-100D/Cockpit/GroundCrew/pilot_02.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/pilot_02
+Aircrafts/F-100D/Cockpit/GroundCrew/pilot_03.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/pilot_03
+Aircrafts/F-100D/Cockpit/GroundCrew/pilot_04.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/pilot_04
+Aircrafts/F-100D/Cockpit/GroundCrew/pilot_05.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/pilot_05
+Aircrafts/F-100D/Cockpit/GroundCrew/pilot_06.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/GroundCrew/pilot_06
+Aircrafts/F-100D/Cockpit/HeavySwitch/Click.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/HeavySwitch/click1
+		Effects/Aircrafts/F-100D/Cockpit/HeavySwitch/click2
+		Effects/Aircrafts/F-100D/Cockpit/HeavySwitch/click3
+		Effects/Aircrafts/F-100D/Cockpit/HeavySwitch/click4
+Aircrafts/F-100D/Cockpit/InstrumentVibrator.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/AltimeterVibrator_temp
+Aircrafts/F-100D/Cockpit/Knob/Knob.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob1
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob2
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob3
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob4
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob5
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob6
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob7
+		Effects/Aircrafts/F-100D/Cockpit/Knob/Knob8
+Aircrafts/F-100D/Cockpit/RHAW/1L13_EWR - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/1L13_EWR - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/55G6_EWR - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/55G6_EWR - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_30 - FIXED.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_30 - FIXED
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_63 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_63 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_63 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_63 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_68 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_68 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_68 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_68 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_71 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_71 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_71 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_71 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_73 - SEARCH 0.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_73 - SEARCH 0
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_73 - SEARCH 1.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_73 - SEARCH 1
+Aircrafts/F-100D/Cockpit/RHAW/AN_APG_73 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APG_73 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_120 - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_120 - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_120 - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_120 - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_159 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_159 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_159 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APQ_159 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/AN_APS_138 - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APS_138 - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/AN_APY_1 - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_APY_1 - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/AN_MPQ_46 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_MPQ_46 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/AN_MPQ_50 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_MPQ_50 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/AN_MPQ_55 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/AN_MPQ_55 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/BigBird - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/BigBird - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/BigBird - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/BigBird - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/carrier search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/carrier search radar - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/ClamShell - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/ClamShell - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/Cyrano_IV - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Cyrano_IV - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Cyrano_IV - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Cyrano_IV - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/Dog Ear - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Dog Ear - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Fan-Song - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Fan-Song - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/Fan-Song - LO PRF AAA BIT.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Fan-Song - LO PRF AAA BIT
+Aircrafts/F-100D/Cockpit/RHAW/Fan-Song - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Fan-Song - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/Fan-Song-E - HI PRF LORO.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Fan-Song-E - HI PRF LORO
+Aircrafts/F-100D/Cockpit/RHAW/Fan-Song-E - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Fan-Song-E - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/Fan-Song-E - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Fan-Song-E - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/FireCan - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/FireCan - Search
+Aircrafts/F-100D/Cockpit/RHAW/FireCan - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/FireCan - Track
+Aircrafts/F-100D/Cockpit/RHAW/FlapLid - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/FlapLid - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/FoxFire - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/FoxFire - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/FoxFire - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/FoxFire - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/Gepard - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Gepard - Search
+Aircrafts/F-100D/Cockpit/RHAW/Gepard - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Gepard - Track
+Aircrafts/F-100D/Cockpit/RHAW/HighLark - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/HighLark - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/HighLark - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/HighLark - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_SR - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_SR - Search
+Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_STR - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_STR - Search
+Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_STR - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_STR - Track
+Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_TR - Acquisition.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_TR - Acquisition
+Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_TR - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Kub_1S91_TR - Track
+Aircrafts/F-100D/Cockpit/RHAW/Low Blow - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Low Blow - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/Low Blow - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Low Blow - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/molniya search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/molniya search radar - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/moskva search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/moskva search radar - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/N_001 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/N_001 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/N_001 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/N_001 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/N_011M - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/N_011M - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/N_011M - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/N_011M - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/N_019 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/N_019 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/N_019 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/N_019 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/Osa_9A33_LN - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Osa_9A33_LN - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Osa_9A33_LN - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Osa_9A33_LN - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/p-19 s-125 sr - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/p-19 s-125 sr - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/Patriot_STR - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Patriot_STR - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Patriot_STR - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Patriot_STR - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/RDY - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/RDY - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/RDY - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/RDY - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/rezki search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/rezki search radar - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/Roland ADS - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Roland ADS - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Roland ADS - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Roland ADS - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/RP_22 - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/RP_22 - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/RP_22 - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/RP_22 - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/RP_5 - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/RP_5 - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/RP_5 - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/RP_5 - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/SA-11 Buk SR 9S18M1 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/SA-11 Buk SR 9S18M1 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/SA-11 Buk TR - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/SA-11 Buk TR - HI PRF
+Aircrafts/F-100D/Cockpit/RHAW/SA-11 Buk TR - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/SA-11 Buk TR - LO PRF
+Aircrafts/F-100D/Cockpit/RHAW/seasparrow tr - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/seasparrow tr - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/TinShield - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/TinShield - REGULAR
+Aircrafts/F-100D/Cockpit/RHAW/Tor_9A331 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Tor_9A331 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Tor_9A331 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Tor_9A331 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/Tunguska_2S6 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Tunguska_2S6 - SEARCH
+Aircrafts/F-100D/Cockpit/RHAW/Tunguska_2S6 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Tunguska_2S6 - TRACK
+Aircrafts/F-100D/Cockpit/RHAW/Vega_M - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/RHAW/Vega_M - REGULAR
+Aircrafts/F-100D/Cockpit/SeekSilence/SeekBrokenTone.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/SeekSilence/SeekBrokenTone
+Aircrafts/F-100D/Cockpit/SeekSilence/SeekSingleTone.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/SeekSilence/SeekSingleTone
+Aircrafts/F-100D/Cockpit/SeekSilence/SeekTransmitTone.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/SeekSilence/SeekTransmitTone
+Aircrafts/F-100D/Cockpit/Shrike/1L13_EWR - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/1L13_EWR - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/55G6_EWR - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/55G6_EWR - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_30 - FIXED.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_30 - FIXED
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_63 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_63 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_63 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_63 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_68 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_68 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_68 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_68 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_71 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_71 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_71 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_71 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_73 - SEARCH 0.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_73 - SEARCH 0
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_73 - SEARCH 1.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_73 - SEARCH 1
+Aircrafts/F-100D/Cockpit/Shrike/AN_APG_73 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APG_73 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_120 - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_120 - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_120 - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_120 - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_159 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_159 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_159 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APQ_159 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/AN_APS_138 - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APS_138 - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/AN_APY_1 - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_APY_1 - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/AN_MPQ_46 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_MPQ_46 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/AN_MPQ_50 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_MPQ_50 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/AN_MPQ_55 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/AN_MPQ_55 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/BigBird - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/BigBird - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/BigBird - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/BigBird - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/carrier search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/carrier search radar - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/ClamShell - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/ClamShell - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/Cyrano_IV - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Cyrano_IV - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Cyrano_IV - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Cyrano_IV - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/Dog Ear - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Dog Ear - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Fan-Song - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Fan-Song - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/Fan-Song - LO PRF AAA BIT.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Fan-Song - LO PRF AAA BIT
+Aircrafts/F-100D/Cockpit/Shrike/Fan-Song - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Fan-Song - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/Fan-Song-E - HI PRF LORO.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Fan-Song-E - HI PRF LORO
+Aircrafts/F-100D/Cockpit/Shrike/Fan-Song-E - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Fan-Song-E - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/Fan-Song-E - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Fan-Song-E - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/FireCan - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/FireCan - Search
+Aircrafts/F-100D/Cockpit/Shrike/FireCan - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/FireCan - Track
+Aircrafts/F-100D/Cockpit/Shrike/FlapLid - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/FlapLid - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/FoxFire - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/FoxFire - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/FoxFire - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/FoxFire - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/Gepard - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Gepard - Search
+Aircrafts/F-100D/Cockpit/Shrike/Gepard - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Gepard - Track
+Aircrafts/F-100D/Cockpit/Shrike/HighLark - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/HighLark - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/HighLark - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/HighLark - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_SR - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_SR - Search
+Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_STR - Search.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_STR - Search
+Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_STR - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_STR - Track
+Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_TR - Acquisition.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_TR - Acquisition
+Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_TR - Track.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Kub_1S91_TR - Track
+Aircrafts/F-100D/Cockpit/Shrike/Low Blow - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Low Blow - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/Low Blow - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Low Blow - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/molniya search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/molniya search radar - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/moskva search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/moskva search radar - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/N_001 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/N_001 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/N_001 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/N_001 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/N_011M - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/N_011M - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/N_011M - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/N_011M - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/N_019 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/N_019 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/N_019 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/N_019 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/Osa_9A33_LN - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Osa_9A33_LN - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Osa_9A33_LN - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Osa_9A33_LN - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/p-19 s-125 sr - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/p-19 s-125 sr - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/Patriot_STR - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Patriot_STR - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Patriot_STR - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Patriot_STR - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/RDY - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/RDY - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/RDY - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/RDY - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/rezki search radar - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/rezki search radar - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/Roland ADS - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Roland ADS - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Roland ADS - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Roland ADS - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/RP_22 - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/RP_22 - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/RP_22 - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/RP_22 - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/RP_5 - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/RP_5 - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/RP_5 - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/RP_5 - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/SA-11 Buk SR 9S18M1 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/SA-11 Buk SR 9S18M1 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/SA-11 Buk TR - HI PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/SA-11 Buk TR - HI PRF
+Aircrafts/F-100D/Cockpit/Shrike/SA-11 Buk TR - LO PRF.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/SA-11 Buk TR - LO PRF
+Aircrafts/F-100D/Cockpit/Shrike/seasparrow tr - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/seasparrow tr - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/TinShield - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/TinShield - REGULAR
+Aircrafts/F-100D/Cockpit/Shrike/Tor_9A331 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Tor_9A331 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Tor_9A331 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Tor_9A331 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/Tunguska_2S6 - SEARCH.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Tunguska_2S6 - SEARCH
+Aircrafts/F-100D/Cockpit/Shrike/Tunguska_2S6 - TRACK.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Tunguska_2S6 - TRACK
+Aircrafts/F-100D/Cockpit/Shrike/Vega_M - REGULAR.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Shrike/Vega_M - REGULAR
+Aircrafts/F-100D/Cockpit/Switch/Switch.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switch/Switch1
+		Effects/Aircrafts/F-100D/Cockpit/Switch/Switch2
+		Effects/Aircrafts/F-100D/Cockpit/Switch/Switch3
+		Effects/Aircrafts/F-100D/Cockpit/Switch/Switch4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-adf-tune.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-adf-tune-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-adf-tune-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-adf-tune-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-adf-tune-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-afterburner-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-afterburner-in-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-afterburner-in-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-afterburner-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-afterburner-out-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-afterburner-out-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-off.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-off-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-off-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-off-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-on.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-on-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-on-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-cicuit-breaker-on-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-drop-tank-off.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-drop-tank-off-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-drop-tank-off-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-drop-tank-on.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-drop-tank-on-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-drop-tank-on-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-emer-jett-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-emer-jett-in-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-emer-jett-in-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-emer-jett-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-emer-jett-out-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-emer-jett-out-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-start-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-start-down-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-start-down-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-start-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-start-up-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-start-up-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-stop-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-stop-down
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-stop-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-engine-stop-up
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gear-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gear-down-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gear-down-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gear-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gear-up-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gear-up-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-button-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-button-in
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-button-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-button-out
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-selector.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-selector-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-selector-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-selector-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-gunsight-selector-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-close.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-close-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-close-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-close-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-open.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-open-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-open-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-cover-open-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-test-cover-close.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-test-cover-close-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-test-cover-close-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-test-cover-open.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-test-cover-open-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-flt-cont-test-cover-open-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-rotary-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-rotary-down-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-rotary-down-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-rotary-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-rotary-up-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-hyd-rotary-up-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-close.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-close-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-close-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-close-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-open.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-open-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-open-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-cover-open-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-switch-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-switch-down
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-switch-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-master-arm-switch-up
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-nosewheel-steering-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-nosewheel-steering-in
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-nosewheel-steering-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-nosewheel-steering-out
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-oxygen-regulator-off.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-oxygen-regulator-off
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-oxygen-regulator-on.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-oxygen-regulator-on
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-select-knob.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-select-knob-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-select-knob-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-select-knob-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-select-knob-4
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-select-knob-5
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-selector-cover-close.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-selector-cover-close
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-selector-cover-open.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-selector-cover-open-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-pylon-selector-cover-open-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rocket-bomb-depression-off.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rocket-bomb-depression-off-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rocket-bomb-depression-off-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rocket-bomb-depression-on.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rocket-bomb-depression-on-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rocket-bomb-depression-on-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-dull.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-dull-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-dull-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-dull-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-large.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-large-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-large-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-large-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-small.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-small-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-small-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-rotary-small-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-speedbrake-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-speedbrake-in
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-speedbrake-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-speedbrake-out
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-in-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-in-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-in-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-in-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-out-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-out-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-out-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-emer-damper-dc-out-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-in-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-in-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-in-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-out-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-out-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-hat-out-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-trigger-pickle-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-trigger-pickle-in-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-trigger-pickle-in-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-trigger-pickle-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-trigger-pickle-out-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stick-trigger-pickle-out-2
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-4
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-5
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-6
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-knob-7
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-reset.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-reset
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-start.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-stopwatch-start
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-down-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-down-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-down-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-down-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-up-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-up-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-up-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-heavy-up-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-down-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-down-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-down-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-up-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-up-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-light-up-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-down.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-down-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-down-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-down-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-up.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-up-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-up-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-switch-medium-up-3
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-tacan-digits.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-tacan-digits-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-tacan-digits-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-tacan-digits-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-tacan-digits-4
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-takeoff-rudder-trim-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-takeoff-rudder-trim-in
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-takeoff-rudder-trim-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-takeoff-rudder-trim-out
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-cage-uncage-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-cage-uncage-in
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-cage-uncage-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-cage-uncage-out
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-radio-ptt-in.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-radio-ptt-in
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-radio-ptt-out.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-throttle-radio-ptt-out
+Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-warning-light-press.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-warning-light-press-1
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-warning-light-press-2
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-warning-light-press-3
+		Effects/Aircrafts/F-100D/Cockpit/Switches/f-100f-cockpit-warning-light-press-4
+Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowFlaps.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowFlaps
+Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowGear_C.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowGear_C
+Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowGear_L.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowGear_L
+Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowGear_R.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowGear_R
+Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowSpeedbrake.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_AirflowSpeedbrake
+Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitRattle.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitRattle
+Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitRumble.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitRumble
+Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitStructuralDamage.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitStructuralDamage
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsFlapsEnd.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsFlapsStop
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsFlapsMove.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsFlapsMove
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsFlapsStop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsFlapsEnd
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndIn_C.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndIn_C
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndIn_L.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndIn_L
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndIn_R.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndIn_R
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndOut_C.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndOut_C
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndOut_L.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndOut_L
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndOut_R.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearEndOut_R
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearMove.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearMove
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodClose_C.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodClose_C
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodClose_L.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodClose_L
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodClose_R.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodClose_R
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodOpen_C.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodOpen_C
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodOpen_L.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodOpen_L
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodOpen_R.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearPodOpen_R
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearStop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsGearStop
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsSpeedbrakeMove.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsSpeedbrakeMove
+Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsSpeedbrakeStop.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_HydraulicsSpeedbrakeStop
+Aircrafts/F-100D/Cockpit/tmp/temp_afterburner_engage.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_01
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_02
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_03
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_04
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_05
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_06
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_07
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_08
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_09
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_10
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_11
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_12
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_13
+		Effects/Aircrafts/F-100D/Cockpit/tmp/a-4e_CockpitSlats_14
+Aircrafts/F-100D/Cockpit/Tumb/TumbDown.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Tumb/TumbDown
+Aircrafts/F-100D/Cockpit/Tumb/TumbUp.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/Tumb/TumbUp
+Aircrafts/F-100D/Cockpit/WindowPush.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Cockpit/WindowPush
+Aircrafts/F-100D/TestEndIn.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Test_In_End
+Aircrafts/F-100D/TestIn.sdef
+	wave:
+		Effects/Aircrafts/F-100D/Test_In
+
+
 Mods/aircraft/F-15C:
 ====================
 
@@ -15882,6 +17221,9 @@ Aircrafts/CH-47/Cockpit/SW_08.sdef
 		Effects/Aircrafts/CH-47/Cockpit/SW_08_1
 		Effects/Aircrafts/CH-47/Cockpit/SW_08_2
 		Effects/Aircrafts/CH-47/Cockpit/SW_08_3
+		Effects/Aircrafts/CH-47/Cockpit/SW_08_4
+		Effects/Aircrafts/CH-47/Cockpit/SW_08_5
+		Effects/Aircrafts/CH-47/Cockpit/SW_08_6
 Aircrafts/CH-47/Cockpit/SW_09_Off.sdef
 	wave:
 		Effects/Aircrafts/CH-47/Cockpit/SW_09_1_Off
@@ -15908,6 +17250,8 @@ Aircrafts/CH-47/Cockpit/SW_11.sdef
 		Effects/Aircrafts/CH-47/Cockpit/SW_11_3
 		Effects/Aircrafts/CH-47/Cockpit/SW_11_4
 		Effects/Aircrafts/CH-47/Cockpit/SW_11_5
+		Effects/Aircrafts/CH-47/Cockpit/SW_11_6
+		Effects/Aircrafts/CH-47/Cockpit/SW_11_7
 Aircrafts/CH-47/Cockpit/SW_12.sdef
 	wave:
 		Effects/Aircrafts/CH-47/Cockpit/SW_12_1
@@ -16653,6 +17997,180 @@ Aircrafts/L-39/Cockpit/Sw9.sdef
 Aircrafts/L-39/Cockpit/Sw_Null.sdef
 	wave:
 		Effects/Aircrafts/L-39/Cockpit/Sw_Null
+
+
+Mods/aircraft/La-7:
+===================
+
+Aircrafts/La-7/CannonEndIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cannon_EndIn
+Aircrafts/La-7/CannonIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/CannonIn
+Aircrafts/La-7/Cockpit/CracklingIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/CracklingIn
+Aircrafts/La-7/Cockpit/Door_close.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Door_close
+Aircrafts/La-7/Cockpit/Door_open.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Door_open
+Aircrafts/La-7/Cockpit/EngineIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/EngineIn
+Aircrafts/La-7/Cockpit/ExhaustStartIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExhaustStartIn
+Aircrafts/La-7/Cockpit/ExIn.sdef
+Aircrafts/La-7/Cockpit/ExIn1.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExIn1
+Aircrafts/La-7/Cockpit/ExIn2.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExIn2
+Aircrafts/La-7/Cockpit/ExIn3.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExIn3
+Aircrafts/La-7/Cockpit/ExProp.sdef
+Aircrafts/La-7/Cockpit/ExProp1.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/PropIn1
+Aircrafts/La-7/Cockpit/ExProp2.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/PropIn2
+Aircrafts/La-7/Cockpit/ExProp3.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/PropIn3
+Aircrafts/La-7/Cockpit/ExRIn.sdef
+Aircrafts/La-7/Cockpit/ExRIn1.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExRIn1
+Aircrafts/La-7/Cockpit/ExRIn2.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExRIn2
+Aircrafts/La-7/Cockpit/ExRIn3.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExRIn3
+Aircrafts/La-7/Cockpit/ExSmPopIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ExSmPopIn1
+		Effects/Aircrafts/La-7/Cockpit/ExSmPopIn2
+		Effects/Aircrafts/La-7/Cockpit/ExSmPopIn3
+		Effects/Aircrafts/La-7/Cockpit/ExSmPopIn4
+Aircrafts/La-7/Cockpit/MotorBroken.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/MotorBroken
+Aircrafts/La-7/Cockpit/MotorDry.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/MotorDry
+Aircrafts/La-7/Cockpit/ShutdownIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/ShutdownIn
+Aircrafts/La-7/Cockpit/StarterClutchIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/StarterClutchIn
+Aircrafts/La-7/Cockpit/StarterIn.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/StarterIn
+Aircrafts/La-7/Cockpit/Sw01.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw01_1
+		Effects/Aircrafts/La-7/Cockpit/Sw01_2
+		Effects/Aircrafts/La-7/Cockpit/Sw01_3
+		Effects/Aircrafts/La-7/Cockpit/Sw01_4
+		Effects/Aircrafts/La-7/Cockpit/Sw01_5
+Aircrafts/La-7/Cockpit/Sw02_Off.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw02_Off
+Aircrafts/La-7/Cockpit/Sw02_On.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw02_On
+Aircrafts/La-7/Cockpit/Sw03.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw03_1
+		Effects/Aircrafts/La-7/Cockpit/Sw03_2
+		Effects/Aircrafts/La-7/Cockpit/Sw03_3
+		Effects/Aircrafts/La-7/Cockpit/Sw03_4
+Aircrafts/La-7/Cockpit/Sw04.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw04_1
+		Effects/Aircrafts/La-7/Cockpit/Sw04_2
+		Effects/Aircrafts/La-7/Cockpit/Sw04_3
+		Effects/Aircrafts/La-7/Cockpit/Sw04_4
+		Effects/Aircrafts/La-7/Cockpit/Sw04_5
+		Effects/Aircrafts/La-7/Cockpit/Sw04_6
+Aircrafts/La-7/Cockpit/Sw05_Down.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw05_Down
+Aircrafts/La-7/Cockpit/Sw05_Up.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw05_Up
+Aircrafts/La-7/Cockpit/Sw06.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw06
+Aircrafts/La-7/Cockpit/Sw07_Left.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw07_Left
+Aircrafts/La-7/Cockpit/Sw07_Right.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw07_Right
+Aircrafts/La-7/Cockpit/Sw08_Off.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw08_Off
+Aircrafts/La-7/Cockpit/Sw08_On.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw08_On
+Aircrafts/La-7/Cockpit/Sw09_Down.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Down1
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Down2
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Down3
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Down4
+Aircrafts/La-7/Cockpit/Sw09_Up.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Up1
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Up2
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Up3
+		Effects/Aircrafts/La-7/Cockpit/Sw09_Up4
+Aircrafts/La-7/Cockpit/Sw10_Off.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw10_Off
+Aircrafts/La-7/Cockpit/Sw10_On.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw10_On
+Aircrafts/La-7/Cockpit/Sw11_Off.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw11_Off
+Aircrafts/La-7/Cockpit/Sw11_On.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw11_On
+Aircrafts/La-7/Cockpit/Sw12.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw12_1
+		Effects/Aircrafts/La-7/Cockpit/Sw12_2
+		Effects/Aircrafts/La-7/Cockpit/Sw12_3
+Aircrafts/La-7/Cockpit/Sw13.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw13_1
+		Effects/Aircrafts/La-7/Cockpit/Sw13_2
+		Effects/Aircrafts/La-7/Cockpit/Sw13_3
+		Effects/Aircrafts/La-7/Cockpit/Sw13_4
+		Effects/Aircrafts/La-7/Cockpit/Sw13_5
+		Effects/Aircrafts/La-7/Cockpit/Sw13_6
+Aircrafts/La-7/Cockpit/Sw14_Down.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw14_Down
+Aircrafts/La-7/Cockpit/Sw14_Up.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw14_Up
+Aircrafts/La-7/Cockpit/Sw15.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw15
+Aircrafts/La-7/Cockpit/Sw16.sdef
+	wave:
+		Effects/Aircrafts/La-7/Cockpit/Sw16
 
 
 Mods/aircraft/Mi-24P:
@@ -21764,6 +23282,17 @@ Ambient/Town.sdef
 
 Mods/terrains/PersianGulf:
 ==========================
+
+Ambient/Field.sdef
+	wave:
+		Effects/Ambient/Field
+Ambient/Field_Night.sdef
+	wave:
+		Effects/Ambient/Field_Night
+
+
+Mods/terrains/Syria:
+====================
 
 Ambient/Field.sdef
 	wave:

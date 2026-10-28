@@ -1,0 +1,84 @@
+/* Tasky's guided tour (src/pages/onboarding.js) */
+
+#tour { position: fixed; inset: 0; z-index: 25000; pointer-events: none; animation: tour-fade 0.2s ease-out; }
+#tour.is-leaving { opacity: 0; transition: opacity 0.2s ease; }
+
+/* The dim: a full layer when nothing is pointed at, else the spotlight's huge shadow */
+.tour-dim { position: absolute; inset: 0; background: rgb(3 6 12 / 0.62); backdrop-filter: blur(2px); pointer-events: auto; transition: opacity 0.25s ease; }
+#tour:has(.tour-spot:not(.is-hidden)) .tour-dim { opacity: 0; }
+.tour-spot {
+  position: absolute;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgb(3 6 12 / 0.62), 0 0 0 2px #3b82f6, 0 0 24px 4px rgba(59, 130, 246, 0.45);
+  transition: left 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.35s, height 0.35s;
+  animation: tour-pulse 2s ease-in-out infinite;
+}
+.tour-spot.is-hidden { opacity: 0; }
+
+/* Dialogs opened by pages (e.g. the first-run scanner) wait under the tour */
+body.tour-active #modal-overlay.tour-behind { z-index: 1; }
+
+.tour-card {
+  position: absolute;
+  width: min(440px, calc(100vw - 32px));
+  pointer-events: auto;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+  animation: tour-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+  transition: left 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), top 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.tour-card.is-center { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%); width: min(520px, calc(100vw - 32px)); animation: tour-in-center 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1) both; transition: none; }
+
+.tour-head { display: flex; gap: 14px; align-items: center; padding: 18px 20px 6px; }
+.tour-tasky { flex: none; width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.06) 70%); border: 1px solid rgba(59, 130, 246, 0.25); }
+.tour-tasky img { width: 52px; height: 52px; object-fit: contain; animation: tour-bob 2.6s ease-in-out infinite; }
+.tour-tasky--happy img { animation: tour-hop 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) both, tour-bob 2.6s 0.7s ease-in-out infinite; }
+.tour-heading { flex: 1; min-width: 0; }
+.tour-heading h3 { margin: 4px 0 0; font-size: 18px; font-weight: 750; letter-spacing: -0.01em; color: #f1f5f9; }
+.tour-chapter { display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #475569; flex-wrap: wrap; }
+.tour-chapter span.on { color: #60a5fa; }
+.tour-chapter i { width: 10px; height: 1px; background: #334155; }
+.tour-x { align-self: flex-start; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: #64748b; cursor: pointer; }
+.tour-x:hover { background: rgba(255, 255, 255, 0.06); color: #f1f5f9; }
+
+.tour-body { padding: 8px 20px 4px; font-size: 13.5px; line-height: 1.6; }
+.tour-body b { color: #f1f5f9; }
+.tour-body code { font-family: var(--font-mono); font-size: 12px; padding: 1px 5px; border-radius: 5px; background: rgba(255, 255, 255, 0.07); color: #e2e8f0; }
+
+.tour-tip { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; padding: 9px 12px; border-radius: 10px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); color: #fcd34d; font-size: 12.5px; }
+.tour-tip svg { margin-top: 2px; }
+
+.tour-langs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.tour-lang { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: 12px; cursor: pointer; font: 600 14px var(--font-sans); color: #e2e8f0; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); transition: border-color 0.15s, background 0.15s; }
+.tour-lang:hover { border-color: rgba(255, 255, 255, 0.22); }
+.tour-lang.on { border-color: #3b82f6; background: rgba(59, 130, 246, 0.12); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18); }
+.tour-flag { display: grid; place-items: center; }
+
+.tour-flow { display: flex; align-items: center; gap: 4px; margin-top: 14px; }
+.tour-flow-box { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); font-size: 11.5px; font-weight: 600; color: #e2e8f0; text-align: center; }
+.tour-flow-box svg { color: #60a5fa; }
+.tour-flow-box:last-child svg { color: #34d399; }
+.tour-flow-arrow { color: #475569; flex: none; }
+
+.tour-check { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 7px; }
+.tour-check li { display: flex; gap: 9px; align-items: flex-start; }
+.tour-check svg { color: #34d399; margin-top: 3px; }
+
+.tour-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 12px; }
+.tour-progress { display: flex; gap: 5px; }
+.tour-progress span { width: 7px; height: 7px; border-radius: 50%; background: #1e293b; transition: all 0.25s ease; }
+.tour-progress span.past { background: #334d7a; }
+.tour-progress span.now { width: 20px; border-radius: 4px; background: #3b82f6; }
+.tour-actions { display: flex; gap: 6px; }
+.tour-keys { padding: 0 20px 12px; font-size: 10.5px; color: #475569; }
+
+@keyframes tour-fade { from { opacity: 0; } }
+@keyframes tour-in { from { opacity: 0; transform: translateY(8px) scale(0.97); } }
+@keyframes tour-in-center { from { opacity: 0; transform: translate(-50%, -46%) scale(0.97); } }
+@keyframes tour-pulse { 50% { box-shadow: 0 0 0 9999px rgb(3 6 12 / 0.62), 0 0 0 2px #60a5fa, 0 0 34px 8px rgba(59, 130, 246, 0.55); } }
+@keyframes tour-bob { 50% { transform: translateY(-3px); } }
+@keyframes tour-hop { 0% { transform: scale(0.6) rotate(-12deg); } 100% { transform: none; } }

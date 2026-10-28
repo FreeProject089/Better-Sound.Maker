@@ -5,6 +5,7 @@ import { t, updateTranslations } from '../utils/i18n.js';
 import { getIcon, renderIcons } from '../utils/icons.js';
 import { showModal } from '../components/modal.js';
 import { GITHUB_REPO, APP_VERSION } from '../utils/version.js';
+import { openUrl } from '../platform/native.js';
 
 export function renderCredits(container) {
   container.innerHTML = `
@@ -117,13 +118,13 @@ export function renderCredits(container) {
       try {
         let text;
         if (window.APP_CONFIG?.LocalLicense === 'true') {
-          if (window.electronAPI) {
-            const appPath = await window.electronAPI.getAppPath();
+          if (window.nativeAPI) {
+            const appPath = await window.nativeAPI.getAppPath();
             // Try public/LICENSE first, fallback to LICENSE if not found
             try {
-              text = await window.electronAPI.readTextFile(`${appPath}/public/LICENSE`);
+              text = await window.nativeAPI.readTextFile(`${appPath}/public/LICENSE`);
             } catch (e) {
-              text = await window.electronAPI.readTextFile(`${appPath}/LICENSE`);
+              text = await window.nativeAPI.readTextFile(`${appPath}/LICENSE`);
             }
           } else {
             // Load from local web server path
@@ -171,7 +172,7 @@ export function renderCredits(container) {
         });
       } catch (err) {
         console.warn('License fetch failed, falling back to GitHub page:', err);
-        window.open(`https://github.com/${GITHUB_REPO}`, '_blank');
+        openUrl(`https://github.com/${GITHUB_REPO}`);
       }
     });
   }

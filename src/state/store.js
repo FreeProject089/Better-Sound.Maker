@@ -172,7 +172,7 @@ export async function setAudioFile(sdefPath, file, meta) {
     if (state.selectedAssets[sdefPath]) {
         state.selectedAssets[sdefPath].audioFileName = file.name;
         state.selectedAssets[sdefPath].audioMeta = meta;
-        // Persist path if available (Electron)
+        // Persist path if available (desktop)
         if (file.path) {
             state.selectedAssets[sdefPath].audioPath = file.path;
         } else {
@@ -559,11 +559,11 @@ export async function importSdefTemplates(templates) {
 // Initialize
 loadState();
 
-// Restore persisted audio files (if in Electron)
+// Restore persisted audio files (desktop app)
 // Restore persisted audio files
 (async function restoreAudioFiles() {
-    // 1. Electron Strategy: Read from disk paths
-    if (window.electronAPI) {
+    // 1. Desktop strategy: Read from disk paths
+    if (window.nativeAPI) {
         // Wait a tick for listeners to maybe be ready, though not strictly necessary
         await new Promise(r => setTimeout(r, 100));
 
@@ -574,7 +574,7 @@ loadState();
             const asset = state.selectedAssets[key];
             if (asset.audioPath && !audioFiles.has(key)) {
                 try {
-                    const buffer = await window.electronAPI.readFile(asset.audioPath);
+                    const buffer = await window.nativeAPI.readFile(asset.audioPath);
                     if (buffer) {
                         const type = asset.audioFileName?.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav';
                         const blob = new Blob([buffer], { type });
@@ -595,7 +595,7 @@ loadState();
                     const waveKey = `${key}::${wavePath}`;
                     if (waveData.audioPath && !audioFiles.has(waveKey)) {
                         try {
-                            const buffer = await window.electronAPI.readFile(waveData.audioPath);
+                            const buffer = await window.nativeAPI.readFile(waveData.audioPath);
                             if (buffer) {
                                 const type = waveData.fileName?.endsWith('.ogg') ? 'audio/ogg' : 'audio/wav';
                                 const blob = new Blob([buffer], { type });
@@ -612,19 +612,19 @@ loadState();
 
         if (restoredCount > 0) {
             notify('selectedAssets');
-            console.log(`Restored ${restoredCount} audio files from disk (Electron).`);
+            console.log(`Restored ${restoredCount} audio files from disk (desktop).`);
         }
     }
 
     // 2. Browser Strategy: Read from IndexedDB
-    // We try this regardless of Electron, in case some files were "downloaded"/synced and stored in IDB
+    // We try this regardless of platform, in case some files were "downloaded"/synced and stored in IDB
     try {
         const keys = await idbKeys();
         let idbCount = 0;
         for (const k of keys) {
             if (typeof k === 'string' && k.startsWith(ASSET_FILES_PREFIX)) {
                 const sdefPath = k.replace(ASSET_FILES_PREFIX, '');
-                // Only restore if we don't have it yet (e.g. from Electron path)
+                // Only restore if we don't have it yet (e.g. from a disk path)
                 if (!audioFiles.has(sdefPath)) {
                     const file = await get(k);
                     if (file) {

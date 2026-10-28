@@ -17,6 +17,7 @@ import { guessLoopType, detectSoundType, SOUND_TYPES, analyzeAudioFile, ensureRu
 import { pickTextFile, pickJsonFile } from '../utils/file-picker.js';
 import { showModal } from '../components/modal.js';
 import { escapeHtml } from '../utils/html.js';
+import { originalForWaves, loadOriginals, originalsReady } from '../utils/dcs-originals.js';
 
 let allAssets = [];
 // currentPath is an array of folder segments (e.g. ['Aircrafts', 'AH-64D'])
@@ -41,6 +42,7 @@ let listContainer = null;
 let selectedDetailAsset = null;
 
 export async function renderLibrary(container) {
+  if (!originalsReady()) loadOriginals().then(idx => { if (idx && document.querySelector('.asset-row')) renderLibrary(container); });
   await ensureRulesLoaded();
   container.innerHTML = `
     <div class="page-header" style="margin-bottom:16px;">
@@ -800,10 +802,11 @@ function renderVirtualList(reset = false) {
     const soundType = detectSoundType(asset.sdefPath);
     const typeInfo = SOUND_TYPES[soundType] || SOUND_TYPES.generic;
     const loopType = guessLoopType(asset.sdefPath);
+    const abReady = originalForWaves(asset.waves || []);
     const loopTag = loopType === 'loop'
-      ? '<span class="tag tag-blue">loop</span>'
+      ? `<span class="play-tag play-tag--loop" title="Loop">${getIcon('repeat', 'w-3 h-3')}Loop</span>`
       : loopType === 'one-shot'
-        ? '<span class="tag tag-amber">one-shot</span>'
+        ? `<span class="play-tag play-tag--once" title="One-shot">${getIcon('zap', 'w-3 h-3')}1×</span>`
         : '';
 
     const rawNote = getAssetNote(asset.sdefPath);
@@ -846,7 +849,7 @@ function renderVirtualList(reset = false) {
         <div>
           <span class="tag" title="${escapeHtml(typeInfo.description)}" style="font-size:10px; display:inline-flex; align-items:center; gap:4px;">${typeIconHtml} ${escapeHtml(typeInfo.label)}</span>
         </div>
-        <div>${loopTag}</div>
+        <div class="lib-loopcell">${loopTag}${abReady ? `<span class="ab-mark" title="A/B: original readable in your DCS">${getIcon('headphones', 'w-3 h-3')}</span>` : ''}</div>
         <div>${noteSnippet}</div>
       </div>
     `;
@@ -1145,18 +1148,21 @@ async function openScannerModal(isFirstLaunch = false) {
   let savedGamesPath = globalSettings.savedGamesPath || '';
 
   // Auto detect if empty
-  if (!dcsPath && window.electronAPI) {
-    const dcsDefault = 'C:/Program Files/Eagle Dynamics/DCS World';
-    if (await window.electronAPI.exists(dcsDefault)) dcsPath = dcsDefault;
+  // Desktop: search every drive and take the install DCS updated last
+  if (!dcsPath && window.nativeAPI) {
+    const installs = await window.nativeAPI.detectDcsInstalls().catch(() => []);
+    if (installs.length) dcsPath = installs[0].path;
   }
 
-  if (!savedGamesPath && window.electronAPI) {
-    const home = await window.electronAPI.getUserHome();
+  if (!savedGamesPath && window.nativeAPI) {
+    const home = await window.nativeAPI.getUserHome();
     const sgDefault = home ? `${home}/Saved Games/DCS` : '';
     // Let's also check DCS.openbeta as a fallback if plain DCS isn't there, 
     // even though user said no more openbeta, it doesn't hurt to check if 'DCS' doesn't exist.
-    if (sgDefault && await window.electronAPI.exists(sgDefault)) {
+    if (sgDefault && await window.nativeAPI.exists(sgDefault)) {
       savedGamesPath = sgDefault;
+    } else if (home && await window.nativeAPI.exists(`${home}/Saved Games/DCS.openbeta`)) {
+      savedGamesPath = `${home}/Saved Games/DCS.openbeta`;
     }
   }
 
@@ -1199,13 +1205,13 @@ async function openScannerModal(isFirstLaunch = false) {
       { id: 'cancel', label: t('library.scanner.cancel'), class: 'btn-secondary' }
     ],
     onRender: (modalEl) => {
-      if (window.electronAPI) {
+      if (window.nativeAPI) {
         modalEl.querySelector('#browse-dcs-btn').addEventListener('click', async () => {
-          const res = await window.electronAPI.selectDirectory();
+          const res = await window.nativeAPI.selectDirectory();
           if (res) modalEl.querySelector('#scan-dcs-path').value = res;
         });
         modalEl.querySelector('#browse-sg-btn').addEventListener('click', async () => {
-          const res = await window.electronAPI.selectDirectory();
+          const res = await window.nativeAPI.selectDirectory();
           if (res) modalEl.querySelector('#scan-sg-path').value = res;
         });
       }
@@ -1240,11 +1246,11 @@ async function runDcsScanner(dcsPath, sgPath) {
     let totalAssetsCount = 0;
 
     // 1. Read base list
-    if (dcsPath && window.electronAPI) {
+    if (dcsPath && window.nativeAPI) {
       if (loaderSub) loaderSub.textContent = "Parsing base sdef list...";
       const basePath = dcsPath + '/Doc/Sounds/sdef_and_wave_list.txt';
-      if (await window.electronAPI.exists(basePath)) {
-        const text = await window.electronAPI.readTextFile(basePath);
+      if (await window.nativeAPI.exists(basePath)) {
+        const text = await window.nativeAPI.readTextFile(basePath);
         if (text) {
           const baseData = parseSdefList(text);
           combinedData.sections.push(...baseData.sections);
@@ -1257,12 +1263,12 @@ async function runDcsScanner(dcsPath, sgPath) {
     }
 
     // 2. Scan CoreMods
-    if (dcsPath && window.electronAPI) {
+    if (dcsPath && window.nativeAPI) {
       if (loaderSub) loaderSub.textContent = "Scanning CoreMods for sdefs...";
       showToast('Scanning CoreMods. This may take a while...', 'info');
       const coreModsPath = dcsPath + '/CoreMods';
-      if (await window.electronAPI.exists(coreModsPath)) {
-        const sdefs = await window.electronAPI.scanSdefs(coreModsPath);
+      if (await window.nativeAPI.exists(coreModsPath)) {
+        const sdefs = await window.nativeAPI.scanSdefs(coreModsPath);
 
         const coreSectionMap = {};
 
@@ -1322,11 +1328,11 @@ async function runDcsScanner(dcsPath, sgPath) {
     }
 
     // 3. Scan Saved Games Mods
-    if (sgPath && window.electronAPI) {
+    if (sgPath && window.nativeAPI) {
       if (loaderSub) loaderSub.textContent = "Scanning Saved Games Mods...";
       const sgModsPath = sgPath + '/Mods';
-      if (await window.electronAPI.exists(sgModsPath)) {
-        const sdefs = await window.electronAPI.scanSdefs(sgModsPath);
+      if (await window.nativeAPI.exists(sgModsPath)) {
+        const sdefs = await window.nativeAPI.scanSdefs(sgModsPath);
         const sgSection = { name: "SavedGames Mods", modPrefix: "SavedGames Mods", assets: [] };
 
         for (const sdef of sdefs) {

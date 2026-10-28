@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bundled sound-type pack index",
+  "type": "object",
+  "required": ["files"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "files": { "type": "array", "items": { "type": "string" }, "description": "Pack files in public/sound-types, loaded in order." }
+  }
+}

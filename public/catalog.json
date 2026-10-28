@@ -1,0 +1,9 @@
+{
+  "$schema": "../schemas/catalog.schema.json",
+  "schemaVersion": 1,
+  "name": "Bundled Catalog",
+  "presets": [
+    { "id": "fa-18c", "url": "presets/preset_FA-18C.json" }
+  ],
+  "soundTypes": []
+}

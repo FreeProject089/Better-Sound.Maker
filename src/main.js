@@ -3,7 +3,13 @@
  * Better Sound.Maker
  */
 
+import './platform/native.js';
+import './intro/intro.js';
+import { installCrashLog, breadcrumb } from './utils/crash-log.js';
+
+installCrashLog();
 import './style.css';
+import './styles/shell.css';
 import rawCfg from './Load.cfg?raw';
 import { renderNav } from './components/nav.js';
 import { renderLibrary } from './pages/library.js';
@@ -70,12 +76,12 @@ async function checkReleaseNotes() {
     const lastVersion = localStorage.getItem(LAST_VERSION_KEY);
 
     if (lastVersion !== CURRENT_VERSION) {
-        if (window.electronAPI) {
+        if (window.nativeAPI) {
             try {
-                const appPath = await window.electronAPI.getAppPath();
+                const appPath = await window.nativeAPI.getAppPath();
                 // Release notes are kept for v1.0.1+
                 const notePath = `${appPath}/Update/.md/PATCH_NOTES_v${CURRENT_VERSION}.md`;
-                const content = await window.electronAPI.readTextFile(notePath);
+                const content = await window.nativeAPI.readTextFile(notePath);
 
                 if (content) {
                     const { showModal } = await import('./utils/modal.js');
@@ -104,15 +110,15 @@ async function checkReleaseNotes() {
 async function showAllReleaseNotes() {
     try {
         const { showModal } = await import('./utils/modal.js');
-        const isElectron = !!window.electronAPI;
+        const isNative = !!window.nativeAPI;
         let mdFiles = [];
         let otherFiles = [];
         let appPath = '';
 
-        if (isElectron) {
-            appPath = await window.electronAPI.getAppPath();
-            mdFiles = await window.electronAPI.readDir(`${appPath}/Update/.md`).catch(() => []);
-            otherFiles = await window.electronAPI.readDir(`${appPath}/Update/Other`).catch(() => []);
+        if (isNative) {
+            appPath = await window.nativeAPI.getAppPath();
+            mdFiles = await window.nativeAPI.readDir(`${appPath}/Update/.md`).catch(() => []);
+            otherFiles = await window.nativeAPI.readDir(`${appPath}/Update/Other`).catch(() => []);
         } else {
             // Fallback for browser: hardcoded list of major versions
             mdFiles = ['PATCH_NOTES_v1.0.3.md', 'PATCH_NOTES_v1.0.4.md'];
@@ -170,8 +176,8 @@ async function showAllReleaseNotes() {
                     const path = btn.dataset.notePath;
                     try {
                         let content = '';
-                        if (isElectron) {
-                            content = await window.electronAPI.readTextFile(`${appPath}/${path}`);
+                        if (isNative) {
+                            content = await window.nativeAPI.readTextFile(`${appPath}/${path}`);
                         } else {
                             const resp = await fetch(`./${path}`);
                             content = await resp.text();
@@ -201,34 +207,42 @@ async function showAllReleaseNotes() {
 }
 
 // Initialize app
+// Ctrl+K: command palette · Ctrl+Shift+L: generate a crash log
+document.addEventListener('keydown', async (e) => {
+    if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const { toggleCommandPalette } = await import('./components/command-palette.js');
+        toggleCommandPalette();
+        return;
+    }
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        const { openCrashLogDialog } = await import('./components/crash-dialog.js');
+        openCrashLogDialog();
+    }
+});
+
 async function init() {
     // Parse Load.cfg immediately
     const cfg = {};
     rawCfg.split('\n').forEach(line => {
         if (line.includes('=')) {
-            const [k, v] = line.split('=');
-            cfg[k.trim()] = v.trim();
+            const i = line.indexOf('=');
+            cfg[line.slice(0, i).trim()] = line.slice(i + 1).trim();
         }
     });
     window.APP_CONFIG = cfg;
 
-    // Start Loader Image swapping
-    let spinImg = document.getElementById('loader-img-spin');
-    let useYeux = false;
-    const spinInterval = setInterval(() => {
-        if (spinImg) {
-            useYeux = !useYeux;
-            spinImg.src = useYeux ? '/Tasky_yeux1.webp' : '/Tasky.webp';
-        }
-    }, 400); // Swap every 400ms
+    const versionEl = document.getElementById('bi-version');
+    if (versionEl) versionEl.textContent = `v${APP_VERSION}`;
 
     // Init i18n first
     const { initI18n, t } = await import('./utils/i18n.js');
     await initI18n();
     window.i18n_t = t;
 
-    const loaderText = document.getElementById('loader-text');
-    if (loaderText) loaderText.textContent = t('common.loading') || 'Loading Better Sound.Maker...';
+
+    window.__bsmIntro?.status(t('common.loading'));
 
     // Render sidebar
     const sidebar = document.getElementById('sidebar');
@@ -246,14 +260,14 @@ async function init() {
     // Auto-scan library if enabled
     setTimeout(async () => {
         const state = getState();
-        if (state.globalSettings?.autoScan && state.globalSettings.dcsPath && window.electronAPI) {
+        if (state.globalSettings?.autoScan && state.globalSettings.dcsPath && window.nativeAPI) {
             try {
                 // Determine sdef path
                 let dcsPath = state.globalSettings.dcsPath.replace(/\\/g, '/');
                 if (dcsPath.endsWith('/')) dcsPath = dcsPath.slice(0, -1);
                 const sdefPath = `${dcsPath}/Doc/Sounds/sdef_and_wave_list.txt`;
 
-                const text = await window.electronAPI.readTextFile(sdefPath);
+                const text = await window.nativeAPI.readTextFile(sdefPath);
                 if (text) {
                     const { parseSdefList } = await import('./data/sdef-parser.js');
                     const { setLibraryData, saveLibraryToStorage } = await import('./state/store.js');
@@ -300,28 +314,17 @@ async function init() {
         renderNav(document.getElementById('sidebar'));
     });
 
+    // Undo / redo (Ctrl+Z, Ctrl+Y); redraw the page after a step
+    const { initHistory } = await import('./state/history.js');
+    initHistory();
+    window.addEventListener('bsm-history-applied', () => renderCurrentPage());
+
     // Initial render
     await renderCurrentPage();
 
-    // Loader Finish Sequence
-    clearInterval(spinInterval);
-    if (spinImg) spinImg.style.display = 'none';
-    const happyImg = document.getElementById('loader-img-happy');
-    if (happyImg) happyImg.style.opacity = '1';
-    if (loaderText) {
-        loaderText.textContent = t('common.ready') || 'Ready!';
-        loaderText.style.animation = 'none';
-        loaderText.style.opacity = '1';
-    }
-
-    // Hide loader after a moment of happiness
-    setTimeout(() => {
-        const loader = document.getElementById('global-loader');
-        if (loader) {
-            loader.classList.add('hidden');
-            setTimeout(() => loader.remove(), 500); // remove after fade
-        }
-    }, 1200);
+    // Intro: Tasky turns happy, then the splash fades
+    window.__bsmIntro?.status(t('common.ready'), '');
+    window.__bsmIntro?.ready();
 
     // Initialise Debug Panel
     initDebugPanel();
@@ -429,6 +432,8 @@ async function renderCurrentPage() {
     const state = getState();
     const page = state.currentPage || 'library';
     const container = document.getElementById('page-container');
+    window.__bsmCurrentPage = page;
+    breadcrumb(`page: ${page}`);
 
     if (!container) return;
 

@@ -1,44 +1,28 @@
 /**
- * src/utils/modal.js — Generic modal utility
+ * src/utils/modal.js — Older modal API, kept for its callers
+ *
+ * showModal({ title, content, buttons: [{ text, primary, onClick, preventClose }] })
+ * is forwarded to the one modal shell in src/components/modal.js.
  */
 
-export function showModal({ title, content, buttons = [], className = '' }) {
-  const overlay = document.getElementById('modal-overlay');
-  if (!overlay) return;
+import { showModal as showShellModal, hideModal } from '../components/modal.js';
 
-  overlay.classList.remove('hidden');
-  overlay.innerHTML = `
-    <div class="modal ${className}">
-      <div class="modal-header">
-        <h2 class="modal-title">${title}</h2>
-        <button class="modal-close" id="modal-close">&times;</button>
-      </div>
-      <div class="modal-body">${content}</div>
-      <div class="modal-footer">
-        ${buttons.map((btn, i) => `
-          <button class="btn ${btn.primary ? 'btn-primary' : 'btn-secondary'}" id="modal-btn-${i}">
-            ${btn.text}
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `;
-
-  // Bind close
-  const closeBtn = document.getElementById('modal-close');
-  closeBtn?.addEventListener('click', closeModal);
-
-  // Bind buttons
-  buttons.forEach((btn, i) => {
-    const el = document.getElementById(`modal-btn-${i}`);
-    el?.addEventListener('click', () => {
-      if (btn.onClick) btn.onClick();
-      if (!btn.preventClose) closeModal();
-    });
+export function showModal({ title, content, buttons = [], className = '', ...rest }) {
+  return showShellModal({
+    ...rest,
+    title,
+    content,
+    className,
+    actions: buttons.map((btn, i) => ({
+      id: `btn-${i}`,
+      label: btn.text,
+      class: btn.primary ? 'btn-primary' : 'btn-secondary',
+      onClick: btn.onClick,
+      keepOpen: !!btn.preventClose,
+    })),
   });
 }
 
 export function closeModal() {
-  const overlay = document.getElementById('modal-overlay');
-  if (overlay) overlay.classList.add('hidden');
+  hideModal();
 }

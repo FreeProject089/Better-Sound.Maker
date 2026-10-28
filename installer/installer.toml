@@ -1,0 +1,47 @@
+# BetterInstaller config for Better Sound.Maker.
+# Every field: BetterInstaller/GUIDE.md. Built by scripts/release.ps1.
+
+[app]
+id        = "com.bettersoundmaker.app"   # same identifier as tauri.conf.json
+name      = "Better Sound.Maker"
+version   = "1.1.0"                     # synced from package.json by scripts/release.ps1
+publisher = "FreeProject089"
+homepage  = "https://github.com/FreeProject089/Better-Sound.Maker"
+platforms = ["windows"]
+
+[branding]
+accent = "#06b6d4"
+logo   = "assets/logo.png"
+
+[i18n]
+default = "auto"
+
+[install]
+# No default_dir: BetterInstaller always proposes %LOCALAPPDATA%\Programs\<name> (no UAC).
+main_exe        = "better-sound-maker.exe"
+create_shortcuts = true
+desktop_shortcut = true
+autostart        = false
+allow_portable   = true
+
+[security]
+# Ed25519 public key; the private key lives outside the repo
+# (~/.betterinstaller/better-sound-maker/private.key, or BSM_BI_PRIVATE_KEY in CI).
+public_key        = "7296e2839b8c52b3e96d9c82ad0d80db9a4afa6c094829574d322a5645d83d2e"
+require_signature = true
+
+[update]
+manifest_url = "https://github.com/FreeProject089/Better-Sound.Maker/releases/latest/download/update.json"
+auto_check   = true
+allow_delta  = true
+
+[[components]]
+id          = "core"
+name        = "Better Sound.Maker"
+description = "Main application — required."
+required    = true
+default     = true
+size_mb     = 20
+
+[handoff]
+enabled = false
