@@ -1,108 +1,47 @@
-# 🎧 Better Sound.Maker
+<div align="center">
 
-**Better Sound.Maker** is a powerful, modern desktop application designed to streamline the creation and management of sound mods for **DCS World**. It provides a comprehensive suite of tools to browse assets, edit SDEF parameters visually, manage custom audio, and package complete mods ready for installation.
+  <img src="public/BSM.png" alt="Better Sound.Maker" width="120" />
 
-![App Version](https://img.shields.io/badge/version-1.0.8-blue)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Electron-brightgreen)
-![License](https://img.shields.io/badge/license-Apache--2.0-orange)
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I2I31ZIPPG)
----
+  # Better Sound.Maker
 
-## ✨ Key Features
+  ![Version](https://img.shields.io/badge/version-1.1.0-blue.svg?style=flat-square)
+  ![License](https://img.shields.io/badge/license-Apache--2.0-green.svg?style=flat-square)
+  ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-important?style=flat-square)
+  ![DCS World](https://img.shields.io/badge/for-DCS%20World-0b1220?style=flat-square)
 
-###  Assets Library
-Browse thousands of DCS sound assets with ease. The library features a deep, recursive folder tree navigation, search functionality, and a detailed preview panel for every `.sdef` and `.wav` file.
+  <img src=".github/screenshots/sdef-editor.png" alt="Better Sound.Maker 1.1.0 — SDEF editor" width="100%" />
 
-###  Visual SDEF Editor
-Forget manual text editing. Tweak internal/external radii, gain, pitch, cones, and play modes (loop vs. one-shot) through a clean, intuitive interface. A real-time Gain-Distance model helps you visualize how the sound will behave in 3D space.
+</div>
 
-###  Project Management
-Organize your mod project in one place. Link your custom `.wav` or `.ogg` files to original DCS sound paths, track missing audio, and preview your changes instantly.
+## English
 
-###  Presets & Templates
-Save your favorite SDEF configurations as presets and apply them to other assets with a single click. Speed up your workflow by reusing proven distance and volume settings.
+A sound-mod maker for DCS World. Pick the game sounds you want to replace, drop in your audio,
+tune each sound's SDEF (volume, distance, cone, loop) with a live checker, listen to it as it
+will sound in game, and build a mod folder ready for `Mods\resource`, OVGME or Better Mods
+Manager. Templates built from DCS's own files, an audio editor, A/B comparison, GitHub
+collaboration and a community preset catalog.
 
-###  GitHub Collaboration
-Sync your project with your team. Built-in integration with GitHub allows you to push your full mod build, pull changes from teammates, share notes, and restore any previous version of your project.
+**[Read the README in English](README_EN.md)** · [What's new in 1.1.0](Update/.md/PATCH_NOTES_v1.1.0.md)
 
-### One-Click Build
-Generate a complete, DCS-ready mod folder structure. The app automatically creates `entry.lua`, organizes the `Sounds` directory, and handles format conversions (WAV/OGG) for you.
+## Français
 
----
+Un créateur de mods son pour DCS World. Choisissez les sons du jeu à remplacer, déposez votre
+audio, réglez le SDEF de chaque son (volume, distance, cône, boucle) avec un vérificateur en
+direct, écoutez-le comme en jeu, puis construisez un dossier de mod prêt pour `Mods\resource`,
+OVGME ou Better Mods Manager. Templates issus des fichiers de DCS, éditeur audio, comparaison
+A/B, collaboration GitHub et catalogue de presets communautaire.
 
-## 🛠️ Technical Stack
-
-- **Core:** Vanilla JavaScript & HTML5
-- **Styling:** Custom CSS with Glassmorphism aesthetics
-- **Desktop Wrapper:** Electron
-- **Bundler/Dev Server:** Vite
-- **Storage:** IndexedDB (via `idb-keyval`) for local persistence
-- **Icons:** Lucide-JS
+**[Lire le README en français](README_FR.md)** · [Nouveautés de la 1.1.0](Update/.md/PATCH_NOTES_v1.1.0.md)
 
 ---
 
-## 🚀 Getting Started
+<div align="center">
 
-### Prerequisites
+  [Download / Télécharger](https://github.com/FreeProject089/Better-Sound.Maker/releases/latest) •
+  [Documentation](https://freeproject089.github.io/Better-Sound.Maker/) •
+  [Discord](https://discord.gg/CTaaEF9R75) •
+  [Ko-fi](https://ko-fi.com/I2I31ZIPPG)
 
-- [Node.js](https://nodejs.org/) (v16 or higher recommended)
-- [npm](https://www.npmjs.com/)
+  <sub>Apache-2.0 · [LICENSE](LICENSE) · [Changelog](CHANGELOG.md)</sub>
 
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/FreeProject089/Better-Sound.Maker.git
-   cd Better-Sound.Maker
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Running Locally
-
-To start the development server (browser-based):
-```bash
-npm run dev
-```
-
-To run the application in the **Electron** desktop environment:
-```bash
-npm run electron:dev
-```
-
----
-
-## 📦 Building the App
-
-To generate a production-ready Windows installer (`.exe`):
-
-1. **Important:** Ensure the application is closed before building.
-2. Run the build script:
-   ```bash
-   npm run electron:build
-   ```
-3. The installer will be located in the `release/` directory.
-
----
-
-## 📖 How to use in DCS
-
-1. **Build** your mod using the app.
-2. Copy the generated mod folder to your `Saved Games/DCS/Mods/resource/` directory.
-3. Start DCS World — the mod will be automatically mounted via the generated `entry.lua`.
-
----
-
-## 👨‍💻 Author
-
-Created & Developed by **FreeProject089**.
-
-- **Discord:** [Join the community](https://discord.gg/CTaaEF9R75)
-- **GitHub:** [@FreeProject089](https://github.com/FreeProject089)
-
----
-
-*Made for the DCS World Community with ❤️.*
+</div>
